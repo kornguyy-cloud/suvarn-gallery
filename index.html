@@ -1,554 +1,685 @@
-<!doctype html>  
-<html lang="th">  
-<head>  
-  <meta charset="UTF-8" />  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  
-  <title>หอศิลป์สุวรรณวิจิตร | Suvarn Fine Art Gallery</title>  
-  <meta name="description" content="แกลเลอรีงานศิลปะภาพวาดไทยและต่างประเทศ โทนสีครีมทอง พร้อมระบบสมาชิกและข้อมูลค่าคอมมิชชั่น" />  
-  <link rel="preconnect" href="https://fonts.googleapis.com" />  
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />  
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Noto+Sans+Thai:wght@400;500;600;700&family=Noto+Serif+Thai:wght@600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />  
-  <script defer src="https://cdn.tailwindcss.com"></script>  
-  <style>  
-    :root { --cream: #FAF8F5; --gold: #C59B27; --gold-deep: #8C6A10; --ink: #1E1B18; --muted: #5C544B; }  
-    html, body { background: var(--cream); color: var(--ink); font-family: "Noto Sans Thai", system-ui, sans-serif; margin: 0; }  
-    h1, h2, h3, h4, .font-editorial { font-family: "Noto Serif Thai", "Cormorant Garamond", Georgia, serif; }  
-    .tabular-nums { font-variant-numeric: tabular-nums; }  
-    .hold-interactive { user-select: none; -webkit-user-select: none; touch-action: pan-y; }  
-    .card { background: #FFF; border: 1px solid rgba(197,155,39,.6); border-radius: .75rem; box-shadow: 0 1px 2px rgba(0,0,0,.04); }  
-    .card-gold { background: #FFF; border: 1px solid #C59B27; border-radius: .75rem; box-shadow: 0 1px 2px rgba(0,0,0,.05); }  
-    .btn-gold { background: #C59B27; color: #1E1B18; font-weight: 700; border: 1px solid #C59B27; border-radius: .5rem; cursor: pointer; }  
-    .btn-gold:hover { background: #B2891E; }  
-    .btn-gold:disabled { background: #EBE6DF; color: #5C544B; border-color: rgba(197,155,39,.3); cursor: not-allowed; }  
-    .btn-out { background: #FFF; color: #1E1B18; font-weight: 600; border: 1px solid #C59B27; border-radius: .5rem; cursor: pointer; }  
-    .btn-out:hover { background: #FAF8F5; }  
-    .inp { width: 100%; padding: .55rem .85rem; background: #FAF8F5; border: 1px solid rgba(197,155,39,.6); border-radius: .5rem; outline: none; color: #1E1B18; }  
-    .inp:focus { border-color: #C59B27; background: #FFF; }  
-  </style>  
-</head>  
-<body class="min-h-screen flex flex-col bg-[#FAF8F5] text-[#1E1B18] pb-16">  
-  <div id="app"></div>  
-  
-  <script>  
-  (() => {  
-    const LINE_URL = "https://lin.ee/n2l2Qqx";  
-    const ADMIN_PASSCODE = "195466";  
-    const THAI_BANKS = ["ธนาคารกสิกรไทย (KBANK)", "ธนาคารไทยพาณิชย์ (SCB)", "ธนาคารกรุงเทพ (BBL)", "ธนาคารกรุงไทย (KTB)", "ธนาคารกรุงศรีอยุธยา (BAY)", "ธนาคารทหารไทยธนชาต (TTB)"];  
-  
-    // เปลี่ยนลิงก์รูปภาพด้านล่างเป็น URL รูปจริงของคุณได้ทันที  
-    const IMG = {  
-      th1: "https://picsum.photos/seed/suvarn-temple-lotus/800/550", in1: "https://picsum.photos/seed/suvarn-venice-canal/800/550",  
-      th2: "https://picsum.photos/seed/suvarn-chaophraya/800/550", in2: "https://picsum.photos/seed/suvarn-stilllife-peony/800/550",  
-      th3: "https://picsum.photos/seed/suvarn-lanna-mist/800/550", in3: "https://picsum.photos/seed/suvarn-kyoto-autumn/800/550",  
-      th4: "https://picsum.photos/seed/suvarn-emerald-falls/800/550", in4: "https://picsum.photos/seed/suvarn-amalfi-coast/800/550",  
-      th5: "https://picsum.photos/seed/suvarn-ayutthaya-lantern/800/550", in5: "https://picsum.photos/seed/suvarn-vienna-hall/800/550",  
-      th6: "https://picsum.photos/seed/suvarn-swan-lotus/800/550", in6: "https://picsum.photos/seed/suvarn-nordic-fjord/800/550",  
-      th7: "https://picsum.photos/seed/suvarn-sukhothai/800/550", in7: "https://picsum.photos/seed/suvarn-paris-opera/800/550",  
-      th8: "https://picsum.photos/seed/suvarn-royal-barge/800/550", in8: "https://picsum.photos/seed/suvarn-tuscany-villa/800/550",  
-      th9: "https://picsum.photos/seed/suvarn-floating-market/800/550", in9: "https://picsum.photos/seed/suvarn-dutch-galleon/800/550",  
-      th10: "https://picsum.photos/seed/suvarn-kinnaree-gold/800/550", in10: "https://picsum.photos/seed/suvarn-swiss-alps/800/550",  
-      th11: "https://picsum.photos/seed/suvarn-bodhi-gold/800/550"  
-    };  
-  
-    const ARTWORKS = [  
-      ["art-th-01","วิหารทองอรุณและบัวบูชา","อ.สุรศักดิ์ พงษ์ไพบูลย์","thai","พ.ศ. 2567","สีฝุ่นธรรมชาติและทองคำเปลวแท้","120 × 90 ซม.","คุณพิพัฒน์ วงศ์สุวรรณ",48000,480000,"จิตรกรรมไทยร่วมสมัยผสานสถาปัตยกรรมอยุธยากับแสงอรุณรุ่งบนผืนน้ำ ประดับทองคำเปลวแท้",IMG.th1],  
-      ["art-intl-01","แสงทองแห่งคลองแกรนด์คาแนล เวนิส","มาร์โก เบลลินี","international","ค.ศ. 2024","สีน้ำมันบนผ้าใบเกรดพิพิธภัณฑ์","140 × 100 ซม.","เอเลนา รอสโตวา (Milan)",85000,850000,"ทิวทัศน์เมืองเวนิสยามอาทิตย์อัสดง แสงสีทองสะท้อนผิวน้ำและสถาปัตยกรรมหินปูนคลาสสิก",IMG.in1],  
-      ["art-th-02","สายน้ำเจ้าพระยายามสนธยา","รสลินทร์ จิตรกรชัย","thai","พ.ศ. 2568","สีน้ำมันปาดเกรียงบนผ้าใบ","110 × 80 ซม.","คุณนลินี เตชะไพบูลย์",52500,525000,"วิถีชีวิตสายน้ำเจ้าพระยาในห้วงเวลาทองคำ เรือไม้สักแล่นผ่านเงาพระปรางค์วัดอรุณ",IMG.th2],  
-      ["art-intl-02","หุ่นนิ่งโบตั๋นขาวและเครื่องทองเหลืองโบราณ","แคลร์ ดูบัวส์","international","ค.ศ. 2023","สีน้ำมันเทคนิคคลาสสิก","90 × 70 ซม.","Henrik Lindqvist (Stockholm)",64000,640000,"จิตรกรรมหุ่นนิ่งสไตล์นีโอคลาสสิกจากปารีส ดอกโบตั๋นสีงาช้างในแจกันพอร์ซเลนเคลือบทอง",IMG.in2],  
-      ["art-th-03","ม่านหมอกล้านนาและนาขั้นบันไดสีทอง","ธนากร ศรีล้านนา","thai","พ.ศ. 2568","สีแร่ธรรมชาติและทองคำเปลว","130 × 95 ซม.","มูลนิธิศิลปวัฒนธรรมเชียงใหม่",42000,420000,"ทัศนียภาพขุนเขาภาคเหนือยามเช้า ผืนหมอกสีงาช้างโอบล้อมนาขั้นบันไดต้องแสงแดดสีทอง",IMG.th3],  
-      ["art-intl-03","ศาลาฤดูใบไม้ร่วงแห่งเกียวโต","เคนจิ ทาคาฮาชิ","international","ค.ศ. 2025","หมึกซุมิเอะและทองคำเปลวบนผ้าไหม","105 × 80 ซม.","Sato Heritage Gallery (Tokyo)",72000,720000,"จิตรกรรมญี่ปุ่นร่วมสมัย ผสานพู่กันหมึกเข้ากับเมฆทองคำเปลวและใบเมเปิลสีชาด",IMG.in3],  
-      ["art-th-04","ธารน้ำตกมรกตและเอื้องผึ้งป่าหิมพานต์","อรุณพงษ์ วนาศิลป์","thai","พ.ศ. 2568","สีแร่ธรรมชาติและทองคำเปลว","115 × 85 ซม.","คุณศิริพร รัตนมงคล",36000,360000,"ป่าดิบชื้นภาคเหนือ น้ำตกมรกตไหลผ่านโขดหินมอสและช่อกล้วยไม้ป่าสีขาว",IMG.th4],  
-      ["art-intl-04","ชายฝั่งอามัลฟียามแสงแดดสีทอง","อันโตนิโอ เฟร์รารา","international","ค.ศ. 2024","สีน้ำมันอิมพาสโตบนลินินอิตาลี","125 × 90 ซม.","Fondazione Arte Napoli",68000,680000,"หมู่บ้านริมหน้าผาอามัลฟีอาบแสงอาทิตย์เมดิเตอร์เรเนียน เหนือผืนน้ำทะเลสีคราม",IMG.in4],  
-      ["art-th-05","โคมยี่เป็งและกระทงสายแห่งอโยธยา","กิตติภพ สุวรรณธาดา","thai","พ.ศ. 2568","สีน้ำมันและปิดทองคำเปลว","135 × 95 ซม.","คุณธนัท ดำรงค์ศิลป์",92000,920000,"ค่ำคืนแห่งประเพณีไทย โคมไฟสีทองลอยส่องสว่างเหนือพระปรางค์วัดโบราณ",IMG.th5],  
-      ["art-intl-05","เรือนกระจกหลวงแห่งเวียนนา","ฟรานซ์ ฟอน ไฮเดน","international","ค.ศ. 2024","สีน้ำมันอะคาเดมิกขนาดใหญ่","150 × 110 ซม.","Belvedere Kunsthandel (Vienna)",110000,1100000,"สถาปัตยกรรมภายในเรือนกระจกหลวงกรุงเวียนนา ซุ้มโค้งกระจกต้องแสงบ่ายสีทอง",IMG.in5],  
-      ["art-th-06","หงส์สุวรรณในสระบัวหิมพานต์","ครูช่างปราณีต จิตรกรรมไทย","thai","พ.ศ. 2568","สีฝุ่นโบราณและทองคำเปลวบนผ้าไหม","100 × 75 ซม.","มูลนิธิอนุรักษ์ศิลป์ไทย",78000,780000,"จิตรกรรมไทยประเพณีอันวิจิตรบรรจง หงส์ขาวทรงเครื่องกลางสระบัวทองคำ",IMG.th6],  
-      ["art-intl-06","ฟยอร์ดนอร์ดิกยามอาทิตย์อัสดงสีทอง","เอริก โซลเบิร์ก","international","ค.ศ. 2025","สีน้ำมันบนผ้าใบลินินเบลเยียม","130 × 90 ซม.","Oslo Fine Collectors Guild",76000,760000,"ฟยอร์ดนอร์เวย์อันสงบงัน ยอดเขาหิมะสะท้อนแสงแชมเปญและสีกลีบกุหลาบ",IMG.in6],  
-      ["art-th-07","เจดีย์สุโขทัยในสายหมอกอรุณ","อ.กิตติศักดิ์ สุโขทัย","thai","พ.ศ. 2567","สีฝุ่นแร่และทองคำเปลว","120 × 90 ซม.","คุณปรเมศวร์ สุโขทัยกุล",58000,580000,"ความสงบงามของมหาเจดีย์ทรงพุ่มข้าวบิณฑ์แห่งกรุงสุโขทัยในยามเช้า",IMG.th7],  
-      ["art-intl-07","ถนนโอเปร่ากรุงปารีสหลังสายฝน","ฌอง-ลุค มาร์แตง","international","ค.ศ. 2024","สีน้ำมันอิมเพรสชันนิสม์","110 × 85 ซม.","Galerie Champs-Élysées",54000,540000,"ถนนสายประวัติศาสตร์หน้าโรงอุปรากรปารีสยามเย็น พื้นหินสะท้อนแสงโคมไฟทอง",IMG.in7],  
-      ["art-th-08","กระบวนพยุหยาตราทางชลมารคสุวรรณ","ศ.ดร.วิจิตร บวรศิลป์","thai","พ.ศ. 2568","สีน้ำมันและทองคำเปลว 24K","180 × 120 ซม.","หอศิลป์สุวรรณวิจิตร (ชุดเกียรติยศ)",160000,1600000,"มหากาพย์แห่งราชประเพณีไทย เรือพระที่นั่งสุพรรณหงส์เหนือลำน้ำเจ้าพระยา",IMG.th8],  
-      ["art-intl-08","คฤหาสน์ทัสคานีท่ามกลางทิวสนทอง","ลอเรนโซ คอนติ","international","ค.ศ. 2024","สีน้ำมันบนผ้าใบลินิน","115 × 85 ซม.","Casa d'Arte Firenze",49000,490000,"เนินเขาแคว้นทัสคานีและแนวต้นสนไซเปรสเรียงรายสู่คฤหาสน์หินเก่าแก่",IMG.in8],  
-      ["art-th-09","ตลาดน้ำยามเช้าและดอกบัวสยาม","อรุณวรรณ ศิลป์สยาม","thai","พ.ศ. 2568","สีอะคริลิกผสมสีฝุ่น","95 × 70 ซม.","คุณสุภาวดี เจริญวัฒนา",31000,310000,"ชีวิตชีวาของตลาดน้ำโบราณยามรุ่งอรุณ เรือพายบรรทุกดอกบัวชมพู",IMG.th9],  
-      ["art-intl-09","กองเรือสำเภายุคทองแห่งดัตช์","เฮนดริก ฟาน เดอร์ เบิร์ก","international","ค.ศ. 2023","สีน้ำมันเทคนิคดัตช์มาสเตอร์","145 × 105 ซม.","Rijkscollectie Rotterdam",128000,1280000,"เรือใบสำเภาหลวงยุคทองฝ่าเกลียวคลื่นสะท้อนพลังแห่งแสงเงาชั้นครู",IMG.in9],  
-      ["art-th-10","ลายรดน้ำกินรีป่าหิมพานต์ทองคำ","ครูช่างศิลป์รัตนโกสินทร์","thai","พ.ศ. 2568","ลายรดน้ำปิดทองคำเปลวแท้","120 × 90 ซม.","คลังสมบัติหอศิลป์สุวรรณวิจิตร",96000,960000,"ศิลปะลายรดน้ำชั้นสูงถ่ายทอดกินรีในป่าหิมพานต์เปล่งประกายทองคำ",IMG.th10],  
-      ["art-intl-10","ทะเลสาบแอลป์ยามรุ่งอรุณสีทอง","วิลเฮล์ม เวเบอร์","international","ค.ศ. 2025","สีน้ำมันเกรดพิพิธภัณฑ์","130 × 95 ซม.","Zürich Kunststiftung",82000,820000,"ขุนเขาแอลป์สะท้อนเงาเหนือผืนน้ำสีครามใสประดับกลุ่มเมฆสีทอง",IMG.in10],  
-      ["art-th-11","โพธิ์ทองแห่งความสงบนิรันดร์","ปราโมทย์ วรรณศิลป์","thai","พ.ศ. 2568","สีแร่ธรรมชาติและทองคำเปลว","110 × 80 ซม.","คุณวรินทร กาญจนศิลป์",45000,450000,"ร่มเงาต้นพระศรีมหาโพธิ์ใบสีทองอร่าม สื่อถึงความร่มเย็นเป็นสุข",IMG.th11]  
-    ].map(([id,titleTh,artistTh,origin,year,medium,dimensions,owner,commissionBaht,estimatedValueBaht,description,imageUrl]) => ({  
-      id, titleTh, artistTh, origin, originLabel: origin === "thai" ? "ศิลปะไทย" : "ศิลปะต่างประเทศ", year, medium, dimensions, owner, commissionBaht, estimatedValueBaht, description, imageUrl  
-    }));  
-  
-    const AUCTION_LEVELS = [  
-      { level: 1, nameTh: "เลเวล 1 · กนกปฐมบท", motifNameTh: "ลายกนกเปลว", priceRangeLabel: "1,000 – 15,000 บาท", commissionRangeLabel: "150 – 1,500 บาท" },  
-      { level: 2, nameTh: "เลเวล 2 · ประจำยามวิจิตร", motifNameTh: "ลายประจำยาม", priceRangeLabel: "20,000 – 60,000 บาท", commissionRangeLabel: "2,400 – 7,200 บาท" },  
-      { level: 3, nameTh: "เลเวล 3 · พุ่มข้าวบิณฑ์สยาม", motifNameTh: "ลายพุ่มข้าวบิณฑ์", priceRangeLabel: "80,000 – 150,000 บาท", commissionRangeLabel: "10,400 – 21,000 บาท" },  
-      { level: 4, nameTh: "เลเวล 4 · บัวแก้วมณี", motifNameTh: "ลายบัวแก้วมณี", priceRangeLabel: "200,000 – 450,000 บาท", commissionRangeLabel: "30,000 – 67,500 บาท" },  
-      { level: 5, nameTh: "เลเวล 5 · ช่อฟ้าสุวรรณ", motifNameTh: "ลายช่อฟ้าสุวรรณ", priceRangeLabel: "600,000 – 1,000,000 บาท", commissionRangeLabel: "96,000 – 160,000 บาท" }  
-    ];  
-  
-    const INITIAL_AUCTION_ITEMS = [  
-      [1,0,"ตลาดน้ำยามเช้าและดอกบัวสยาม","อรุณวรรณ ศิลป์สยาม","ศิลปะไทย",1000,150,5,2140,12480,IMG.th9],  
-      [1,1,"หุ่นนิ่งโบตั๋นขาวและเครื่องทองเหลือง","แคลร์ ดูบัวส์","ศิลปะต่างประเทศ",5000,600,8,2480,18920,IMG.in2],  
-      [1,2,"ม่านหมอกล้านนาและนาขั้นบันไดสีทอง","ธนากร ศรีล้านนา","ศิลปะไทย",15000,1500,10,2890,24650,IMG.th3],  
-      [2,0,"ถนนโอเปร่ากรุงปารีสหลังสายฝน","ฌอง-ลุค มาร์แตง","ศิลปะต่างประเทศ",20000,2400,12,3120,31400,IMG.in7],  
-      [2,1,"สายน้ำเจ้าพระยายามสนธยา","รสลินทร์ จิตรกรชัย","ศิลปะไทย",40000,4800,15,3540,38750,IMG.th2],  
-      [2,2,"ชายฝั่งอามัลฟียามแสงแดดสีทอง","อันโตนิโอ เฟร์รารา","ศิลปะต่างประเทศ",60000,7200,18,3980,44200,IMG.in4],  
-      [3,0,"ธารน้ำตกมรกตและเอื้องผึ้งป่าหิมพานต์","อรุณพงษ์ วนาศิลป์","ศิลปะไทย",80000,10400,20,4250,52800,IMG.th4],  
-      [3,1,"ศาลาฤดูใบไม้ร่วงแห่งเกียวโต","เคนจิ ทาคาฮาชิ","ศิลปะต่างประเทศ",120000,15600,23,4690,61300,IMG.in3],  
-      [3,2,"โคมยี่เป็งและกระทงสายแห่งอโยธยา","กิตติภพ สุวรรณธาดา","ศิลปะไทย",150000,21000,25,5120,68900,IMG.th5],  
-      [4,0,"เรือนกระจกหลวงแห่งเวียนนา","ฟรานซ์ ฟอน ไฮเดน","ศิลปะต่างประเทศ",200000,30000,28,5640,76400,IMG.in5],  
-      [4,1,"หงส์สุวรรณในสระบัวหิมพานต์","ครูช่างปราณีต จิตรกรรมไทย","ศิลปะไทย",320000,48000,30,6180,84900,IMG.th6],  
-      [4,2,"ฟยอร์ดนอร์ดิกยามอาทิตย์อัสดงสีทอง","เอริก โซลเบิร์ก","ศิลปะต่างประเทศ",450000,67500,33,6750,92500,IMG.in6],  
-      [5,0,"ลายรดน้ำกินรีป่าหิมพานต์ทองคำ","ครูช่างศิลป์รัตนโกสินทร์","ศิลปะไทย",600000,96000,35,7420,108600,IMG.th10],  
-      [5,1,"กองเรือสำเภายุคทองแห่งดัตช์","เฮนดริก ฟาน เดอร์ เบิร์ก","ศิลปะต่างประเทศ",800000,128000,38,8150,126400,IMG.in9],  
-      [5,2,"กระบวนพยุหยาตราทางชลมารคสุวรรณ","ศ.ดร.วิจิตร บวรศิลป์","ศิลปะไทย",1000000,160000,40,9280,148900,IMG.th8]  
-    ].map(([level,slotIndex,titleTh,artistTh,originLabel,priceBaht,commissionBaht,durationMinutes,participants,likes,imageUrl]) => ({  
-      id: `lv${level}-slot${slotIndex}`, level, slotIndex, titleTh, artistTh, originLabel, priceBaht, commissionBaht, durationMinutes, participants, likes, imageUrl, editionNumber: 1  
-    }));  
-  
-    const POOL = ARTWORKS.map(a => ({ titleTh: a.titleTh, artistTh: a.artistTh, originLabel: a.originLabel, imageUrl: a.imageUrl }));  
-    const KEYS = { users: "suvarn_gallery_users_v1", session: "suvarn_gallery_session_v1", workspaces: "suvarn_gallery_workspaces_v2", auction: "suvarn_gallery_auction_items_v2", cycle: "suvarn_gallery_cycle_24h_slot_v1", view: "suvarn_gallery_active_view_v1" };  
-  
-    const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));  
-    const fmtBaht = n => new Intl.NumberFormat("th-TH").format(Number(n) || 0);  
-    const fmtPhone = p => { const d = String(p || "").replace(/\D/g, ""); return d.length === 10 ? `${d.slice(0,3)}-${d.slice(3,6)}-${d.slice(6)}` : d; };  
-    const maskBank = n => { const d = String(n || "").replace(/\D/g, ""); return d.length < 4 ? "•••• ••***" : `•••• ••${d.slice(-4).slice(0,3)}*`; };  
-    const deriveId = p => `SV-${(String(p || "").replace(/\D/g, "").slice(-6) || "804278").padStart(6, "8")}`;  
-    const slotKey = (lv, sl) => `lv${lv}-slot${sl}`;  
-    const fmtTime = iso => { try { return new Intl.DateTimeFormat("th-TH", { day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit" }).format(new Date(iso)); } catch { return iso; } };  
-    const fmtCountdown = ms => { const s = Math.max(0, Math.ceil(ms / 1000)); return `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`; };  
-    const get24hSlot = ms => Math.floor(ms / 3600000) % 24;  
-    const getSt = (k, fb) => { try { const r = localStorage.getItem(k); return r ? JSON.parse(r) : fb; } catch { return fb; } };  
-    const setSt = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };  
-  
-    function emptyWs(phone) {  
-      return { phone, memberId: deriveId(phone), vipLevel: 1, totalBalanceBaht: 2000000, transactionBalanceBaht: 0, withdrawalPin: null, bankAccount: null, lockedLevels: [], lockedItemIds: [], txHistory: [], activeBid: null, lastSettledItem: null };  
-    }  
-  
-    function seedWs() {  
-      const now = Date.now();  
-      return {  
-        "0812345678": { ...emptyWs("0812345678"), txHistory: [{ id: "tx-s1", type: "topup", title: "คำขอเติมเงินเข้าบัญชี (รออนุมัติ)", amountBaht: 50000, timestamp: new Date(now - 720000).toISOString(), status: "รออนุมัติ" }] },  
-        "0894567890": { ...emptyWs("0894567890"), vipLevel: 3, totalBalanceBaht: 450000, withdrawalPin: "654321", bankAccount: { bankName: THAI_BANKS[0], accountHolder: "คุณกิตติพงษ์ รัตนศิลป์", accountNumber: "0458912789", boundAt: new Date(now - 259200000).toISOString() }, lockedLevels: [5], txHistory: [{ id: "tx-s2", type: "withdraw", title: "คำขอถอนเงินเข้า ธนาคารกสิกรไทย (KBANK)", amountBaht: -25000, timestamp: new Date(now - 1500000).toISOString(), status: "รออนุมัติ" }] },  
-        "0629981122": { ...emptyWs("0629981122"), vipLevel: 2, totalBalanceBaht: 120000, withdrawalPin: "112233", bankAccount: { bankName: THAI_BANKS[1], accountHolder: "คุณณัฐธิดา สุวรรณวงศ์", accountNumber: "1182903456", boundAt: new Date(now - 432000000).toISOString() }, lockedItemIds: ["lv2-slot2"], txHistory: [{ id: "tx-s3", type: "topup", title: "คำขอเติมเงินเข้าบัญชี (รออนุมัติ)", amountBaht: 20000, timestamp: new Date(now - 2400000).toISOString(), status: "รออนุมัติ" }] }  
-      };  
-    }  
-  
-    function replaceSlot(item, seed) {  
-      const ed = item.editionNumber + 1;  
-      let idx = (item.level * 5 + item.slotIndex * 3 + ed + seed) % POOL.length;  
-      if (POOL[idx].imageUrl === item.imageUrl) idx = (idx + 1) % POOL.length;  
-      const c = POOL[idx];  
-      return { ...item, id: `lv${item.level}-slot${item.slotIndex}-ed${ed}`, titleTh: `${c.titleTh} (รอบ ${ed})`, artistTh: c.artistTh, originLabel: c.originLabel, imageUrl: c.imageUrl, participants: item.participants + 95, likes: item.likes + 1250, editionNumber: ed };  
-    }  
-  
-    function motifSvg(lv, cls = "w-7 h-7") {  
-      const p = {  
-        1: '<circle cx="24" cy="24" r="21" stroke="#C59B27" stroke-width="1.5"/><path d="M24 9C24 16 17 19 17 26C17 31.5 20.5 35.5 24 37.5C27.5 35.5 31 31.5 31 26C31 19 24 16 24 9Z" stroke="#8C6A10" stroke-width="1.8" fill="#C59B27" fill-opacity="0.2"/>',  
-        2: '<rect x="9" y="9" width="30" height="30" rx="4" stroke="#C59B27" stroke-width="1.5"/><path d="M24 10L29 19L38 24L29 29L24 38L19 29L10 24L19 19L24 10Z" stroke="#8C6A10" stroke-width="1.7" fill="#C59B27" fill-opacity="0.2"/>',  
-        3: '<path d="M24 6C28 13 33 17 33 25C33 31 29 35 24 38C19 35 15 31 15 25C15 17 20 13 24 6Z" stroke="#8C6A10" stroke-width="1.8" fill="#C59B27" fill-opacity="0.2"/><circle cx="24" cy="24" r="3" fill="#8C6A10"/>',  
-        4: '<path d="M24 8C27.5 14 29.5 19 29.5 26C29.5 31 27 34.5 24 36.5C21 34.5 18.5 31 18.5 26C18.5 19 20.5 14 24 8Z" stroke="#8C6A10" stroke-width="1.7" fill="#C59B27" fill-opacity="0.22"/><path d="M12 38.5C16 36.5 32 36.5 36 38.5" stroke="#C59B27" stroke-width="1.8" stroke-linecap="round"/>',  
-        5: '<circle cx="24" cy="24" r="21" stroke="#C59B27" stroke-width="1.6"/><path d="M24 6L27 17L35 19L28 26L31 37L24 32L17 37L20 26L13 19L21 17L24 6Z" stroke="#8C6A10" stroke-width="1.6" fill="#C59B27" fill-opacity="0.24"/>'  
-      };  
-      return `<svg viewBox="0 0 48 48" fill="none" class="${cls}" aria-hidden="true">${p[lv] || p[1]}</svg>`;  
-    }  
-  
-    const st = {  
-      view: new URLSearchParams(location.search).get("admin") === "1" ? "admin" : (getSt(KEYS.view, "home") || "home"),  
-      adminUnlocked: false, authMode: "register",  
-      users: getSt(KEYS.users, [{ phone: "0812345678", password: "123456", createdAt: "2026-01-01T00:00:00.000Z" }]),  
-      currentUser: getSt(KEYS.session, null),  
-      workspaces: getSt(KEYS.workspaces, null) || seedWs(),  
-      auctionItems: getSt(KEYS.auction, null) || INITIAL_AUCTION_ITEMS,  
-      lastCycleSlot: getSt(KEYS.cycle, get24hSlot(Date.now())),  
-      previewPhone: "0812345678", adminSelectedPhone: "0812345678",  
-      adminLevel: 1, adminSearch: "", adminTxFilter: "all", adminMsg: null,  
-      selectedArtworkId: ARTWORKS[0].id, homeFilter: "all",  
-      auctionModalLevel: null, auctionSlideIdx: 0, accountPanel: "none",  
-      panelErr: null, panelOk: null, toast: null, nowMs: Date.now(),  
-      sliderPaused: false, sliderHold: false, sliderOffset: 0, tapCount: 0, lastTapAt: 0  
-    };  
-    if (st.currentUser?.phone) { st.previewPhone = st.currentUser.phone; st.adminSelectedPhone = st.currentUser.phone; }  
-  
-    const activePhone = () => st.currentUser?.phone || st.previewPhone;  
-    const activeWs = () => (st.workspaces[activePhone()] ||= emptyWs(activePhone()));  
-    const persist = () => {  
-      setSt(KEYS.users, st.users); setSt(KEYS.session, st.currentUser); setSt(KEYS.workspaces, st.workspaces);  
-      setSt(KEYS.auction, st.auctionItems); setSt(KEYS.cycle, st.lastCycleSlot);  
-      if (st.view !== "admin") setSt(KEYS.view, st.view);  
-    };  
-    const toast = msg => { st.toast = msg; render(); clearTimeout(window.__tt); window.__tt = setTimeout(() => { st.toast = null; render(); }, 4500); };  
-    const sliderUi = () => {  
-      const t = document.getElementById("slider-status-txt"), b = document.getElementById("btn-slide-toggle");  
-      if (t) t.textContent = st.sliderHold ? "กดค้าง — หยุดชม (ปล่อยเพื่อเลื่อนต่อ)" : st.sliderPaused ? "หยุดสไลด์ชั่วคราว" : "กดค้างที่ภาพเพื่อหยุด ปล่อยเพื่อเลื่อนต่อ";  
-      if (b) b.textContent = (st.sliderPaused || st.sliderHold) ? "เลื่อนต่อ" : "หยุด";  
-    };  
-  
-    window.addEventListener("pointerup", () => { if (st.sliderHold) { st.sliderHold = false; sliderUi(); } });  
-    window.addEventListener("pointercancel", () => { if (st.sliderHold) { st.sliderHold = false; sliderUi(); } });  
-  
-    setInterval(() => {  
-      st.nowMs = Date.now();  
-      const slot = get24hSlot(st.nowMs);  
-      if (slot !== st.lastCycleSlot) {  
-        st.lastCycleSlot = slot;  
-        const aid = activeWs().activeBid?.item?.id;  
-        st.auctionItems = st.auctionItems.map(it => it.id === aid ? it : replaceSlot(it, slot));  
-        persist();  
-      }  
-      let settled = false;  
-      Object.keys(st.workspaces).forEach(ph => {  
-        const w = st.workspaces[ph];  
-        if (w?.activeBid && st.nowMs >= w.activeBid.endsAt) {  
-          settled = true;  
-          const f = w.activeBid.item, ret = f.priceBaht + f.commissionBaht;  
-          w.transactionBalanceBaht = Math.max(0, w.transactionBalanceBaht - f.priceBaht);  
-          w.totalBalanceBaht += ret; w.activeBid = null; w.lastSettledItem = f;  
-          w.txHistory.unshift({ id: `tx-set-${st.nowMs}-${ph}`, type: "commission_return", title: `คืนทุน + ค่าคอมมิชชั่น: ${f.titleTh}`, amountBaht: ret, timestamp: new Date(st.nowMs).toISOString(), status: "สำเร็จ" });  
-          st.auctionItems = st.auctionItems.map(it => (it.level === f.level && it.slotIndex === f.slotIndex) ? replaceSlot(it, slot) : it);  
-          if (ph === activePhone()) toast(`หมดเวลาประมูล "${f.titleTh}" — คืนทุนและค่าคอมฯ ${fmtBaht(ret)} บาท เข้าบัญชีแล้ว`);  
-        }  
-      });  
-      if (settled) persist();  
-      if (st.view === "timer" || settled) render();  
-    }, 1000);  
-  
-    let lastRaf = performance.now();  
-    function rafLoop(now) {  
-      const dt = Math.min((now - lastRaf) / 1000, 0.05); lastRaf = now;  
-      const tr = document.getElementById("slider-track");  
-      if (tr && !st.sliderPaused && !st.sliderHold) {  
-        const half = tr.scrollWidth / 2;  
-        if (half > 0) { st.sliderOffset = (st.sliderOffset + 44 * dt) % half; tr.style.transform = `translate3d(-${st.sliderOffset.toFixed(2)}px,0,0)`; }  
-      }  
-      requestAnimationFrame(rafLoop);  
-    }  
-    requestAnimationFrame(rafLoop);  
-  
-    function render() {  
-      const ws = activeWs(), remMs = ws.activeBid ? Math.max(0, ws.activeBid.endsAt - st.nowMs) : 0, counting = ws.activeBid !== null && remMs > 0;  
-      const slot24 = get24hSlot(st.nowMs), shift = (slot24 * 3) % ARTWORKS.length;  
-      const homeArts = [...ARTWORKS.slice(shift), ...ARTWORKS.slice(0, shift)];  
-      const selArt = ARTWORKS.find(a => a.id === st.selectedArtworkId) || ARTWORKS[0];  
-      const titleMap = { home:"หน้าแรก", auction:"ประมูล", timer:"เวลา", account:"บัญชี", admin:"หลังบ้าน", auth: st.authMode==="register"?"สมัครสมาชิก":"เข้าสู่ระบบ" };  
-      let main = "";  
-  
-      if (st.view === "home") {  
-        const totalComm = ARTWORKS.reduce((s, a) => s + a.commissionBaht, 0);  
-        const filtered = st.homeFilter === "all" ? homeArts : homeArts.filter(a => a.origin === st.homeFilter);  
-        main = `<main class="flex-1">  
-          <section class="max-w-7xl mx-auto px-3 sm:px-6 pt-3 pb-1"><div class="card p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3">  
-            <div><p class="text-[11px] uppercase tracking-wider text-[#8C6A10] font-semibold">นิทรรศการภาพวาดไทยและต่างประเทศ · Thai & International Fine Art</p><h1 class="font-editorial text-xl sm:text-2xl font-bold mt-0.5">คลังศิลปะภาพวาดทรงคุณค่า แห่งสยามและนานาชาติ</h1><p class="mt-1 text-xs text-[#5C544B]">สไลด์หมุนเวียน 24 ชม. · กดค้างที่ภาพเพื่อหยุดพิจารณา ปล่อยมือเพื่อเลื่อนต่อ</p></div>  
-            <div class="flex flex-wrap items-center gap-4 pt-2 lg:pt-0 border-t lg:border-t-0 lg:border-l border-[#C59B27]/30 lg:pl-5 shrink-0">  
-              <div><span class="block text-[11px] text-[#5C544B]">ผลงานจัดแสดง</span><b class="font-editorial text-lg tabular-nums">${ARTWORKS.length} ภาพ</b></div>  
-              <div><span class="block text-[11px] text-[#5C544B]">ค่าคอมฯ รวม</span><b class="font-editorial text-lg text-[#8C6A10] tabular-nums">${fmtBaht(totalComm)} ฿</b></div>  
-              <button data-nav="auction" class="btn-gold px-3.5 py-2 text-xs">เข้าห้องประมูล 5 เลเวล</button>  
-            </div>  
-          </div></section>  
-          <section class="py-3">  
-            <div class="max-w-7xl mx-auto px-3 sm:px-6 mb-2.5 flex flex-wrap items-center justify-between gap-2 text-xs text-[#5C544B]">  
-              <span><span id="slider-status-txt">${st.sliderPaused ? "หยุดสไลด์ชั่วคราว" : "กดค้างที่ภาพเพื่อหยุด ปล่อยเพื่อเลื่อนต่อ"}</span> · <b class="text-[#8C6A10] tabular-nums">รอบ ${slot24 + 1}/24</b></span>  
-              <div class="flex items-center gap-1.5"><button id="btn-slide-prev" class="btn-out w-8 h-8">&lt;</button><button id="btn-slide-toggle" class="btn-out h-8 px-2.5 text-[11px]">${st.sliderPaused ? "เลื่อนต่อ" : "หยุด"}</button><button id="btn-slide-next" class="btn-out w-8 h-8">&gt;</button></div>  
-            </div>  
-            <div id="slider-viewport" class="w-full overflow-hidden hold-interactive cursor-grab"><div id="slider-track" class="flex items-stretch gap-3.5 w-max px-3 sm:px-6" style="transform:translate3d(-${st.sliderOffset.toFixed(2)}px,0,0)">  
-              ${[...homeArts, ...homeArts].map(a => `<article data-select-art="${a.id}" class="w-[225px] sm:w-[248px] shrink-0 card p-2.5 flex flex-col justify-between ${a.id===selArt.id?"ring-1 ring-[#C59B27]":""}">  
-                <div><div class="aspect-[16/11] overflow-hidden rounded bg-[#FAF8F5] border border-[#C59B27]/30 mb-2"><img src="${a.imageUrl}" alt="${esc(a.titleTh)}" draggable="false" class="w-full h-full object-cover"/></div>  
-                <div class="text-[11px] text-[#5C544B] truncate"><b class="text-[#8C6A10]">${esc(a.originLabel)}</b> · ${esc(a.year)}</div><h3 class="font-editorial text-sm font-bold line-clamp-1">${esc(a.titleTh)}</h3><p class="text-[11px] text-[#5C544B] truncate">${esc(a.artistTh)}</p></div>  
-                <div class="mt-2 pt-2 border-t border-[#C59B27]/25 space-y-1 text-[11px]"><div class="flex justify-between gap-2"><span class="text-[#5C544B]">เจ้าของ</span><span class="truncate font-medium">${esc(a.owner)}</span></div><div class="flex justify-between gap-2"><span class="text-[#5C544B]">ค่าคอม</span><b class="text-[#8C6A10] tabular-nums">${fmtBaht(a.commissionBaht)} ฿</b></div></div>  
-              </article>`).join("")}  
-            </div></div>  
-          </section>  
-          <section id="artwork-ledger" class="max-w-7xl mx-auto px-3 sm:px-6 pt-2 pb-6 space-y-5">  
-            <div class="card-gold p-4 sm:p-5">  
-              <div class="flex flex-wrap items-baseline justify-between gap-2 pb-3 mb-3.5 border-b border-[#C59B27]/30">  
-                <div><p class="text-[11px] text-[#8C6A10] font-semibold">เจ้าของภาพ · ค่าคอมมิชชั่น · ข้อมูลงานศิลปะ</p><h2 class="font-editorial text-xl sm:text-2xl font-bold">${esc(selArt.titleTh)}</h2></div>  
-                <div class="text-right"><span class="block text-[11px] text-[#5C544B]">ค่าคอมมิชชั่น</span><b class="font-editorial text-xl sm:text-2xl text-[#8C6A10] tabular-nums">${fmtBaht(selArt.commissionBaht)} บาท</b></div>  
-              </div>  
-              <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">  
-                <div class="lg:col-span-5 h-52 rounded-lg overflow-hidden border border-[#C59B27]/40 bg-[#FAF8F5]"><img src="${selArt.imageUrl}" alt="${esc(selArt.titleTh)}" class="w-full h-full object-cover"/></div>  
-                <div class="lg:col-span-7 space-y-3 text-xs sm:text-sm"><p>${esc(selArt.description)}</p>  
-                  <dl class="grid grid-cols-2 gap-3 border-t border-b border-[#C59B27]/25 py-2.5 text-xs">  
-                    <div><dt class="text-[#5C544B]">เจ้าของภาพ</dt><dd class="font-semibold">${esc(selArt.owner)}</dd></div><div><dt class="text-[#5C544B]">ศิลปิน</dt><dd class="font-medium">${esc(selArt.artistTh)}</dd></div>  
-                    <div><dt class="text-[#5C544B]">เทคนิคและวัสดุ</dt><dd class="font-medium">${esc(selArt.medium)}</dd></div><div><dt class="text-[#5C544B]">ขนาด / มูลค่า</dt><dd class="font-medium tabular-nums">${esc(selArt.dimensions)} · ${fmtBaht(selArt.estimatedValueBaht)} ฿</dd></div>  
-                  </dl>  
-                </div>  
-              </div>  
-            </div>  
-            <div>  
-              <div class="flex flex-wrap items-center justify-between gap-2 mb-3"><h3 class="font-editorial text-lg font-bold">ทำเนียบภาพวาดไทยและต่างประเทศ (${homeArts.length} ผลงาน)</h3>  
-                <div class="inline-flex gap-1 p-0.5 bg-[#FFF] border border-[#C59B27]/50 rounded-lg text-xs">${[["all","ทั้งหมด"],["thai","ไทย"],["international","ต่างประเทศ"]].map(([k,l])=>`<button data-home-filter="${k}" class="px-2.5 py-1 rounded font-semibold cursor-pointer ${st.homeFilter===k?"bg-[#C59B27]":"text-[#5C544B]"}">${l}</button>`).join("")}</div>  
-              </div>  
-              <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">${filtered.map(a=>`  
-                <article data-select-art="${a.id}" data-scroll-ledger="1" class="card p-2.5 cursor-pointer ${a.id===selArt.id?"ring-1 ring-[#C59B27]":""}">  
-                  <div class="aspect-[16/11] overflow-hidden rounded bg-[#FAF8F5] border border-[#C59B27]/30 mb-2"><img src="${a.imageUrl}" alt="${esc(a.titleTh)}" class="w-full h-full object-cover"/></div>  
-                  <div class="text-[10px] text-[#8C6A10] font-semibold">${esc(a.originLabel)} · ${esc(a.year)}</div><h4 class="font-editorial text-sm font-bold line-clamp-1">${esc(a.titleTh)}</h4>  
-                  <div class="mt-1.5 pt-1.5 border-t border-[#C59B27]/20 flex justify-between text-[11px]"><span class="text-[#5C544B]">ค่าคอม</span><b class="text-[#8C6A10] tabular-nums">${fmtBaht(a.commissionBaht)} ฿</b></div>  
-                </article>`).join("")}  
-              </div>  
-            </div>  
-          </section>  
-        </main>`;  
-      } else if (st.view === "auction") {  
-        const mItems = st.auctionModalLevel ? st.auctionItems.filter(i => i.level === st.auctionModalLevel).sort((a,b) => a.slotIndex - b.slotIndex) : [];  
-        const mItem = mItems[st.auctionSlideIdx] || mItems[0];  
-        const lvCfg = AUCTION_LEVELS.find(l => l.level === st.auctionModalLevel);  
-        main = `<main class="flex-1 py-4"><div class="max-w-7xl mx-auto px-3 sm:px-6 space-y-4">  
-          <section class="card-gold p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3">  
-            <div><p class="text-[11px] text-[#8C6A10] font-semibold">ห้องประมูลภาพวาดศิลปะ 5 เลเวล · รอบ ${slot24 + 1}/24</p><h1 class="font-editorial text-xl sm:text-2xl font-bold">เลือกเลเวลเพื่อเปิดชมและประมูลภาพวาด</h1></div>  
-            <div class="grid grid-cols-2 sm:flex items-center gap-2.5">  
-              <div class="bg-[#FAF8F5] border border-[#C59B27]/45 rounded-lg px-3.5 py-2"><span class="text-[11px] text-[#5C544B] block">เงินทั้งหมด</span><b class="font-editorial text-lg tabular-nums">${fmtBaht(ws.totalBalanceBaht)} ฿</b></div>  
-              <div class="bg-[#FAF8F5] border border-[#C59B27]/45 rounded-lg px-3.5 py-2"><span class="text-[11px] text-[#5C544B] block">ธุรกรรม</span><b class="font-editorial text-lg text-[#8C6A10] tabular-nums">${fmtBaht(ws.transactionBalanceBaht)} ฿</b></div>  
-              ${counting ? `<button data-nav="timer" class="col-span-2 sm:col-span-1 btn-gold px-3.5 py-2.5 text-xs">ไปหน้าเวลา (กำลังนับ)</button>` : ""}  
-            </div>  
-          </section>  
-          <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">${AUCTION_LEVELS.map(l => {  
-            const lk = ws.lockedLevels.includes(l.level);  
-            return `<button data-open-level="${l.level}" class="card text-left p-3.5 flex flex-col justify-between gap-2.5 cursor-pointer hover:border-[#C59B27]">  
-              <div class="flex items-center justify-between"><div class="w-10 h-10 rounded-lg bg-[#FAF8F5] border border-[#C59B27]/40 flex items-center justify-center">${motifSvg(l.level)}</div><span class="px-2 py-0.5 rounded text-[11px] font-bold ${lk?"bg-[#EBE6DF] text-[#5C544B]":"bg-[#C59B27]"}">${lk?"ล็อก":`เลเวล ${l.level}`}</span></div>  
-              <div><div class="font-editorial text-base font-bold">${esc(l.nameTh)}</div><div class="text-[11px] text-[#5C544B]">${lk?"ถูกล็อกโดยหลังบ้าน":esc(l.motifNameTh)}</div></div>  
-              <div class="pt-2 border-t border-[#C59B27]/25 text-[11px] space-y-0.5"><div class="font-semibold text-[#8C6A10]">ราคา: ${esc(l.priceRangeLabel)}</div><div class="text-[#5C544B]">คอมฯ: ${esc(l.commissionRangeLabel)}</div><div class="pt-1 font-bold">เปิดดู 3 ภาพ &gt;</div></div>  
-            </button>`;  
-          }).join("")}</section>  
-        </div>  
-        ${(st.auctionModalLevel && mItem && lvCfg) ? (() => {  
-          const sk = slotKey(mItem.level, mItem.slotIndex), lvLk = ws.lockedLevels.includes(mItem.level), itLk = ws.lockedItemIds.includes(sk), lk = lvLk || itLk, aff = ws.totalBalanceBaht >= mItem.priceBaht;  
-          const bt = lvLk ? `เลเวล ${mItem.level} ถูกล็อก` : itLk ? "ภาพนี้ถูกล็อกไม่ให้ประมูล" : counting ? "กรุณารอการประมูลปัจจุบันสิ้นสุด" : !aff ? "ยอดเงินทั้งหมดไม่เพียงพอ" : `ประมูล (${fmtBaht(mItem.priceBaht)} บาท)`;  
-          return `<div id="auction-modal-bg" class="fixed inset-0 z-50 bg-[#1E1B18]/50 flex items-center justify-center p-3 overflow-y-auto"><div class="w-full max-w-xl bg-[#FFF] border-2 border-[#C59B27] rounded-2xl shadow-xl overflow-hidden" onclick="event.stopPropagation()">  
-            <div class="px-4 py-3 bg-[#FAF8F5] border-b border-[#C59B27]/40 flex items-center justify-between"><div class="flex items-center gap-2"><div class="w-8 h-8 rounded bg-[#FFF] border border-[#C59B27]/50 flex items-center justify-center">${motifSvg(lvCfg.level,"w-6 h-6")}</div><div><h2 class="font-editorial text-base font-bold">${esc(lvCfg.nameTh)}</h2><p class="text-[11px] text-[#5C544B]">ภาพ ${st.auctionSlideIdx+1}/${mItems.length}</p></div></div><button id="btn-close-auction-modal" class="btn-out w-8 h-8">✕</button></div>  
-            <div class="p-4 space-y-3">  
-              <div class="flex items-center justify-between gap-2"><button data-slide-step="-1" class="btn-out px-2.5 py-1.5 text-xs">ก่อนหน้า</button><div class="flex gap-1">${mItems.map((_,i)=>`<button data-slide-idx="${i}" class="px-2.5 py-1 rounded text-[11px] font-bold cursor-pointer ${i===st.auctionSlideIdx?"bg-[#C59B27]":"bg-[#FAF8F5] border border-[#C59B27]/35"}">ภาพ ${i+1}</button>`).join("")}</div><button data-slide-step="1" class="btn-out px-2.5 py-1.5 text-xs">ถัดไป</button></div>  
-              <div class="bg-[#FAF8F5] border border-[#C59B27] rounded-xl p-3 space-y-2.5">  
-                <div class="flex justify-between text-[11px]"><b class="text-[#8C6A10]">${esc(mItem.originLabel)} · ภาพที่ ${mItem.slotIndex+1}</b><span class="bg-[#FFF] border border-[#C59B27]/60 px-2 py-0.5 rounded font-semibold tabular-nums">${mItem.durationMinutes}:00 นาที</span></div>  
-                <div class="aspect-[16/10] max-h-[200px] w-full overflow-hidden rounded-lg border border-[#C59B27]/40"><img src="${mItem.imageUrl}" alt="${esc(mItem.titleTh)}" class="w-full h-full object-cover"/></div>  
-                <div><h3 class="font-editorial text-lg font-bold">${esc(mItem.titleTh)}</h3><p class="text-xs text-[#5C544B]">ศิลปิน: ${esc(mItem.artistTh)}</p></div>  
-                <div class="bg-[#FFF] border border-[#C59B27]/40 rounded-lg p-2.5 grid grid-cols-2 gap-2.5 text-xs">  
-                  <div><span class="text-[#5C544B] block">ราคา</span><b class="text-sm tabular-nums">${fmtBaht(mItem.priceBaht)} บาท</b></div><div><span class="text-[#5C544B] block">ค่าคอมมิชชั่น</span><b class="text-sm text-[#8C6A10] tabular-nums">+${fmtBaht(mItem.commissionBaht)} บาท</b></div>  
-                  <div class="pt-1.5 border-t border-[#C59B27]/20"><span class="text-[#5C544B] block">ผู้เข้าร่วม</span><b class="tabular-nums">${fmtBaht(mItem.participants)} คน</b></div><div class="pt-1.5 border-t border-[#C59B27]/20"><span class="text-[#5C544B] block">ถูกใจ / ไลฟ์</span><b class="tabular-nums">${fmtBaht(mItem.likes)} ครั้ง</b></div>  
-                </div>  
-                <button id="btn-place-bid" data-bid-id="${mItem.id}" ${(lk||counting||!aff)?"disabled":""} class="btn-gold w-full py-2.5 text-sm">${bt}</button>  
-              </div>  
-            </div>  
-          </div></div>`;  
-        })() : ""}</main>`;  
-      } else if (st.view === "timer") {  
-        const bid = ws.activeBid, pct = counting && bid ? Math.min(100, Math.max(0, ((bid.item.durationMinutes*60000 - remMs)/(bid.item.durationMinutes*60000))*100)) : 100;  
-        main = `<main class="flex-1 py-4"><div class="max-w-3xl mx-auto px-3 sm:px-6 space-y-3.5">  
-          <section class="card-gold p-3.5 grid grid-cols-2 gap-3">  
-            <div class="bg-[#FAF8F5] border border-[#C59B27]/45 rounded-lg px-3 py-2"><span class="text-[11px] text-[#5C544B] block">เงินทั้งหมด</span><b class="font-editorial text-lg tabular-nums">${fmtBaht(ws.totalBalanceBaht)} บาท</b></div>  
-            <div class="bg-[#FAF8F5] border border-[#C59B27]/45 rounded-lg px-3 py-2"><span class="text-[11px] text-[#5C544B] block">ธุรกรรม (กำลังประมูล)</span><b class="font-editorial text-lg text-[#8C6A10] tabular-nums">${fmtBaht(ws.transactionBalanceBaht)} บาท</b></div>  
-          </section>  
-          ${counting && bid ? `<section class="card-gold border-2 p-4 sm:p-5 space-y-3.5 text-center">  
-            <div class="p-2.5 bg-[#FAF8F5] border border-[#C59B27] rounded-lg text-xs font-semibold">อยู่ระหว่างนับถอยหลัง — ห้ามกดปุ่มใดๆ จนกว่าจะหมดเวลา</div>  
-            <div class="text-[11px] text-[#8C6A10] font-semibold">เลเวล ${bid.item.level} · ${esc(bid.item.originLabel)}</div>  
-            <div class="font-editorial text-5xl font-bold tabular-nums">${fmtCountdown(remMs)}</div>  
-            <div class="max-w-sm mx-auto h-2 bg-[#FAF8F5] border border-[#C59B27]/40 rounded-full overflow-hidden"><div class="h-full bg-[#C59B27]" style="width:${pct}%"></div></div>  
-            <div class="max-w-md mx-auto space-y-2.5 text-left">  
-              <div class="aspect-[16/10] max-h-[190px] overflow-hidden rounded-lg border border-[#C59B27]/50"><img src="${bid.item.imageUrl}" alt="${esc(bid.item.titleTh)}" class="w-full h-full object-cover"/></div>  
-              <div class="text-center"><h1 class="font-editorial text-xl font-bold">${esc(bid.item.titleTh)}</h1><p class="text-xs text-[#5C544B]">ศิลปิน: ${esc(bid.item.artistTh)}</p></div>  
-              <div class="bg-[#FAF8F5] border border-[#C59B27]/50 rounded-lg p-3 grid grid-cols-2 gap-2.5 text-xs">  
-                <div><span class="text-[#5C544B] block">ราคา</span><b class="text-base tabular-nums">${fmtBaht(bid.item.priceBaht)} บาท</b></div><div><span class="text-[#5C544B] block">ค่าคอมมิชชั่น</span><b class="text-base text-[#8C6A10] tabular-nums">+${fmtBaht(bid.item.commissionBaht)} บาท</b></div>  
-                <div class="pt-1.5 border-t border-[#C59B27]/25"><span class="text-[#5C544B] block">ผู้เข้าร่วม</span><b class="tabular-nums">${fmtBaht(bid.item.participants)} คน</b></div><div class="pt-1.5 border-t border-[#C59B27]/25"><span class="text-[#5C544B] block">ถูกใจ / ไลฟ์</span><b class="tabular-nums">${fmtBaht(bid.item.likes)} ครั้ง</b></div>  
-              </div>  
-              <div class="p-2.5 bg-[#FFF] border border-[#C59B27]/40 rounded-lg text-center text-xs text-[#5C544B]">หมดเวลาแล้วระบบจะคืนทุน + ค่าคอมฯ รวม <b class="text-[#1E1B18] tabular-nums">${fmtBaht(bid.item.priceBaht + bid.item.commissionBaht)} บาท</b> อัตโนมัติ</div>  
-            </div>  
-          </section>` : `<section class="card-gold p-6 text-center space-y-3.5">  
-            ${ws.lastSettledItem ? `<h1 class="font-editorial text-xl font-bold">หมดเวลาประมูลแล้ว · รูปภาพสิ้นสุดรายการ</h1><p class="text-sm text-[#5C544B]">คืนทุน + ค่าคอมมิชชั่นรวม <b class="text-[#1E1B18] tabular-nums">${fmtBaht(ws.lastSettledItem.priceBaht + ws.lastSettledItem.commissionBaht)} บาท</b> เข้าบัญชีแล้ว</p>` : `<h1 class="font-editorial text-xl font-bold">ยังไม่มีรายการประมูลที่กำลังนับถอยหลัง</h1><p class="text-xs text-[#5C544B]">เลือกภาพวาดจากหน้าประมูล (เลเวล 1–5) เพื่อเริ่มนับถอยหลัง</p>`}  
-            <button data-nav="auction" class="btn-gold px-5 py-2.5 text-sm">ไปยังหน้าประมูล</button>  
-          </section>`}  
-        </div></main>`;  
-      } else if (st.view === "account") {  
-        main = `<main class="flex-1 py-4"><div class="max-w-3xl mx-auto px-3 sm:px-6 space-y-3.5">  
-          <section class="card-gold p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">  
-            <div class="space-y-1.5"><div class="flex flex-wrap items-center gap-2 text-xs"><span class="px-2.5 py-0.5 bg-[#C59B27] font-bold rounded">VIP ${ws.vipLevel}</span><b class="tabular-nums">ID: ${esc(ws.memberId)}</b><span class="text-emerald-800 font-semibold">· ยืนยันตัวตนแล้ว</span></div><h1 class="font-editorial text-xl font-bold">บัญชีนักสะสมงานศิลปะ</h1><p class="text-xs text-[#5C544B]">สมาชิกที่ผ่านการรับรองสิทธิ์เข้าร่วมประมูลผลงานศิลปะไทยและนานาชาติ</p></div>  
-            <div class="grid grid-cols-1 gap-2 w-full sm:w-44 shrink-0"><button data-open-panel="topup" class="btn-gold h-10 text-sm">เติมเงิน</button><button data-open-panel="withdraw" class="btn-out h-10 text-sm">ถอนเงิน</button></div>  
-          </section>  
-          <section class="grid grid-cols-1 sm:grid-cols-2 gap-3">  
-            <div class="card-gold p-4"><span class="text-xs font-bold block">เงินทั้งหมด (พร้อมใช้/ถอน)</span><div class="font-editorial text-2xl font-bold mt-1 tabular-nums">${fmtBaht(ws.totalBalanceBaht)} <span class="text-sm">บาท</span></div></div>  
-            <div class="bg-[#FAF8F5] border border-[#C59B27]/75 rounded-xl p-4"><span class="text-xs font-bold block">ธุรกรรม</span><div class="font-editorial text-2xl font-bold text-[#8C6A10] mt-1 tabular-nums">${fmtBaht(ws.transactionBalanceBaht)} <span class="text-sm">บาท</span></div></div>  
-          </section>  
-          <section class="card p-4"><div class="flex justify-between items-center mb-2 text-xs font-bold"><span>บัญชีธนาคารรับเงิน</span><span>${ws.bankAccount?"ผูกแล้ว":'<button data-open-panel="bank" class="text-[#8C6A10] underline cursor-pointer">ผูกบัญชีตอนนี้</button>'}</span></div>  
-            ${ws.bankAccount?`<div class="bg-[#FAF8F5] border border-[#C59B27]/35 rounded-lg p-2.5 grid grid-cols-3 gap-2 text-xs"><div><span class="block text-[10px] text-[#5C544B]">ธนาคาร</span><b>${esc(ws.bankAccount.bankName)}</b></div><div><span class="block text-[10px] text-[#5C544B]">ชื่อบัญชี</span><b>${esc(ws.bankAccount.accountHolder)}</b></div><div><span class="block text-[10px] text-[#5C544B]">เลขบัญชี</span><b class="tabular-nums">${maskBank(ws.bankAccount.accountNumber)}</b></div></div>`:`<p class="text-xs text-[#5C544B] bg-[#FAF8F5] p-2.5 rounded-lg">ยังไม่ได้ผูกบัญชีธนาคาร — กดเมนู "บัญชีธนาคาร" ด้านล่างเพื่อผูกบัญชี</p>`}  
-          </section>  
-          <section class="card divide-y divide-[#C59B27]/25 overflow-hidden text-sm">  
-            <a href="${LINE_URL}" target="_blank" rel="noopener noreferrer" class="px-4 py-3 flex items-center justify-between hover:bg-[#FAF8F5]"><div><div class="font-semibold">ศูนย์ช่วยเหลือ / ติดต่อฝ่ายบริการ</div><div class="text-[11px] text-[#8C6A10]">เปิดแชท LINE ทันที · ${LINE_URL}</div></div><span>↗</span></a>  
-            <button data-open-panel="pin" class="w-full px-4 py-3 flex items-center justify-between hover:bg-[#FAF8F5] text-left cursor-pointer"><div><div class="font-semibold">รหัสถอน</div><div class="text-[11px] text-[#5C544B]">${ws.withdrawalPin?"ตั้งแล้ว (เปลี่ยนเองไม่ได้ต้องทักหลังบ้าน)":"ตัวเลข 6 หลัก (ยังไม่ได้ตั้งค่า)"}</div></div><span>&gt;</span></button>  
-            <button data-open-panel="bank" class="w-full px-4 py-3 flex items-center justify-between hover:bg-[#FAF8F5] text-left cursor-pointer"><div><div class="font-semibold">บัญชีธนาคาร</div><div class="text-[11px] text-[#5C544B]">${ws.bankAccount?`${esc(ws.bankAccount.bankName)} · ${maskBank(ws.bankAccount.accountNumber)}`:"ผูกบัญชีธนาคาร (ผูกแล้วเปลี่ยนเองไม่ได้)"}</div></div><span>&gt;</span></button>  
-            <button data-open-panel="history" class="w-full px-4 py-3 flex items-center justify-between hover:bg-[#FAF8F5] text-left cursor-pointer"><div><div class="font-semibold">บันทึกประวัติธุรกรรม</div><div class="text-[11px] text-[#5C544B]">รายการทั้งหมด ${ws.txHistory.length} รายการ</div></div><span>&gt;</span></button>  
-            <button id="btn-logout-account" class="w-full px-4 py-3 flex items-center justify-between hover:bg-red-50 text-left cursor-pointer text-red-800 font-bold"><span>ออกจากระบบ</span><span>&gt;</span></button>  
-          </section>  
-        </div>${st.accountPanel !== "none" ? renderAccountModal(ws) : ""}</main>`;  
-      } else if (st.view === "auth") {  
-        main = `<main class="flex-1 py-10 px-4 flex items-center justify-center"><div class="card-gold w-full max-w-md p-6 space-y-4">  
-          <h1 class="font-editorial text-2xl font-bold text-center">${st.authMode==="register"?"สมัครสมาชิก":"เข้าสู่ระบบ"}</h1>  
-          <div class="grid grid-cols-2 gap-1 p-1 bg-[#FAF8F5] border border-[#C59B27]/35 rounded-lg text-sm">  
-            <button data-auth-tab="login" class="py-2 rounded font-semibold cursor-pointer ${st.authMode==="login"?"bg-[#C59B27]":"text-[#5C544B]"}">เข้าสู่ระบบ</button>  
-            <button data-auth-tab="register" class="py-2 rounded font-semibold cursor-pointer ${st.authMode==="register"?"bg-[#C59B27]":"text-[#5C544B]"}">สมัครสมาชิก</button>  
-          </div>  
-          ${st.panelErr ? `<div class="p-2.5 bg-red-50 border border-red-200 rounded text-xs text-red-800">${esc(st.panelErr)}</div>` : ""}  
-          <form id="auth-form" class="space-y-3 text-sm">  
-            <div><label class="block font-semibold mb-1">เบอร์โทรศัพท์</label><input id="auth-phone" type="tel" placeholder="0812345678" class="inp tabular-nums"/></div>  
-            <div><label class="block font-semibold mb-1">รหัสผ่าน (ตัวเลข 6–8 หลัก)</label><input id="auth-pass" type="password" inputmode="numeric" maxlength="8" placeholder="ตัวเลข 6–8 หลัก" class="inp tabular-nums"/></div>  
-            ${st.authMode==="register"?`<div><label class="block font-semibold mb-1">ยืนยันรหัสผ่าน</label><input id="auth-confirm" type="password" inputmode="numeric" maxlength="8" placeholder="กรอกอีกครั้ง" class="inp tabular-nums"/></div>`:""}  
-            <button type="submit" class="btn-gold w-full py-2.5">${st.authMode==="register"?"ยืนยันการสมัครสมาชิก":"เข้าสู่ระบบ"}</button>  
-          </form>  
-          ${st.authMode==="login"?`<div class="pt-3 border-t border-[#C59B27]/25 flex justify-between text-xs text-[#5C544B]"><span>ตัวอย่าง: 081-234-5678 / 123456</span><button id="btn-fill-demo" class="font-semibold text-[#8C6A10] underline cursor-pointer">กรอกอัตโนมัติ</button></div>`:""}  
-        </div></main>`;  
-      } else if (st.view === "admin") {  
-        main = !st.adminUnlocked ? `<main class="flex-1 py-12 px-4 flex items-center justify-center"><div class="card-gold border-2 w-full max-w-sm p-6 space-y-4 text-center">  
-          <h1 class="font-editorial text-xl font-bold">เข้าสู่ระบบหลังบ้าน</h1><p class="text-xs text-[#5C544B]">กรุณากรอกรหัสผ่านหลังบ้านตัวเลข 6 หลัก</p>  
-          ${st.panelErr ? `<div class="p-2 bg-red-50 border border-red-200 rounded text-xs text-red-800">${esc(st.panelErr)}</div>` : ""}  
-          <form id="admin-gate-form" class="space-y-3"><input id="admin-pass-input" type="password" inputmode="numeric" maxlength="6" placeholder="••••••" class="inp text-center text-lg font-bold tracking-[0.35em] tabular-nums"/><button type="submit" class="btn-gold w-full py-2.5 text-sm">ยืนยันเข้าสู่หน้าหลังบ้าน</button><button type="button" data-nav="home" class="btn-out w-full py-2 text-xs">กลับหน้าแรก</button></form>  
-        </div></main>` : renderAdmin();  
-      }  
-  
-      document.getElementById("app").innerHTML = `  
-        <header class="sticky top-0 z-40 w-full bg-[#FAF8F5]/95 backdrop-blur-sm border-b border-[#C59B27]/35">  
-          <div class="max-w-7xl mx-auto px-3 sm:px-6 h-12 grid grid-cols-3 items-center gap-2">  
-            <div class="flex justify-start"><button data-nav="home" class="font-editorial text-sm sm:text-lg font-bold truncate cursor-pointer">หอศิลป์สุวรรณวิจิตร</button></div>  
-            <div class="flex justify-center"><button id="btn-secret-admin" class="font-editorial text-base sm:text-xl font-bold select-none">${esc(titleMap[st.view] || "หน้าแรก")}</button></div>  
-            <div class="flex justify-end">${st.currentUser ? `<button id="btn-top-logout" class="btn-out px-2.5 py-1 text-xs">ออกระบบ</button>` : `<button id="btn-top-login" class="btn-gold px-2.5 py-1 text-xs">เข้าสู่ระบบ</button>`}</div>  
-          </div>  
-        </header>  
-        ${st.toast ? `<div class="fixed top-14 left-1/2 -translate-x-1/2 z-[60] w-[calc(100%-1.5rem)] max-w-xl bg-emerald-50 border-2 border-emerald-600 text-emerald-950 px-3.5 py-2.5 rounded-xl text-xs font-semibold shadow-lg">${esc(st.toast)}</div>` : ""}  
-        ${main}  
-        <nav aria-label="แถบเมนูหลักด้านล่าง" class="fixed bottom-0 left-0 right-0 z-40 bg-[#FFF]/95 border-t border-[#C59B27]/45 shadow-sm">  
-          <div class="max-w-3xl mx-auto grid grid-cols-4 h-14 text-[11px]">  
-            ${[["home","หน้าแรก"],["auction","ประมูล"],["timer",counting?"เวลา (กำลังนับ)":"เวลา"],["account","บัญชี"]].map(([v,l])=>`<button data-nav="${v}" class="flex flex-col items-center justify-center border-t-2 cursor-pointer ${st.view===v?"bg-[#FAF8F5] border-[#C59B27] font-bold":"border-transparent text-[#5C544B]"}">${esc(l)}</button>`).join("")}  
-          </div>  
-        </nav>`;  
-      bindEvents();  
-    }  
-  
-    function renderAccountModal(ws) {  
-      const titles = { topup:"เติมเงินเข้าสู่บัญชี", withdraw:"ถอนเงินเข้าบัญชีธนาคาร", pin:"รหัสถอนเงิน (6 หลัก)", bank:"บัญชีธนาคาร", history:"บันทึกประวัติธุรกรรม" };  
-      let body = "";  
-      if (st.accountPanel === "topup") body = `<form id="form-topup" class="space-y-3 text-sm"><p class="p-3 bg-[#FAF8F5] border border-[#C59B27]/50 rounded-lg text-xs text-[#5C544B]">คำขอเติมเงินจะถูกส่งไปรอการอนุมัติจากหลังบ้าน หรือติดต่อแอดมินทาง LINE</p><input id="inp-topup" type="text" inputmode="numeric" value="10000" class="inp tabular-nums"/><div class="flex flex-col sm:flex-row gap-2"><button type="submit" class="btn-gold flex-1 py-2.5">ส่งคำขอเติมเงิน</button><a href="${LINE_URL}" target="_blank" rel="noopener noreferrer" class="btn-out py-2.5 px-4 text-center">ติดต่อแอดมิน LINE</a></div></form>`;  
-      else if (st.accountPanel === "withdraw") body = `<form id="form-withdraw" class="space-y-3 text-sm"><input id="inp-wd-amt" type="text" inputmode="numeric" placeholder="จำนวนเงินถอน (บาท)" class="inp tabular-nums"/><input id="inp-wd-pin" type="password" inputmode="numeric" maxlength="6" placeholder="รหัสถอน 6 หลัก" class="inp tabular-nums"/><button type="submit" class="btn-gold w-full py-2.5">ส่งคำขอถอนเงิน</button></form>`;  
-      else if (st.accountPanel === "pin") body = ws.withdrawalPin ? `<div class="p-3.5 bg-[#FAF8F5] border border-[#C59B27]/50 rounded-lg space-y-2 text-xs"><p>ตั้งค่ารหัสถอนแล้ว (••••••) ไม่สามารถแก้ไขเองได้</p><a href="${LINE_URL}" target="_blank" rel="noopener noreferrer" class="btn-gold inline-block px-4 py-2">ทักหลังบ้าน LINE เพื่อขอเปลี่ยนรหัสถอน</a></div>` : `<form id="form-pin" class="space-y-3 text-sm"><input id="inp-pin-1" type="password" inputmode="numeric" maxlength="6" placeholder="รหัสถอน 6 หลัก" class="inp tabular-nums"/><input id="inp-pin-2" type="password" inputmode="numeric" maxlength="6" placeholder="ยืนยันรหัสถอน 6 หลัก" class="inp tabular-nums"/><button type="submit" class="btn-gold w-full py-2.5">บันทึกรหัสถอน 6 หลัก</button></form>`;  
-      else if (st.accountPanel === "bank") body = ws.bankAccount ? `<div class="p-3.5 bg-[#FAF8F5] border border-[#C59B27]/50 rounded-lg space-y-2 text-xs"><p><b>${esc(ws.bankAccount.bankName)}</b> · ${esc(ws.bankAccount.accountHolder)} · ${maskBank(ws.bankAccount.accountNumber)}</p><a href="${LINE_URL}" target="_blank" rel="noopener noreferrer" class="btn-gold inline-block px-4 py-2">ทักหลังบ้าน LINE เพื่อเปลี่ยนบัญชี</a></div>` : `<form id="form-bank" class="space-y-3 text-sm"><select id="inp-bank-name" class="inp">${THAI_BANKS.map(b=>`<option value="${esc(b)}">${esc(b)}</option>`).join("")}</select><input id="inp-bank-holder" type="text" placeholder="ชื่อ–นามสกุล เจ้าของบัญชี" class="inp"/><input id="inp-bank-num" type="text" inputmode="numeric" maxlength="12" placeholder="เลขที่บัญชี 10–12 หลัก" class="inp tabular-nums"/><button type="submit" class="btn-gold w-full py-2.5">ยืนยันผูกบัญชีธนาคาร</button></form>`;  
-      else if (st.accountPanel === "history") body = ws.txHistory.length === 0 ? `<p class="text-sm text-center text-[#5C544B] py-4">ยังไม่มีรายการธุรกรรม</p>` : `<div class="divide-y divide-[#C59B27]/25 border border-[#C59B27]/35 rounded-lg">${ws.txHistory.map(t=>`<div class="p-3 flex justify-between gap-2 text-xs"><div><div class="font-semibold">${esc(t.title)}</div><div class="text-[#5C544B]">${fmtTime(t.timestamp)} · ${esc(t.status)}</div></div><b class="tabular-nums ${t.amountBaht>=0?"text-[#8C6A10]":""}">${t.amountBaht>=0?"+":""}${fmtBaht(t.amountBaht)} ฿</b></div>`).join("")}</div>`;  
-      return `<div id="acc-modal-bg" class="fixed inset-0 z-50 bg-[#1E1B18]/50 flex items-center justify-center p-3"><div class="w-full max-w-lg bg-[#FFF] border-2 border-[#C59B27] rounded-2xl shadow-xl overflow-hidden" onclick="event.stopPropagation()"><div class="px-4 py-3 bg-[#FAF8F5] border-b border-[#C59B27]/40 flex justify-between items-center"><h2 class="font-editorial text-lg font-bold">${titles[st.accountPanel]||""}</h2><button id="btn-close-acc-modal" class="btn-out w-8 h-8">✕</button></div><div class="p-4 space-y-3 max-h-[80vh] overflow-y-auto">${st.panelErr?`<div class="p-2.5 bg-red-50 border border-red-200 rounded text-xs text-red-800">${esc(st.panelErr)}</div>`:""}${st.panelOk?`<div class="p-2.5 bg-emerald-50 border border-emerald-600 rounded text-xs text-emerald-950">${esc(st.panelOk)}</div>`:""}${body}</div></div></div>`;  
-    }  
-  
-    function renderAdmin() {  
-      const members = Object.values(st.workspaces), q = st.adminSearch.trim().toLowerCase();  
-      const fm = members.filter(m => !q || m.phone.includes(q.replace(/\D/g,"")) || m.memberId.toLowerCase().includes(q));  
-      const sel = st.workspaces[st.adminSelectedPhone] || members[0];  
-      const lvlItems = st.auctionItems.filter(i => i.level === st.adminLevel).sort((a,b) => a.slotIndex - b.slotIndex);  
-      const isLvLk = sel.lockedLevels.includes(st.adminLevel);  
-      const txs = sel.txHistory.filter(t => st.adminTxFilter === "pending" ? t.status === "รออนุมัติ" : true);  
-      return `<main class="flex-1 py-4"><div class="max-w-7xl mx-auto px-3 sm:px-6 space-y-4">  
-        <section class="card-gold p-4 flex flex-wrap justify-between items-center gap-3">  
-          <div><p class="text-[11px] text-[#8C6A10] font-semibold">Back-Office Management · ระบบหลังบ้านผู้ดูแล</p><h1 class="font-editorial text-xl font-bold">จัดการสมาชิก ฝาก/ถอน และสิทธิ์การประมูล</h1></div>  
-          <div class="flex gap-2">${sel.phone!==activePhone()?`<button id="btn-adm-switch" class="btn-gold px-3 py-2 text-xs">สลับมุมมองเป็นสมาชิกนี้</button>`:`<span class="px-3 py-1.5 bg-[#FAF8F5] border border-[#C59B27] text-xs text-[#8C6A10] rounded-lg font-semibold">กำลังซิงก์กับสมาชิกนี้</span>`}<button id="btn-adm-lock" class="btn-out px-3 py-2 text-xs">ล็อกหลังบ้าน</button></div>  
-        </section>  
-        <section class="card p-4 space-y-3">  
-          <div class="flex flex-wrap justify-between gap-2"><h2 class="font-editorial text-lg font-bold">เลือกสมาชิก (${fm.length}/${members.length})</h2><input id="inp-adm-search" value="${esc(st.adminSearch)}" placeholder="ค้นหาเบอร์โทร / ID..." class="inp text-xs !w-64"/></div>  
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">${fm.map(m=>`<button data-adm-sel="${m.phone}" class="text-left p-3 rounded-xl border cursor-pointer ${m.phone===sel.phone?"bg-[#FAF8F5] border-[#C59B27] ring-2 ring-[#C59B27]/40":"border-[#C59B27]/40"}"><div class="flex justify-between text-xs font-bold"><span class="px-2 py-0.5 bg-[#C59B27] rounded">VIP ${m.vipLevel}</span><span>${esc(m.memberId)}</span></div><div class="text-xs text-[#5C544B] mt-1 tabular-nums">โทร: ${fmtPhone(m.phone)}</div><div class="text-xs font-bold mt-1 tabular-nums">เงิน: ${fmtBaht(m.totalBalanceBaht)} ฿</div></button>`).join("")}</div>  
-        </section>  
-        ${st.adminMsg?`<div class="card-gold p-3 text-sm">${esc(st.adminMsg)}</div>`:""}  
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">  
-          <section class="lg:col-span-6 card p-4 space-y-4">  
-            <div class="flex justify-between border-b border-[#C59B27]/25 pb-3"><div><h2 class="font-editorial text-lg font-bold">จัดการฝาก / ถอน และปรับยอด</h2><p class="text-xs text-[#5C544B]">${esc(sel.memberId)} (${fmtPhone(sel.phone)})</p></div><div class="text-right"><span class="text-xs text-[#5C544B] block">เงินทั้งหมด</span><b class="font-editorial text-lg text-[#8C6A10] tabular-nums">${fmtBaht(sel.totalBalanceBaht)} บาท</b></div></div>  
-            <div class="bg-[#FAF8F5] border border-[#C59B27]/40 rounded-lg p-3 space-y-2.5 text-sm">  
-              <div class="grid grid-cols-2 gap-2"><input id="inp-adm-amt" type="text" inputmode="numeric" value="10000" class="inp !bg-[#FFF] tabular-nums"/><input id="inp-adm-note" type="text" placeholder="หมายเหตุ" class="inp !bg-[#FFF]"/></div>  
-              <div class="grid grid-cols-2 gap-2"><button id="btn-adm-add" class="btn-gold py-2">+ เพิ่มยอดเงิน</button><button id="btn-adm-sub" class="btn-out py-2">- หักยอดเงิน</button></div>  
-            </div>  
-            <div class="space-y-2">  
-              <div class="flex justify-between items-center text-xs"><b class="text-sm">รายการฝาก / ถอน</b><div class="flex gap-1"><button data-adm-txf="all" class="px-2 py-1 rounded font-semibold cursor-pointer ${st.adminTxFilter==="all"?"bg-[#C59B27]":"bg-[#FAF8F5]"}">ทั้งหมด</button><button data-adm-txf="pending" class="px-2 py-1 rounded font-semibold cursor-pointer ${st.adminTxFilter==="pending"?"bg-[#C59B27]":"bg-[#FAF8F5]"}">รออนุมัติ</button></div></div>  
-              <div class="divide-y divide-[#C59B27]/25 border border-[#C59B27]/40 rounded-lg max-h-[320px] overflow-y-auto">${txs.length===0?`<p class="p-4 text-center text-xs text-[#5C544B]">ไม่มีรายการ</p>`:txs.map(t=>`<div class="p-3 flex justify-between items-center gap-2 text-xs"><div><div class="font-semibold">${esc(t.title)}</div><div class="text-[#5C544B]">${fmtTime(t.timestamp)} · <b>${esc(t.status)}</b></div></div><div class="flex items-center gap-2 shrink-0"><b class="tabular-nums">${t.amountBaht>=0?"+":""}${fmtBaht(t.amountBaht)} ฿</b>${t.status==="รออนุมัติ"?`<button data-tx-app="${t.id}" class="btn-gold px-2 py-1">อนุมัติ</button><button data-tx-rej="${t.id}" class="px-2 py-1 border border-red-300 text-red-800 font-bold rounded cursor-pointer">ปฏิเสธ</button>`:""}</div></div>`).join("")}</div>  
-            </div>  
-          </section>  
-          <section class="lg:col-span-6 card p-4 space-y-4">  
-            <h2 class="font-editorial text-lg font-bold border-b border-[#C59B27]/25 pb-3">ล็อก / ปลดล็อกรูปภาพประมูล</h2>  
-            <div class="grid grid-cols-5 gap-2">${AUCTION_LEVELS.map(l=>`<button data-adm-lv="${l.level}" class="p-2 rounded-lg border text-center cursor-pointer ${l.level===st.adminLevel?"bg-[#FAF8F5] border-[#C59B27]":"border-[#C59B27]/35"}"><div class="text-xs font-bold">LV.${l.level}</div><div class="text-[11px] text-[#8C6A10]">${sel.lockedLevels.includes(l.level)?"ล็อกอยู่":"ปกติ"}</div></button>`).join("")}</div>  
-            <div class="bg-[#FAF8F5] border border-[#C59B27]/50 rounded-lg p-3 flex justify-between items-center gap-2 text-xs"><div><b>ควบคุมทั้งเลเวล ${st.adminLevel}</b><div class="text-[#5C544B]">${isLvLk?"ล็อกทั้งเลเวลอยู่":"เปิดให้ประมูลปกติ"}</div></div><button id="btn-adm-lock-lv" class="px-3.5 py-2 ${isLvLk?"btn-out":"btn-gold"}">${isLvLk?`ปลดล็อกทั้งเลเวล ${st.adminLevel}`:`ล็อกทั้งเลเวล ${st.adminLevel}`}</button></div>  
-            <div class="space-y-2.5">${lvlItems.map(it=>{const sk=slotKey(it.level,it.slotIndex), il=sel.lockedItemIds.includes(sk); return `<div class="p-3 rounded-lg border border-[#C59B27]/40 flex justify-between items-center gap-3 text-xs"><div class="min-w-0"><div class="font-bold truncate">${esc(it.titleTh)}</div><div class="text-[#5C544B] tabular-nums">ราคา ${fmtBaht(it.priceBaht)} ฿ · คอม ${fmtBaht(it.commissionBaht)} ฿</div></div><button data-adm-lock-item="${sk}" class="px-3 py-1.5 shrink-0 ${il?"btn-out":"btn-gold"}">${il?"ปลดล็อกภาพ":"ล็อกภาพนี้"}</button></div>`;}).join("")}</div>  
-          </section>  
-        </div>  
-      </div></main>`;  
-    }  
-  
-    function bindEvents() {  
-      const $ = id => document.getElementById(id);  
-      document.querySelectorAll("[data-nav]").forEach(el => el.onclick = () => { st.view = el.dataset.nav; st.panelErr = null; persist(); render(); window.scrollTo({ top: 0, behavior: "smooth" }); });  
-      if ($("btn-top-login")) $("btn-top-login").onclick = () => { st.authMode = "login"; st.view = "auth"; st.panelErr = null; render(); };  
-      const logout = () => { st.currentUser = null; st.view = "auth"; st.authMode = "login"; persist(); toast("ออกจากระบบเรียบร้อยแล้ว"); };  
-      if ($("btn-top-logout")) $("btn-top-logout").onclick = logout;  
-      if ($("btn-logout-account")) $("btn-logout-account").onclick = logout;  
-      if ($("btn-secret-admin")) $("btn-secret-admin").onclick = () => {  
-        const n = Date.now(); if (n - st.lastTapAt > 2500) st.tapCount = 0;  
-        st.lastTapAt = n; st.tapCount += 1;  
-        if (st.tapCount >= 5) { st.tapCount = 0; st.view = "admin"; st.panelErr = null; render(); }  
-      };  
-  
-      if ($("slider-viewport")) $("slider-viewport").onpointerdown = () => { st.sliderHold = true; sliderUi(); };  
-      if ($("btn-slide-toggle")) $("btn-slide-toggle").onclick = () => { st.sliderPaused = !st.sliderPaused; sliderUi(); };  
-      if ($("btn-slide-prev")) $("btn-slide-prev").onclick = () => { st.sliderOffset = Math.max(0, st.sliderOffset - 260); if ($("slider-track")) $("slider-track").style.transform = `translate3d(-${st.sliderOffset.toFixed(2)}px,0,0)`; };  
-      if ($("btn-slide-next")) $("btn-slide-next").onclick = () => { st.sliderOffset += 260; if ($("slider-track")) $("slider-track").style.transform = `translate3d(-${st.sliderOffset.toFixed(2)}px,0,0)`; };  
-      document.querySelectorAll("[data-select-art]").forEach(el => el.onclick = () => { st.selectedArtworkId = el.dataset.selectArt; render(); if (el.dataset.scrollLedger) $("artwork-ledger")?.scrollIntoView({ behavior: "smooth" }); });  
-      document.querySelectorAll("[data-home-filter]").forEach(el => el.onclick = () => { st.homeFilter = el.dataset.homeFilter; render(); });  
-  
-      document.querySelectorAll("[data-open-level]").forEach(el => el.onclick = () => { st.auctionModalLevel = Number(el.dataset.openLevel); st.auctionSlideIdx = 0; render(); });  
-      if ($("auction-modal-bg")) $("auction-modal-bg").onclick = () => { st.auctionModalLevel = null; render(); };  
-      if ($("btn-close-auction-modal")) $("btn-close-auction-modal").onclick = () => { st.auctionModalLevel = null; render(); };  
-      document.querySelectorAll("[data-slide-idx]").forEach(el => el.onclick = () => { st.auctionSlideIdx = Number(el.dataset.slideIdx); render(); });  
-      document.querySelectorAll("[data-slide-step]").forEach(el => el.onclick = () => { st.auctionSlideIdx = Math.max(0, Math.min(2, st.auctionSlideIdx + Number(el.dataset.slideStep))); render(); });  
-      if ($("btn-place-bid")) $("btn-place-bid").onclick = () => {  
-        const ws = activeWs(), item = st.auctionItems.find(i => i.id === $("btn-place-bid").dataset.bidId); if (!item) return;  
-        const now = Date.now();  
-        ws.totalBalanceBaht -= item.priceBaht; ws.transactionBalanceBaht += item.priceBaht; ws.vipLevel = Math.max(ws.vipLevel, item.level);  
-        ws.activeBid = { item, startedAt: now, endsAt: now + item.durationMinutes * 60000 }; ws.lastSettledItem = null;  
-        ws.txHistory.unshift({ id: `tx-bid-${now}`, type: "bid", title: `ประมูลภาพ: ${item.titleTh} (เลเวล ${item.level})`, amountBaht: -item.priceBaht, timestamp: new Date(now).toISOString(), status: "ย้ายเข้าธุรกรรม" });  
-        st.auctionModalLevel = null; st.view = "timer"; persist(); toast(`กดประมูล "${item.titleTh}" แล้ว`);  
-      };  
-  
-      document.querySelectorAll("[data-open-panel]").forEach(el => el.onclick = () => { st.accountPanel = el.dataset.openPanel; st.panelErr = null; st.panelOk = null; render(); });  
-      if ($("acc-modal-bg")) $("acc-modal-bg").onclick = () => { st.accountPanel = "none"; render(); };  
-      if ($("btn-close-acc-modal")) $("btn-close-acc-modal").onclick = () => { st.accountPanel = "none"; render(); };  
-      if ($("form-topup")) $("form-topup").onsubmit = e => { e.preventDefault(); const amt = parseInt($("inp-topup").value.replace(/\D/g,""),10); if (!amt || amt < 100) { st.panelErr = "ขั้นต่ำ 100 บาท"; render(); return; } activeWs().txHistory.unshift({ id: `tx-dep-${Date.now()}`, type: "topup", title: "คำขอเติมเงินเข้าบัญชี", amountBaht: amt, timestamp: new Date().toISOString(), status: "รออนุมัติ" }); st.panelOk = `ส่งคำขอเติมเงิน ${fmtBaht(amt)} บาทแล้ว (รออนุมัติจากหลังบ้าน)`; persist(); render(); };  
-      if ($("form-withdraw")) $("form-withdraw").onsubmit = e => { e.preventDefault(); const ws = activeWs(), amt = parseInt($("inp-wd-amt").value.replace(/\D/g,""),10), pin = $("inp-wd-pin").value; if (!ws.bankAccount) st.panelErr = "กรุณาผูกบัญชีธนาคารก่อน"; else if (!ws.withdrawalPin) st.panelErr = "กรุณาตั้งค่ารหัสถอน 6 หลักก่อน"; else if (pin !== ws.withdrawalPin) st.panelErr = "รหัสถอน 6 หลักไม่ถูกต้อง"; else if (!amt || amt < 100 || amt > ws.totalBalanceBaht) st.panelErr = "จำนวนเงินถอนไม่ถูกต้องหรือไม่เพียงพอ"; else { ws.totalBalanceBaht -= amt; ws.txHistory.unshift({ id: `tx-wd-${Date.now()}`, type: "withdraw", title: `คำขอถอนเงินเข้า ${ws.bankAccount.bankName}`, amountBaht: -amt, timestamp: new Date().toISOString(), status: "รออนุมัติ" }); st.panelOk = `ส่งคำขอถอนเงิน ${fmtBaht(amt)} บาทแล้ว`; persist(); } render(); };  
-      if ($("form-pin")) $("form-pin").onsubmit = e => { e.preventDefault(); const p1 = $("inp-pin-1").value, p2 = $("inp-pin-2").value; if (!/^\d{6}$/.test(p1)) st.panelErr = "รหัสถอนต้องเป็นตัวเลข 6 หลัก"; else if (p1 !== p2) st.panelErr = "ยืนยันรหัสถอนไม่ตรงกัน"; else { activeWs().withdrawalPin = p1; st.panelOk = "ตั้งรหัสถอน 6 หลักเรียบร้อยแล้ว"; persist(); } render(); };  
-      if ($("form-bank")) $("form-bank").onsubmit = e => { e.preventDefault(); const bn = $("inp-bank-name").value, bh = $("inp-bank-holder").value.trim(), num = $("inp-bank-num").value.replace(/\D/g,""); if (!bh || num.length < 10 || num.length > 12) st.panelErr = "กรุณากรอกชื่อบัญชีและเลขบัญชี 10–12 หลัก"; else { activeWs().bankAccount = { bankName: bn, accountHolder: bh, accountNumber: num, boundAt: new Date().toISOString() }; st.panelOk = "ผูกบัญชีธนาคารเรียบร้อยแล้ว"; persist(); } render(); };  
-  
-      document.querySelectorAll("[data-auth-tab]").forEach(el => el.onclick = () => { st.authMode = el.dataset.authTab; st.panelErr = null; render(); });  
-      if ($("btn-fill-demo")) $("btn-fill-demo").onclick = () => { $("auth-phone").value = "0812345678"; $("auth-pass").value = "123456"; };  
-      if ($("auth-form")) $("auth-form").onsubmit = e => {  
-        e.preventDefault(); const ph = $("auth-phone").value.replace(/\D/g,""), pw = $("auth-pass").value.replace(/\D/g,"");  
-        if (!/^0\d{8,9}$/.test(ph)) { st.panelErr = "เบอร์โทรไม่ถูกต้อง"; render(); return; }  
-        if (pw.length < 6 || pw.length > 8) { st.panelErr = "รหัสผ่านต้องเป็นตัวเลข 6–8 หลัก"; render(); return; }  
-        if (st.authMode === "register") {  
-          if (pw !== $("auth-confirm").value.replace(/\D/g,"")) { st.panelErr = "รหัสผ่านไม่ตรงกัน"; render(); return; }  
-          if (st.users.some(u => u.phone === ph)) { st.panelErr = "เบอร์นี้สมัครไว้แล้ว"; render(); return; }  
-          const u = { phone: ph, password: pw, createdAt: new Date().toISOString() };  
-          st.users.push(u); st.currentUser = u; st.previewPhone = ph; st.adminSelectedPhone = ph;  
-          st.workspaces[ph] ||= emptyWs(ph); st.view = "home"; persist(); toast(`สมัครสมาชิกสำเร็จ (${fmtPhone(ph)})`);  
-        } else {  
-          const u = st.users.find(x => x.phone === ph && x.password === pw);  
-          if (!u) { st.panelErr = "เบอร์โทรศัพท์หรือรหัสผ่านไม่ถูกต้อง"; render(); return; }  
-          st.currentUser = u; st.previewPhone = ph; st.adminSelectedPhone = ph; st.view = "home"; persist(); toast(`เข้าสู่ระบบสำเร็จ (${fmtPhone(ph)})`);  
-        }  
-      };  
-  
-      if ($("admin-gate-form")) $("admin-gate-form").onsubmit = e => { e.preventDefault(); if ($("admin-pass-input").value === ADMIN_PASSCODE) { st.adminUnlocked = true; st.panelErr = null; render(); } else { st.panelErr = "รหัสผ่านไม่ถูกต้อง"; render(); } };  
-      if ($("inp-adm-search")) {  
-        if (st._focusSearch) { st._focusSearch = false; $("inp-adm-search").focus(); $("inp-adm-search").setSelectionRange(st.adminSearch.length, st.adminSearch.length); }  
-        $("inp-adm-search").oninput = e => { st.adminSearch = e.target.value; st._focusSearch = true; render(); };  
-      }  
-      document.querySelectorAll("[data-adm-sel]").forEach(el => el.onclick = () => { st.adminSelectedPhone = el.dataset.admSel; st.adminMsg = null; render(); });  
-      if ($("btn-adm-switch")) $("btn-adm-switch").onclick = () => { const s = st.workspaces[st.adminSelectedPhone]; if (s) { st.previewPhone = s.phone; st.currentUser = { phone: s.phone, password: "******", createdAt: new Date().toISOString() }; persist(); toast(`สลับมุมมองเป็น ${s.memberId}`); } };  
-      if ($("btn-adm-lock")) $("btn-adm-lock").onclick = () => { st.adminUnlocked = false; st.view = "home"; render(); };  
-      const adj = dir => { const s = st.workspaces[st.adminSelectedPhone], amt = parseInt($("inp-adm-amt").value.replace(/\D/g,""),10), note = $("inp-adm-note").value.trim() || (dir>0?"แอดมินปรับเพิ่มยอดเงิน":"แอดมินปรับลดยอดเงิน"); if (!amt || s.totalBalanceBaht + dir*amt < 0) { st.adminMsg = "จำนวนเงินไม่ถูกต้อง"; render(); return; } s.totalBalanceBaht += dir*amt; s.txHistory.unshift({ id: `tx-adj-${Date.now()}`, type: dir>0?"topup":"withdraw", title: note, amountBaht: dir*amt, timestamp: new Date().toISOString(), status: "อนุมัติแล้ว" }); st.adminMsg = `ปรับยอด ${fmtBaht(amt)} บาท เรียบร้อย`; persist(); render(); };  
-      if ($("btn-adm-add")) $("btn-adm-add").onclick = () => adj(1);  
-      if ($("btn-adm-sub")) $("btn-adm-sub").onclick = () => adj(-1);  
-      document.querySelectorAll("[data-adm-txf]").forEach(el => el.onclick = () => { st.adminTxFilter = el.dataset.admTxf; render(); });  
-      document.querySelectorAll("[data-tx-app]").forEach(el => el.onclick = () => { const s = st.workspaces[st.adminSelectedPhone], tx = s.txHistory.find(t => t.id === el.dataset.txApp); if (tx && tx.status === "รออนุมัติ") { if (tx.type === "topup" && tx.amountBaht > 0) s.totalBalanceBaht += tx.amountBaht; tx.status = "อนุมัติแล้ว"; st.adminMsg = "อนุมัติรายการแล้ว"; persist(); render(); } });  
-      document.querySelectorAll("[data-tx-rej]").forEach(el => el.onclick = () => { const s = st.workspaces[st.adminSelectedPhone], tx = s.txHistory.find(t => t.id === el.dataset.txRej); if (tx && tx.status === "รออนุมัติ") { if (tx.type === "withdraw" && tx.amountBaht < 0) s.totalBalanceBaht += Math.abs(tx.amountBaht); tx.status = tx.type === "withdraw" ? "ปฏิเสธ (คืนยอดแล้ว)" : "ปฏิเสธ"; st.adminMsg = "ปฏิเสธรายการแล้ว"; persist(); render(); } });  
-      document.querySelectorAll("[data-adm-lv]").forEach(el => el.onclick = () => { st.adminLevel = Number(el.dataset.admLv); render(); });  
-      if ($("btn-adm-lock-lv")) $("btn-adm-lock-lv").onclick = () => { const s = st.workspaces[st.adminSelectedPhone], i = s.lockedLevels.indexOf(st.adminLevel); if (i>=0) s.lockedLevels.splice(i,1); else s.lockedLevels.push(st.adminLevel); persist(); render(); };  
-      document.querySelectorAll("[data-adm-lock-item]").forEach(el => el.onclick = () => { const s = st.workspaces[st.adminSelectedPhone], k = el.dataset.admLockItem, i = s.lockedItemIds.indexOf(k); if (i>=0) s.lockedItemIds.splice(i,1); else s.lockedItemIds.push(k); persist(); render(); });  
-    }  
-  
-    render();  
-  })();  
-  </script>  
-</body>  
-</html>  
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>หอศิลป์สุวรรณวิจิตร | Suvarn Fine Art Gallery</title>
+    <meta
+      name="description"
+      content="แกลเลอรีงานศิลปะภาพวาดไทยและต่างประเทศ โทนสีครีมทอง พร้อมระบบสมาชิก ประมูล 5 เลเวล และข้อมูลค่าคอมมิชชั่น"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Noto+Sans+Thai:wght@400;500;600;700&family=Noto+Serif+Thai:wght@600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <script defer src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        font-family: 'Noto Sans Thai', sans-serif;
+        background: #faf8f5;
+        color: #1e1b18;
+      }
+      .font-editorial {
+        font-family: 'Noto Serif Thai', 'Cormorant Garamond', serif;
+      }
+      @keyframes marquee {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+      }
+      .marquee-track {
+        display: flex;
+        width: max-content;
+        animation: marquee 70s linear infinite;
+      }
+      .marquee-track.paused {
+        animation-play-state: paused;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen flex flex-col bg-[#FAF8F5] text-[#1E1B18] pb-16">
+    <div id="app"></div>
+
+    <script>
+      const IMG_BASE =
+        './';
+      const LINE_URL = 'https://lin.ee/n2l2Qqx';
+      const ADMIN_PASSCODE = '195466';
+
+      const KEYS = {
+        USERS: 'sv_standalone_users_v1',
+        SESSION: 'sv_standalone_session_v1',
+        WORKSPACES: 'sv_standalone_ws_v1',
+        AUCTIONS: 'sv_standalone_auctions_v1',
+        ALERTS: 'sv_standalone_alerts_v1',
+        TAB_VIEW: 'sv_standalone_tab_view_v1',
+        TAB_ADMIN: 'sv_standalone_tab_admin_v1',
+        TAB_PANEL: 'sv_standalone_tab_panel_v1',
+      };
+
+      const ARTWORKS = [
+        { id: 'art-th-01', accessionNo: 'SV-TH-2026-01', titleTh: 'วิหารทองอรุณและบัวบูชา', artistTh: 'อ.สุรศักดิ์ พงษ์ไพบูลย์', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'คุณพิพัฒน์ วงศ์สุวรรณ', commissionBaht: 48000, estimatedValueBaht: 480000, imageUrl: IMG_BASE + 'paint_thai_golden_pavilion_1795220691183.jpg', description: 'จิตรกรรมไทยร่วมสมัยผสานสถาปัตยกรรมอยุธยากับแสงอรุณรุ่งบนผืนน้ำ' },
+        { id: 'art-intl-01', accessionNo: 'SV-INT-2026-02', titleTh: 'แสงทองแห่งคลองแกรนด์คาแนล เวนิส', artistTh: 'มาร์โก เบลลินี', origin: 'international', originLabel: 'ศิลปะต่างประเทศ', owner: 'คอลเลกชัน เอเลนา รอสโตวา', commissionBaht: 85000, estimatedValueBaht: 850000, imageUrl: IMG_BASE + 'paint_intl_venice_canal_1795220754100.jpg', description: 'ทิวทัศน์เมืองเวนิสยามอาทิตย์อัสดงสะท้อนผิวน้ำด้วยฝีแปรงอิมเพรสชันนิสม์' },
+        { id: 'art-th-02', accessionNo: 'SV-TH-2026-03', titleTh: 'สายน้ำเจ้าพระยายามสนธยา', artistTh: 'รสลินทร์ จิตรกรชัย', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'คุณนลินี เตชะไพบูลย์', commissionBaht: 52500, estimatedValueBaht: 525000, imageUrl: IMG_BASE + 'paint_thai_chaophraya_twilight_1795220691075.jpg', description: 'วิถีชีวิตสายน้ำเจ้าพระยา เรือไม้สักแล่นผ่านเงาพระปรางค์วัดอรุณ' },
+        { id: 'art-intl-02', accessionNo: 'SV-INT-2026-04', titleTh: 'หุ่นนิ่งโบตั๋นขาวและเครื่องทองเหลืองโบราณ', artistTh: 'แคลร์ ดูบัวส์', origin: 'international', originLabel: 'ศิลปะต่างประเทศ', owner: 'Mr. Henrik Lindqvist', commissionBaht: 64000, estimatedValueBaht: 640000, imageUrl: IMG_BASE + 'paint_intl_peonies_brass_1795220710286.jpg', description: 'หุ่นนิ่งดอกโบตั๋นสีงาช้างในแจกันพอร์ซเลนคู่ผลมะเดื่อและเข็มทิศทองเหลือง' },
+        { id: 'art-th-03', accessionNo: 'SV-TH-2026-05', titleTh: 'ม่านหมอกล้านนาและนาขั้นบันไดสีทอง', artistTh: 'ธนากร ศรีล้านนา', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'มูลนิธิศิลปวัฒนธรรมเชียงใหม่', commissionBaht: 42000, estimatedValueBaht: 420000, imageUrl: IMG_BASE + 'paint_thai_lanna_terraces_1795220691245.jpg', description: 'ขุนเขาภาคเหนือยามเช้าที่ผืนหมอกโอบล้อมนาขั้นบันไดต้องแสงทอง' },
+        { id: 'art-intl-03', accessionNo: 'SV-INT-2026-06', titleTh: 'ศาลาฤดูใบไม้ร่วงแห่งเกียวโต', artistTh: 'เคนจิ ทาคาฮาชิ', origin: 'international', originLabel: 'ศิลปะต่างประเทศ', owner: 'Sato Heritage Gallery', commissionBaht: 72000, estimatedValueBaht: 720000, imageUrl: IMG_BASE + 'paint_intl_kyoto_pavilion_1795220754160.jpg', description: 'พู่กันหมึกญี่ปุ่นผสานเมฆทองคำเปลวและใบเมเปิลสีชาดแบบวาบิ-ซาบิ' },
+        { id: 'art-th-04', accessionNo: 'SV-TH-2026-07', titleTh: 'ธารน้ำตกมรกตและเอื้องผึ้งป่าหิมพานต์', artistTh: 'อรุณพงษ์ วนาศิลป์', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'คุณศิริพร รัตนมงคล', commissionBaht: 36000, estimatedValueBaht: 360000, imageUrl: IMG_BASE + 'paint_thai_emerald_waterfall_1795220691784.jpg', description: 'น้ำตกมรกตไหลผ่านโขดหินมอสและกล้วยไม้ป่าภายใต้ลำแสงทองยามเช้า' },
+        { id: 'art-intl-04', accessionNo: 'SV-INT-2026-08', titleTh: 'ชายฝั่งอามัลฟียามแสงแดดสีทอง', artistTh: 'อันโตนิโอ เฟร์รารา', origin: 'international', originLabel: 'ศิลปะต่างประเทศ', owner: 'Fondazione Arte Napoli', commissionBaht: 68000, estimatedValueBaht: 680000, imageUrl: IMG_BASE + 'paint_intl_amalfi_coast_1795220692030.jpg', description: 'หมู่บ้านริมหน้าผาอามัลฟีอาบแสงแดดเมดิเตอร์เรเนียนเหนือทะเลสีคราม' },
+        { id: 'art-th-05', accessionNo: 'SV-TH-2026-09', titleTh: 'โคมยี่เป็งและกระทงสายแห่งอโยธยา', artistTh: 'กิตติภพ สุวรรณธาดา', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'คุณธนัท ดำรงค์ศิลป์', commissionBaht: 92000, estimatedValueBaht: 920000, imageUrl: IMG_BASE + 'paint_thai_ayutthaya_lanterns_1795220690967.jpg', description: 'โคมไฟสีทองเหนือพระปรางค์วัดโบราณและเงากระทงดอกบัวบนผิวน้ำ' },
+        { id: 'art-intl-05', accessionNo: 'SV-INT-2026-10', titleTh: 'เรือนกระจกหลวงแห่งเวียนนา', artistTh: 'ฟรานซ์ ฟอน ไฮเดน', origin: 'international', originLabel: 'ศิลปะต่างประเทศ', owner: 'Belvedere Kunsthandel', commissionBaht: 110000, estimatedValueBaht: 1100000, imageUrl: IMG_BASE + 'paint_intl_vienna_conservatory_1795220691736.jpg', description: 'ซุ้มโค้งกระจกสูงตระหง่านและประติมากรรมหินอ่อนต้องแสงบ่ายสีทอง' },
+        { id: 'art-th-06', accessionNo: 'SV-TH-2026-11', titleTh: 'หงส์สุวรรณในสระบัวหิมพานต์', artistTh: 'ครูช่างปราณีต จิตรกรรมไทย', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'มูลนิธิอนุรักษ์ศิลป์ไทย', commissionBaht: 78000, estimatedValueBaht: 780000, imageUrl: IMG_BASE + 'paint_thai_himmapan_swan_1795220754660.jpg', description: 'หงส์ขาวทรงเครื่องกลางสระบัวทองคำท่ามกลางเมฆลายกนกเปลวโบราณ' },
+        { id: 'art-intl-06', accessionNo: 'SV-INT-2026-12', titleTh: 'ฟยอร์ดนอร์ดิกยามอาทิตย์อัสดงสีทอง', artistTh: 'เอริก โซลเบิร์ก', origin: 'international', originLabel: 'ศิลปะต่างประเทศ', owner: 'Oslo Fine Collectors Guild', commissionBaht: 76000, estimatedValueBaht: 760000, imageUrl: IMG_BASE + 'paint_intl_nordic_fjord_1795220755255.jpg', description: 'ยอดเขาหิมะสะท้อนแสงแชมเปญลงบนผืนน้ำฟยอร์ดที่นิ่งราวกระจกเงา' },
+        { id: 'art-th-07', accessionNo: 'SV-TH-2026-13', titleTh: 'เจดีย์สุโขทัยในสายหมอกอรุณ', artistTh: 'อ.กิตติศักดิ์ สุโขทัย', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'คุณปรเมศวร์ สุโขทัยกุล', commissionBaht: 58000, estimatedValueBaht: 580000, imageUrl: IMG_BASE + 'paint_thai_sukhothai_stupa_1795220691422.jpg', description: 'มหาเจดีย์ทรงพุ่มข้าวบิณฑ์แห่งสุโขทัยท่ามกลางสายหมอกบางยามเช้า' },
+        { id: 'art-intl-07', accessionNo: 'SV-INT-2026-14', titleTh: 'ถนนโอเปร่ากรุงปารีสหลังสายฝน', artistTh: 'ฌอง-ลุค มาร์แตง', origin: 'international', originLabel: 'ศิลปะต่างประเทศ', owner: 'Galerie Champs-Élysées', commissionBaht: 54000, estimatedValueBaht: 540000, imageUrl: IMG_BASE + 'paint_intl_paris_boulevard_1795220691248.jpg', description: 'ถนนหน้าโรงอุปรากรปารีสหลังฝนซาสะท้อนแสงโคมไฟสีทองอุ่น' },
+        { id: 'art-th-08', accessionNo: 'SV-TH-2026-15', titleTh: 'กระบวนพยุหยาตราทางชลมารคสุวรรณ', artistTh: 'ศ.ดร.วิจิตร บวรศิลป์', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'หอศิลป์สุวรรณวิจิตร', commissionBaht: 160000, estimatedValueBaht: 1600000, imageUrl: IMG_BASE + 'paint_thai_royal_barge_1795220691574.jpg', description: 'เรือพระที่นั่งสุพรรณหงส์เคลื่อนผ่านแสงอาทิตย์สีทองเหนือเจ้าพระยา' },
+        { id: 'art-intl-08', accessionNo: 'SV-INT-2026-16', titleTh: 'คฤหาสน์ทัสคานีท่ามกลางทิวสนทอง', artistTh: 'ลอเรนโซ คอนติ', origin: 'international', originLabel: 'ศิลปะต่างประเทศ', owner: 'Casa d’Arte Firenze', commissionBaht: 49000, estimatedValueBaht: 490000, imageUrl: IMG_BASE + 'paint_intl_tuscany_villa_1795220754179.jpg', description: 'แนวต้นสนไซเปรสสู่คฤหาสน์หินทัสคานีอาบแสงแห่งฤดูเก็บเกี่ยว' },
+        { id: 'art-th-09', accessionNo: 'SV-TH-2026-17', titleTh: 'ตลาดน้ำยามเช้าและดอกบัวสยาม', artistTh: 'อรุณวรรณ ศิลป์สยาม', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'คุณสุภาวดี เจริญวัฒนา', commissionBaht: 31000, estimatedValueBaht: 310000, imageUrl: IMG_BASE + 'paint_thai_floating_market_1795220691470.jpg', description: 'เรือพายบรรทุกดอกบัวชมพูและผลไม้ท่ามกลางหมอกเช้าเหนือผิวน้ำ' },
+        { id: 'art-intl-09', accessionNo: 'SV-INT-2026-18', titleTh: 'กองเรือสำเภายุคทองแห่งดัตช์', artistTh: 'เฮนดริก ฟาน เดอร์ เบิร์ก', origin: 'international', originLabel: 'ศิลปะต่างประเทศ', owner: 'Rijkscollectie Rotterdam', commissionBaht: 128000, estimatedValueBaht: 1280000, imageUrl: IMG_BASE + 'paint_intl_dutch_galleon_1795220691745.jpg', description: 'เรือใบสำเภาหลวงยุคทองฝ่าเกลียวคลื่นภายใต้แสงเงาแบบดัตช์มาสเตอร์' },
+        { id: 'art-th-10', accessionNo: 'SV-TH-2026-19', titleTh: 'ลายรดน้ำกินรีป่าหิมพานต์ทองคำ', artistTh: 'ครูช่างศิลป์รัตนโกสินทร์', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'คลังสมบัติหอศิลป์สุวรรณวิจิตร', commissionBaht: 96000, estimatedValueBaht: 960000, imageUrl: IMG_BASE + 'paint_thai_kinnaree_gold_1795220691843.jpg', description: 'ศิลปะลายรดน้ำปิดทองคำเปลวแท้บนพื้นรักดำถ่ายทอดกินรีป่าหิมพานต์' },
+        { id: 'art-intl-10', accessionNo: 'SV-INT-2026-20', titleTh: 'ทะเลสาบแอลป์ยามรุ่งอรุณสีทอง', artistTh: 'วิลเฮล์ม เวเบอร์', origin: 'international', originLabel: 'ศิลปะต่างประเทศ', owner: 'Zürich Kunststiftung', commissionBaht: 82000, estimatedValueBaht: 820000, imageUrl: IMG_BASE + 'paint_intl_swiss_alpine_1795220754005.jpg', description: 'ขุนเขาแอลป์สะท้อนเงาเหนือผืนน้ำสีครามใสในยามรุ่งอรุณ' },
+        { id: 'art-th-11', accessionNo: 'SV-TH-2026-21', titleTh: 'โพธิ์ทองแห่งความสงบนิรันดร์', artistTh: 'ปราโมทย์ วรรณศิลป์', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'คุณวรินทร กาญจนศิลป์', commissionBaht: 45000, estimatedValueBaht: 450000, imageUrl: IMG_BASE + 'paint_thai_golden_bodhi_1795220691214.jpg', description: 'ร่มเงาต้นพระศรีมหาโพธิ์ใบสีทองอร่ามแผ่กิ่งก้านปกคลุมลานธรรม' },
+      ];
+
+      const LEVELS = [
+        { level: 1, name: 'เลเวล 1 · กนกปฐมบท', motif: 'ลายกนกเปลว', priceRange: '1,000 – 15,000 บาท', commRange: '150 – 1,500 บาท' },
+        { level: 2, name: 'เลเวล 2 · ประจำยามวิจิตร', motif: 'ลายประจำยาม', priceRange: '20,000 – 60,000 บาท', commRange: '2,400 – 7,200 บาท' },
+        { level: 3, name: 'เลเวล 3 · พุ่มข้าวบิณฑ์สยาม', motif: 'ลายพุ่มข้าวบิณฑ์', priceRange: '80,000 – 150,000 บาท', commRange: '10,400 – 21,000 บาท' },
+        { level: 4, name: 'เลเวล 4 · บัวแก้วมณี', motif: 'ลายบัวแก้วมณี', priceRange: '200,000 – 450,000 บาท', commRange: '30,000 – 67,500 บาท' },
+        { level: 5, name: 'เลเวล 5 · ช่อฟ้าสุวรรณ', motif: 'ลายช่อฟ้าสุวรรณ', priceRange: '600,000 – 1,000,000 บาท', commRange: '96,000 – 160,000 บาท' },
+      ];
+
+      const DEFAULT_AUCTIONS = [
+        { id: 'lv1-0', slotIndex: 0, level: 1, titleTh: 'ตลาดน้ำยามเช้าและดอกบัวสยาม', artistTh: 'อรุณวรรณ ศิลป์สยาม', priceBaht: 1000, commissionBaht: 150, durationMinutes: 5, participants: 2140, likes: 12480, imageUrl: ARTWORKS[16].imageUrl },
+        { id: 'lv1-1', slotIndex: 1, level: 1, titleTh: 'หุ่นนิ่งโบตั๋นขาวและเครื่องทองเหลือง', artistTh: 'แคลร์ ดูบัวส์', priceBaht: 5000, commissionBaht: 600, durationMinutes: 8, participants: 2480, likes: 18920, imageUrl: ARTWORKS[3].imageUrl },
+        { id: 'lv1-2', slotIndex: 2, level: 1, titleTh: 'ม่านหมอกล้านนาและนาขั้นบันไดสีทอง', artistTh: 'ธนากร ศรีล้านนา', priceBaht: 15000, commissionBaht: 1500, durationMinutes: 10, participants: 2890, likes: 24650, imageUrl: ARTWORKS[4].imageUrl },
+        { id: 'lv2-0', slotIndex: 0, level: 2, titleTh: 'ถนนโอเปร่ากรุงปารีสหลังสายฝน', artistTh: 'ฌอง-ลุค มาร์แตง', priceBaht: 20000, commissionBaht: 2400, durationMinutes: 12, participants: 3120, likes: 31400, imageUrl: ARTWORKS[13].imageUrl },
+        { id: 'lv2-1', slotIndex: 1, level: 2, titleTh: 'สายน้ำเจ้าพระยายามสนธยา', artistTh: 'รสลินทร์ จิตรกรชัย', priceBaht: 40000, commissionBaht: 4800, durationMinutes: 15, participants: 3540, likes: 38750, imageUrl: ARTWORKS[2].imageUrl },
+        { id: 'lv2-2', slotIndex: 2, level: 2, titleTh: 'ชายฝั่งอามัลฟียามแสงแดดสีทอง', artistTh: 'อันโตนิโอ เฟร์รารา', priceBaht: 60000, commissionBaht: 7200, durationMinutes: 18, participants: 3980, likes: 44200, imageUrl: ARTWORKS[7].imageUrl },
+        { id: 'lv3-0', slotIndex: 0, level: 3, titleTh: 'ธารน้ำตกมรกตและเอื้องผึ้งป่าหิมพานต์', artistTh: 'อรุณพงษ์ วนาศิลป์', priceBaht: 80000, commissionBaht: 10400, durationMinutes: 20, participants: 4250, likes: 52800, imageUrl: ARTWORKS[6].imageUrl },
+        { id: 'lv3-1', slotIndex: 1, level: 3, titleTh: 'ศาลาฤดูใบไม้ร่วงแห่งเกียวโต', artistTh: 'เคนจิ ทาคาฮาชิ', priceBaht: 120000, commissionBaht: 15600, durationMinutes: 23, participants: 4690, likes: 61300, imageUrl: ARTWORKS[5].imageUrl },
+        { id: 'lv3-2', slotIndex: 2, level: 3, titleTh: 'โคมยี่เป็งและกระทงสายแห่งอโยธยา', artistTh: 'กิตติภพ สุวรรณธาดา', priceBaht: 150000, commissionBaht: 21000, durationMinutes: 25, participants: 5120, likes: 68900, imageUrl: ARTWORKS[8].imageUrl },
+        { id: 'lv4-0', slotIndex: 0, level: 4, titleTh: 'เรือนกระจกหลวงแห่งเวียนนา', artistTh: 'ฟรานซ์ ฟอน ไฮเดน', priceBaht: 200000, commissionBaht: 30000, durationMinutes: 28, participants: 5640, likes: 76400, imageUrl: ARTWORKS[9].imageUrl },
+        { id: 'lv4-1', slotIndex: 1, level: 4, titleTh: 'หงส์สุวรรณในสระบัวหิมพานต์', artistTh: 'ครูช่างปราณีต จิตรกรรมไทย', priceBaht: 320000, commissionBaht: 48000, durationMinutes: 30, participants: 6180, likes: 84900, imageUrl: ARTWORKS[10].imageUrl },
+        { id: 'lv4-2', slotIndex: 2, level: 4, titleTh: 'ฟยอร์ดนอร์ดิกยามอาทิตย์อัสดงสีทอง', artistTh: 'เอริก โซลเบิร์ก', priceBaht: 450000, commissionBaht: 67500, durationMinutes: 33, participants: 6750, likes: 92500, imageUrl: ARTWORKS[11].imageUrl },
+        { id: 'lv5-0', slotIndex: 0, level: 5, titleTh: 'ลายรดน้ำกินรีป่าหิมพานต์ทองคำ', artistTh: 'ครูช่างศิลป์รัตนโกสินทร์', priceBaht: 600000, commissionBaht: 96000, durationMinutes: 35, participants: 7420, likes: 108600, imageUrl: ARTWORKS[18].imageUrl },
+        { id: 'lv5-1', slotIndex: 1, level: 5, titleTh: 'กองเรือสำเภายุคทองแห่งดัตช์', artistTh: 'เฮนดริก ฟาน เดอร์ เบิร์ก', priceBaht: 800000, commissionBaht: 128000, durationMinutes: 38, participants: 8150, likes: 126400, imageUrl: ARTWORKS[17].imageUrl },
+        { id: 'lv5-2', slotIndex: 2, level: 5, titleTh: 'กระบวนพยุหยาตราทางชลมารคสุวรรณ', artistTh: 'ศ.ดร.วิจิตร บวรศิลป์', priceBaht: 1000000, commissionBaht: 160000, durationMinutes: 40, participants: 9280, likes: 148900, imageUrl: ARTWORKS[14].imageUrl },
+      ];
+
+      const BANK_LIST = [
+        'ธนาคารกสิกรไทย (KBANK)',
+        'ธนาคารไทยพาณิชย์ (SCB)',
+        'ธนาคารกรุงเทพ (BBL)',
+        'ธนาคารกรุงไทย (KTB)',
+        'ธนาคารกรุงศรีอยุธยา (BAY)',
+        'ธนาคารทหารไทยธนชาต (TTB)',
+      ];
+
+      const readLS = (k, fallback) => {
+        try { return JSON.parse(localStorage.getItem(k)) ?? fallback; } catch { return fallback; }
+      };
+      const writeLS = (k, v) => {
+        try { localStorage.setItem(k, JSON.stringify(v)); } catch {}
+      };
+      const fmt = (n) => new Intl.NumberFormat('th-TH').format(n || 0);
+      const deriveId = (p) => 'SV-' + String(p).replace(/\D/g, '').slice(-6).padStart(6, '0');
+      const maskBank = (num) => {
+        const d = String(num || '').replace(/\D/g, '');
+        return d.length >= 4 ? '•••• ••' + d.slice(-4, -1) + '*' : '•••• ••••';
+      };
+      const newWorkspace = (phone) => ({
+        phone,
+        memberId: deriveId(phone),
+        vipLevel: 1,
+        totalBalanceBaht: 0,
+        transactionBalanceBaht: 0,
+        withdrawalPin: null,
+        bankAccount: null,
+        lockedLevels: [],
+        lockedItemIds: [],
+        txHistory: [],
+        activeBid: null,
+        lastSettledItem: null,
+      });
+
+      // Seed default demo user with 0 Baht
+      let users = readLS(KEYS.USERS, null);
+      if (!users) {
+        users = [{ phone: '0812345678', password: '123456', createdAt: new Date().toISOString() }];
+        writeLS(KEYS.USERS, users);
+      }
+      let workspaces = readLS(KEYS.WORKSPACES, null);
+      if (!workspaces) {
+        workspaces = { '0812345678': newWorkspace('0812345678') };
+        writeLS(KEYS.WORKSPACES, workspaces);
+      }
+      let auctions = readLS(KEYS.AUCTIONS, DEFAULT_AUCTIONS);
+      let alerts = readLS(KEYS.ALERTS, []);
+      let currentUser = readLS(KEYS.SESSION, null);
+
+      let activeView = new URLSearchParams(location.search).get('admin') === '1'
+        ? 'admin'
+        : sessionStorage.getItem(KEYS.TAB_VIEW) || 'home';
+      let adminUnlocked = sessionStorage.getItem(KEYS.TAB_ADMIN) === '1';
+      let accountPanel = sessionStorage.getItem(KEYS.TAB_PANEL) || 'none';
+      let selectedArt = ARTWORKS[0];
+      let filterOrigin = 'all';
+      let authMode = 'login';
+      let openLevel = null;
+      let slideIdx = 0;
+      let adminSelectedPhone = currentUser?.phone || Object.keys(workspaces)[0];
+      let toast = null;
+      let sliderPaused = false;
+      let tapCount = 0;
+      let lastTap = 0;
+
+      const setToast = (msg) => {
+        toast = msg;
+        render();
+        setTimeout(() => { toast = null; render(); }, 4000);
+      };
+
+      const setView = (v) => {
+        activeView = v;
+        if (v !== 'admin') sessionStorage.setItem(KEYS.TAB_VIEW, v);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        render();
+      };
+
+      const activePhone = () => currentUser?.phone || null;
+      const activeWs = () => (activePhone() && workspaces[activePhone()]) || {
+        phone: 'guest', memberId: 'ผู้เยี่ยมชม', vipLevel: 1, totalBalanceBaht: 0,
+        transactionBalanceBaht: 0, withdrawalPin: null, bankAccount: null,
+        lockedLevels: [], lockedItemIds: [], txHistory: [], activeBid: null, lastSettledItem: null
+      };
+
+      // Cross-tab sync
+      window.addEventListener('storage', () => {
+        users = readLS(KEYS.USERS, users);
+        workspaces = readLS(KEYS.WORKSPACES, workspaces);
+        alerts = readLS(KEYS.ALERTS, alerts);
+        render();
+      });
+
+      // 1-second timer tick & auto-settlement
+      setInterval(() => {
+        const now = Date.now();
+        let changed = false;
+        Object.keys(workspaces).forEach((p) => {
+          const ws = workspaces[p];
+          if (ws.activeBid && now >= ws.activeBid.endsAt) {
+            const item = ws.activeBid.item;
+            const ret = item.priceBaht + item.commissionBaht;
+            ws.transactionBalanceBaht = Math.max(0, ws.transactionBalanceBaht - item.priceBaht);
+            ws.totalBalanceBaht += ret;
+            ws.lastSettledItem = item;
+            ws.activeBid = null;
+            ws.txHistory.unshift({
+              id: 'tx-' + now,
+              type: 'commission_return',
+              title: 'คืนทุน + ค่าคอมมิชชั่น: ' + item.titleTh,
+              amountBaht: ret,
+              timestamp: new Date().toISOString(),
+              status: 'สำเร็จ',
+            });
+            changed = true;
+            if (p === activePhone()) {
+              setToast(`หมดเวลาประมูล "${item.titleTh}" แล้ว — รวมเงิน ${fmt(ret)} บาทเข้าบัญชีเรียบร้อย`);
+            }
+          }
+        });
+        if (changed) writeLS(KEYS.WORKSPACES, workspaces);
+        if (activeView === 'timer' || activeView === 'auction') render();
+      }, 1000);
+
+      function render() {
+        const ws = activeWs();
+        const titleMap = { home: 'หน้าแรก', auction: 'ประมูล', timer: 'เวลา', account: 'บัญชี', admin: 'หลังบ้าน', auth: authMode === 'register' ? 'สมัครสมาชิก' : 'เข้าสู่ระบบ' };
+        const hasBid = ws.activeBid && ws.activeBid.endsAt > Date.now();
+        const remMs = hasBid ? Math.max(0, ws.activeBid.endsAt - Date.now()) : 0;
+        const mm = String(Math.floor(remMs / 60000)).padStart(2, '0');
+        const ss = String(Math.floor((remMs % 60000) / 1000)).padStart(2, '0');
+
+        let mainHtml = '';
+
+        if (activeView === 'home') {
+          const filtered = filterOrigin === 'all' ? ARTWORKS : ARTWORKS.filter((a) => a.origin === filterOrigin);
+          const sliderCards = [...ARTWORKS, ...ARTWORKS].map((a) => `
+            <div onclick="selectArt('${a.id}')" class="w-56 shrink-0 bg-white border ${selectedArt.id === a.id ? 'border-[#C59B27] ring-1 ring-[#C59B27]' : 'border-[#C59B27]/40'} rounded-xl overflow-hidden shadow-sm cursor-pointer">
+              <div class="aspect-[4/3] bg-[#FAF8F5] overflow-hidden">
+                <img src="${a.imageUrl}" alt="${a.titleTh}" class="w-full h-full object-cover" />
+              </div>
+              <div class="p-2.5">
+                <span class="text-[10px] font-bold text-[#8C6A10]">${a.originLabel}</span>
+                <div class="font-editorial text-sm font-bold truncate">${a.titleTh}</div>
+                <div class="text-[11px] text-[#5C544B] truncate">${a.artistTh}</div>
+              </div>
+            </div>
+          `).join('');
+
+          mainHtml = `
+            <main class="flex-1 max-w-7xl mx-auto w-full px-3 sm:px-6 py-4 space-y-4">
+              <section class="bg-white border border-[#C59B27]/60 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
+                <div>
+                  <p class="text-[11px] uppercase text-[#8C6A10] font-semibold">นิทรรศการภาพวาดไทยและต่างประเทศ</p>
+                  <h1 class="font-editorial text-xl sm:text-2xl font-bold mt-0.5">คลังศิลปะภาพวาดทรงคุณค่า แห่งสยามและนานาชาติ</h1>
+                  <p class="text-xs text-[#5C544B] mt-1">สไลด์หมุนเวียน 24 ชม. · กดค้างที่ภาพเพื่อหยุดพิจารณา</p>
+                </div>
+                <div class="flex items-center gap-4 shrink-0">
+                  <div><span class="block text-[11px] text-[#5C544B]">ผลงาน</span><b class="font-editorial text-lg">${ARTWORKS.length} ภาพ</b></div>
+                  <button onclick="setView('auction')" class="px-3.5 py-2 bg-[#C59B27] text-[#1E1B18] text-xs font-bold rounded-lg whitespace-nowrap">เข้าห้องประมูล 5 เลเวล</button>
+                </div>
+              </section>
+
+              <section class="overflow-hidden py-1" onmousedown="togglePause(true)" onmouseup="togglePause(false)" ontouchstart="togglePause(true)" ontouchend="togglePause(false)">
+                <div class="marquee-track gap-3 ${sliderPaused ? 'paused' : ''}">${sliderCards}</div>
+              </section>
+
+              <section class="bg-white border border-[#C59B27]/50 rounded-xl p-4 space-y-3 shadow-sm">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <h2 class="font-editorial text-lg font-bold">รายละเอียดผลงาน & ค่าคอมมิชชั่น</h2>
+                  <div class="flex gap-1.5 text-xs">
+                    <button onclick="setOriginFilter('all')" class="px-2.5 py-1 rounded ${filterOrigin === 'all' ? 'bg-[#C59B27] font-bold' : 'bg-[#FAF8F5] border border-[#C59B27]/40'}">ทั้งหมด</button>
+                    <button onclick="setOriginFilter('thai')" class="px-2.5 py-1 rounded ${filterOrigin === 'thai' ? 'bg-[#C59B27] font-bold' : 'bg-[#FAF8F5] border border-[#C59B27]/40'}">ศิลปะไทย</button>
+                    <button onclick="setOriginFilter('international')" class="px-2.5 py-1 rounded ${filterOrigin === 'international' ? 'bg-[#C59B27] font-bold' : 'bg-[#FAF8F5] border border-[#C59B27]/40'}">ต่างประเทศ</button>
+                  </div>
+                </div>
+                <div class="grid md:grid-cols-2 gap-4 bg-[#FAF8F5] p-3.5 rounded-xl border border-[#C59B27]/35">
+                  <img src="${selectedArt.imageUrl}" alt="${selectedArt.titleTh}" class="w-full aspect-[4/3] object-cover rounded-lg border border-[#C59B27]/40" />
+                  <div class="space-y-2 text-xs">
+                    <div class="text-[#8C6A10] font-bold">${selectedArt.accessionNo} · ${selectedArt.originLabel}</div>
+                    <h3 class="font-editorial text-xl font-bold">${selectedArt.titleTh}</h3>
+                    <p class="text-[#5C544B]">${selectedArt.description}</p>
+                    <div class="grid grid-cols-2 gap-2 pt-2 border-t border-[#C59B27]/30">
+                      <div><span class="text-[#5C544B] block">ศิลปิน</span><b>${selectedArt.artistTh}</b></div>
+                      <div><span class="text-[#5C544B] block">ผู้ครอบครอง</span><b>${selectedArt.owner}</b></div>
+                      <div><span class="text-[#5C544B] block">มูลค่าประเมิน</span><b>${fmt(selectedArt.estimatedValueBaht)} บาท</b></div>
+                      <div><span class="text-[#5C544B] block">ค่าคอมมิชชั่น</span><b class="text-[#8C6A10]">${fmt(selectedArt.commissionBaht)} บาท</b></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2.5">
+                  ${filtered.map((a) => `
+                    <button onclick="selectArt('${a.id}')" class="text-left p-2 rounded-lg border ${selectedArt.id === a.id ? 'border-[#C59B27] bg-[#FAF8F5]' : 'border-[#C59B27]/30 bg-white'}">
+                      <img src="${a.imageUrl}" alt="${a.titleTh}" class="w-full aspect-[4/3] object-cover rounded mb-1.5" />
+                      <div class="text-xs font-bold truncate">${a.titleTh}</div>
+                      <div class="text-[11px] text-[#8C6A10]">คอมฯ ${fmt(a.commissionBaht)} ฿</div>
+                    </button>
+                  `).join('')}
+                </div>
+              </section>
+            </main>`;
+        } else if (activeView === 'auction') {
+          const levelCards = LEVELS.map((l) => {
+            const locked = ws.lockedLevels.includes(l.level);
+            return `
+              <button onclick="openLvlModal(${l.level})" class="text-left p-3.5 rounded-xl border border-[#C59B27]/60 bg-white hover:border-[#C59B27] shadow-sm space-y-2">
+                <div class="flex justify-between items-center">
+                  <span class="text-xs font-bold px-2 py-0.5 rounded ${locked ? 'bg-[#EBE6DF]' : 'bg-[#C59B27]'}">เลเวล ${l.level}</span>
+                  <span class="text-[11px] text-[#8C6A10]">${l.motif}</span>
+                </div>
+                <div class="font-editorial text-base font-bold">${l.name}</div>
+                <div class="text-[11px] text-[#5C544B]">ราคา: ${l.priceRange}</div>
+                <div class="text-[11px] text-[#8C6A10] font-semibold">คอมฯ: ${l.commRange}</div>
+              </button>`;
+          }).join('');
+
+          let modalHtml = '';
+          if (openLevel) {
+            const items = auctions.filter((i) => i.level === openLevel);
+            const cur = items[slideIdx] || items[0];
+            const isLocked = ws.lockedLevels.includes(openLevel) || ws.lockedItemIds.includes(`lv${cur.level}-slot${cur.slotIndex}`);
+            modalHtml = `
+              <div onclick="closeLvlModal()" class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-3">
+                <div onclick="event.stopPropagation()" class="w-full max-w-md bg-white border-2 border-[#C59B27] rounded-2xl p-4 space-y-3">
+                  <div class="flex justify-between items-center">
+                    <h3 class="font-editorial font-bold text-lg">เลเวล ${openLevel} · ภาพ ${slideIdx + 1}/${items.length}</h3>
+                    <button onclick="closeLvlModal()" class="px-2 py-1 text-xs border border-[#C59B27]/60 rounded">ปิด</button>
+                  </div>
+                  <div class="flex justify-between gap-2 text-xs">
+                    <button onclick="stepSlide(-1)" ${slideIdx === 0 ? 'disabled' : ''} class="px-3 py-1 bg-[#FAF8F5] border rounded disabled:opacity-40">ก่อนหน้า</button>
+                    <button onclick="stepSlide(1)" ${slideIdx === items.length - 1 ? 'disabled' : ''} class="px-3 py-1 bg-[#FAF8F5] border rounded disabled:opacity-40">ถัดไป</button>
+                  </div>
+                  <img src="${cur.imageUrl}" class="w-full aspect-[16/10] object-cover rounded-lg border border-[#C59B27]/40" />
+                  <div>
+                    <div class="font-editorial text-lg font-bold">${cur.titleTh}</div>
+                    <div class="text-xs text-[#5C544B]">ศิลปิน: ${cur.artistTh} · เวลา ${cur.durationMinutes} นาที</div>
+                  </div>
+                  <div class="grid grid-cols-2 gap-2 bg-[#FAF8F5] p-3 rounded-lg border border-[#C59B27]/35 text-xs">
+                    <div><span class="text-[#5C544B] block">ราคา</span><b class="text-sm">${fmt(cur.priceBaht)} บาท</b></div>
+                    <div><span class="text-[#5C544B] block">ค่าคอมมิชชั่น</span><b class="text-sm text-[#8C6A10]">+${fmt(cur.commissionBaht)} บาท</b></div>
+                    <div><span class="text-[#5C544B] block">ผู้เข้าร่วม</span><b>${fmt(cur.participants)} คน</b></div>
+                    <div><span class="text-[#5C544B] block">ถูกใจ</span><b>${fmt(cur.likes)}</b></div>
+                  </div>
+                  <button onclick="placeBid('${cur.id}')" ${isLocked || hasBid ? 'disabled' : ''} class="w-full py-2.5 bg-[#C59B27] disabled:bg-[#EBE6DF] font-bold text-sm rounded-lg">
+                    ${isLocked ? 'รายการนี้ถูกล็อกโดยหลังบ้าน' : hasBid ? 'มีรายการกำลังนับถอยหลังอยู่' : `ประมูล (${fmt(cur.priceBaht)} บาท)`}
+                  </button>
+                </div>
+              </div>`;
+          }
+
+          mainHtml = `
+            <main class="flex-1 max-w-7xl mx-auto w-full px-3 sm:px-6 py-4 space-y-4">
+              <section class="bg-white border border-[#C59B27] rounded-xl p-4 flex flex-wrap justify-between items-center gap-3">
+                <h1 class="font-editorial text-xl font-bold">ห้องประมูลภาพวาดศิลปะ 5 เลเวล</h1>
+                <div class="flex gap-3 text-xs">
+                  <div class="bg-[#FAF8F5] border border-[#C59B27]/40 px-3 py-2 rounded-lg"><span class="block text-[#5C544B]">เงินทั้งหมด</span><b class="text-base">${fmt(ws.totalBalanceBaht)} ฿</b></div>
+                  <div class="bg-[#FAF8F5] border border-[#C59B27]/40 px-3 py-2 rounded-lg"><span class="block text-[#5C544B]">ธุรกรรม</span><b class="text-base text-[#8C6A10]">${fmt(ws.transactionBalanceBaht)} ฿</b></div>
+                </div>
+              </section>
+              <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">${levelCards}</section>
+              ${modalHtml}
+            </main>`;
+        } else if (activeView === 'timer') {
+          mainHtml = `
+            <main class="flex-1 max-w-2xl mx-auto w-full px-4 py-6">
+              <div class="bg-white border-2 border-[#C59B27] rounded-2xl p-6 text-center space-y-4 shadow-sm">
+                <h1 class="font-editorial text-xl font-bold">เวลานับถอยหลังการประมูล</h1>
+                ${hasBid ? `
+                  <img src="${ws.activeBid.item.imageUrl}" class="w-full max-h-56 object-cover rounded-xl border border-[#C59B27]/40" />
+                  <div class="font-editorial text-lg font-bold">${ws.activeBid.item.titleTh}</div>
+                  <div class="text-4xl font-bold text-[#8C6A10] tabular-nums">${mm}:${ss}</div>
+                  <div class="text-xs text-[#5C544B]">ทุน ${fmt(ws.activeBid.item.priceBaht)} ฿ + ค่าคอมฯ ${fmt(ws.activeBid.item.commissionBaht)} ฿ จะคืนเข้าเงินทั้งหมดเมื่อครบเวลา</div>
+                ` : `
+                  <p class="text-sm text-[#5C544B]">ยังไม่มีรายการที่กำลังนับถอยหลัง</p>
+                  ${ws.lastSettledItem ? `<div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-900">รายการล่าสุดเสร็จสิ้นแล้ว: ${ws.lastSettledItem.titleTh}</div>` : ''}
+                  <button onclick="setView('auction')" class="px-5 py-2.5 bg-[#C59B27] font-bold text-sm rounded-lg">ไปหน้าประมูล</button>
+                `}
+              </div>
+            </main>`;
+        } else if (activeView === 'account') {
+          mainHtml = `
+            <main class="flex-1 max-w-2xl mx-auto w-full px-3 sm:px-6 py-4 space-y-4">
+              <section class="bg-white border-2 border-[#C59B27] rounded-2xl p-4 space-y-3 shadow-sm">
+                <div class="flex flex-wrap justify-between items-center gap-2">
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <span class="px-2 py-0.5 bg-[#C59B27] text-xs font-bold rounded">VIP ${ws.vipLevel}</span>
+                      <span class="text-xs font-semibold text-emerald-700">${currentUser ? 'ยืนยันตัวตนแล้ว · คลังศิลปะรับรอง' : 'โหมดผู้เยี่ยมชม'}</span>
+                    </div>
+                    <div class="font-editorial text-lg font-bold mt-1">รหัสสมาชิก ID: ${ws.memberId}</div>
+                  </div>
+                  ${!currentUser ? `<button onclick="openAuth('login')" class="px-3 py-1.5 bg-[#C59B27] text-xs font-bold rounded-lg">เข้าสู่ระบบ / สมัครสมาชิก</button>` : ''}
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="bg-[#FAF8F5] border border-[#C59B27]/45 p-3 rounded-xl"><span class="text-xs text-[#5C544B]">เงินทั้งหมด</span><b class="block text-xl font-bold">${fmt(ws.totalBalanceBaht)} ฿</b></div>
+                  <div class="bg-[#FAF8F5] border border-[#C59B27]/45 p-3 rounded-xl"><span class="text-xs text-[#5C544B]">ธุรกรรม</span><b class="block text-xl font-bold text-[#8C6A10]">${fmt(ws.transactionBalanceBaht)} ฿</b></div>
+                </div>
+                <div class="space-y-2">
+                  <button onclick="setAccPanel('topup')" class="w-full py-2.5 bg-[#C59B27] font-bold text-sm rounded-lg">เติมเงิน</button>
+                  <button onclick="setAccPanel('withdraw')" class="w-full py-2.5 bg-[#FAF8F5] border border-[#C59B27] font-bold text-sm rounded-lg">ถอนเงิน</button>
+                </div>
+              </section>
+
+              <section class="bg-white border border-[#C59B27]/50 rounded-xl p-4 space-y-2 text-sm">
+                <a href="${LINE_URL}" target="_blank" rel="noopener noreferrer" class="flex justify-between items-center p-2.5 bg-[#FAF8F5] rounded-lg border border-[#C59B27]/30">
+                  <span class="font-semibold">ศูนย์ช่วยเหลือ (LINE ฝ่ายบริการ)</span><span class="text-xs text-[#8C6A10]">เปิด LINE &rarr;</span>
+                </a>
+                <button onclick="setAccPanel('pin')" class="w-full flex justify-between items-center p-2.5 bg-[#FAF8F5] rounded-lg border border-[#C59B27]/30 text-left">
+                  <span class="font-semibold">รหัสถอน (6 ตัวเลข)</span><span class="text-xs text-[#5C544B]">${ws.withdrawalPin ? 'ตั้งค่าแล้ว (เปลี่ยนเองไม่ได้)' : 'กดเพื่อตั้งค่า'}</span>
+                </button>
+                <button onclick="setAccPanel('bank')" class="w-full flex justify-between items-center p-2.5 bg-[#FAF8F5] rounded-lg border border-[#C59B27]/30 text-left">
+                  <span class="font-semibold">บัญชีธนาคารรับเงิน</span><span class="text-xs text-[#5C544B]">${ws.bankAccount ? ws.bankAccount.bankName + ' · ' + maskBank(ws.bankAccount.accountNumber) : 'กดเพื่อผูกบัญชี'}</span>
+                </button>
+                <button onclick="setAccPanel('history')" class="w-full flex justify-between items-center p-2.5 bg-[#FAF8F5] rounded-lg border border-[#C59B27]/30 text-left">
+                  <span class="font-semibold">ประวัติธุรกรรม</span><span class="text-xs text-[#8C6A10]">${ws.txHistory.length} รายการ</span>
+                </button>
+              </section>
+
+              ${renderAccountSubPanel(ws)}
+            </main>`;
+        } else if (activeView === 'auth') {
+          mainHtml = `
+            <main class="flex-1 max-w-md mx-auto w-full px-4 py-8">
+              <div class="bg-white border-2 border-[#C59B27] rounded-2xl p-6 space-y-4 shadow-sm">
+                <div class="flex gap-2">
+                  <button onclick="openAuth('login')" class="flex-1 py-2 rounded-lg text-xs font-bold ${authMode === 'login' ? 'bg-[#C59B27]' : 'bg-[#FAF8F5] border'}">เข้าสู่ระบบ</button>
+                  <button onclick="openAuth('register')" class="flex-1 py-2 rounded-lg text-xs font-bold ${authMode === 'register' ? 'bg-[#C59B27]' : 'bg-[#FAF8F5] border'}">สมัครสมาชิก</button>
+                </div>
+                <form onsubmit="submitAuth(event)" class="space-y-3 text-xs">
+                  <div><label class="block font-semibold mb-1">เบอร์โทรศัพท์</label><input id="auth-phone" required placeholder="08XXXXXXXX" class="w-full p-2.5 bg-[#FAF8F5] border border-[#C59B27]/60 rounded-lg" /></div>
+                  <div><label class="block font-semibold mb-1">รหัสผ่าน (ตัวเลข 6-8 หลัก)</label><input id="auth-pass" type="password" required minlength="6" maxlength="8" class="w-full p-2.5 bg-[#FAF8F5] border border-[#C59B27]/60 rounded-lg" /></div>
+                  ${authMode === 'register' ? `<div><label class="block font-semibold mb-1">ยืนยันรหัสผ่าน</label><input id="auth-confirm" type="password" required minlength="6" maxlength="8" class="w-full p-2.5 bg-[#FAF8F5] border border-[#C59B27]/60 rounded-lg" /></div>` : ''}
+                  <button type="submit" class="w-full py-2.5 bg-[#C59B27] font-bold text-sm rounded-lg">${authMode === 'register' ? 'ยืนยันสมัครสมาชิก (เริ่มต้น 0 บาท)' : 'เข้าสู่ระบบ'}</button>
+                </form>
+              </div>
+            </main>`;
+        } else if (activeView === 'admin') {
+          if (!adminUnlocked) {
+            mainHtml = `
+              <main class="flex-1 flex items-center justify-center p-4">
+                <form onsubmit="unlockAdmin(event)" class="w-full max-w-sm bg-white border-2 border-[#C59B27] rounded-2xl p-6 space-y-4 text-center">
+                  <h1 class="font-editorial text-xl font-bold">เข้าสู่ระบบหลังบ้าน</h1>
+                  <input id="admin-pin" type="password" maxlength="6" placeholder="••••••" class="w-full p-2.5 text-center font-bold tracking-widest bg-[#FAF8F5] border border-[#C59B27] rounded-lg" />
+                  <button type="submit" class="w-full py-2.5 bg-[#C59B27] font-bold text-sm rounded-lg">ยืนยันรหัสผ่านหลังบ้าน</button>
+                </form>
+              </main>`;
+          } else {
+            const sel = workspaces[adminSelectedPhone] || Object.values(workspaces)[0];
+            const unread = alerts.filter((a) => !a.readByAdmin).length;
+            mainHtml = `
+              <main class="flex-1 max-w-5xl mx-auto w-full px-3 sm:px-6 py-4 space-y-4 text-xs">
+                <div class="bg-white border border-[#C59B27] rounded-xl p-4 flex justify-between items-center">
+                  <h1 class="font-editorial text-lg font-bold">ระบบหลังบ้าน · จัดการสมาชิกและยอดเงิน</h1>
+                  <button onclick="lockAdmin()" class="px-3 py-1.5 bg-[#FAF8F5] border border-[#C59B27] rounded font-semibold">ออกหลังบ้าน</button>
+                </div>
+                <div class="bg-white border border-[#C59B27] rounded-xl p-4 space-y-2">
+                  <div class="flex justify-between items-center">
+                    <b class="text-sm">แจ้งเตือนผู้สมัครใหม่สำหรับ "อ๊อฟ" (${unread} รายการใหม่)</b>
+                    <button onclick="markAlertsRead()" class="text-[#8C6A10] underline">รับทราบทั้งหมด</button>
+                  </div>
+                  ${alerts.length === 0 ? '<p class="text-[#5C544B]">ยังไม่มีผู้สมัครใหม่</p>' : alerts.slice(0, 8).map((a) => `
+                    <div class="flex justify-between items-center p-2 rounded ${a.readByAdmin ? 'bg-[#FAF8F5]' : 'bg-amber-50 border border-[#C59B27]'}">
+                      <span>${a.memberId} · โทร ${a.phone}</span>
+                      <button onclick="selectAdminMember('${a.phone}')" class="px-2 py-1 bg-[#C59B27] rounded font-bold">จัดการ/เติมเงิน</button>
+                    </div>
+                  `).join('')}
+                </div>
+                <div class="bg-white border border-[#C59B27] rounded-xl p-4 space-y-3">
+                  <div class="flex flex-wrap gap-2">
+                    ${Object.values(workspaces).map((m) => `<button onclick="selectAdminMember('${m.phone}')" class="px-2.5 py-1 rounded border ${sel.phone === m.phone ? 'bg-[#C59B27] font-bold' : 'bg-[#FAF8F5]'}">${m.memberId} (${m.phone}) · ${fmt(m.totalBalanceBaht)} ฿</button>`).join('')}
+                  </div>
+                  <div class="p-3 bg-[#FAF8F5] rounded-lg space-y-2">
+                    <div>สมาชิกที่เลือก: <b>${sel.memberId} (${sel.phone})</b> | ยอดเงินปัจจุบัน: <b class="text-[#8C6A10]">${fmt(sel.totalBalanceBaht)} บาท</b></div>
+                    <div class="flex gap-2">
+                      <input id="adj-amt" type="number" value="10000" class="flex-1 p-2 bg-white border border-[#C59B27]/60 rounded" />
+                      <button onclick="adminAdjust(1)" class="px-3 py-2 bg-[#C59B27] font-bold rounded">+ เพิ่มยอด</button>
+                      <button onclick="adminAdjust(-1)" class="px-3 py-2 bg-white border border-red-400 text-red-700 font-bold rounded">- หักยอด</button>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5 pt-2">
+                      ${[1, 2, 3, 4, 5].map((lv) => {
+                        const lk = sel.lockedLevels.includes(lv);
+                        return `<button onclick="toggleLvlLock('${sel.phone}', ${lv})" class="px-2.5 py-1 rounded border ${lk ? 'bg-red-50 border-red-400 text-red-700' : 'bg-white border-[#C59B27]/40'}">${lk ? 'ปลดล็อก' : 'ล็อก'} เลเวล ${lv}</button>`;
+                      }).join('')}
+                    </div>
+                  </div>
+                </div>
+              </main>`;
+          }
+        }
+
+        document.getElementById('app').innerHTML = `
+          <header class="sticky top-0 z-40 bg-[#FAF8F5]/95 border-b border-[#C59B27]/35">
+            <div class="max-w-7xl mx-auto px-3 sm:px-6 h-12 grid grid-cols-3 items-center">
+              <button onclick="setView('home')" class="text-left font-editorial text-sm sm:text-base font-bold truncate">หอศิลป์สุวรรณวิจิตร</button>
+              <button onclick="handleCenterTap()" class="font-editorial text-base font-bold text-center select-none">${titleMap[activeView] || 'หน้าแรก'}</button>
+              <div class="text-right">
+                ${currentUser
+                  ? `<button onclick="logout()" class="px-2.5 py-1 text-xs font-semibold bg-white border border-[#C59B27] rounded">ออกระบบ</button>`
+                  : `<button onclick="openAuth('login')" class="px-2.5 py-1 text-xs font-bold bg-[#C59B27] rounded">เข้าสู่ระบบ</button>`}
+              </div>
+            </div>
+          </header>
+          ${toast ? `<div class="fixed top-14 left-1/2 -translate-x-1/2 z-50 bg-emerald-50 border-2 border-emerald-600 text-emerald-950 px-4 py-2 rounded-xl text-xs font-bold shadow">${toast}</div>` : ''}
+          ${mainHtml}
+          <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 border-t border-[#C59B27]/45">
+            <div class="max-w-3xl mx-auto grid grid-cols-4 h-14 text-[11px]">
+              ${[['home', 'หน้าแรก'], ['auction', 'ประมูล'], ['timer', hasBid ? 'เวลา (กำลังนับ)' : 'เวลา'], ['account', 'บัญชี']].map(([v, lb]) => `
+                <button onclick="setView('${v}')" class="flex items-center justify-center border-t-2 ${activeView === v ? 'bg-[#FAF8F5] border-[#C59B27] font-bold' : 'border-transparent text-[#5C544B]'}">${lb}</button>
+              `).join('')}
+            </div>
+          </nav>`;
+      }
+
+      function renderAccountSubPanel(ws) {
+        if (accountPanel === 'none') return '';
+        let body = '';
+        if (accountPanel === 'topup') {
+          body = `<form onsubmit="submitTopup(event)" class="space-y-2"><input id="dep-amt" type="number" min="100" required placeholder="จำนวนเงินเติม (บาท)" class="w-full p-2 border rounded" /><button class="w-full py-2 bg-[#C59B27] font-bold rounded">ส่งคำขอเติมเงิน</button></form>`;
+        } else if (accountPanel === 'withdraw') {
+          body = `<form onsubmit="submitWithdraw(event)" class="space-y-2"><input id="wd-amt" type="number" min="100" required placeholder="จำนวนเงินถอน" class="w-full p-2 border rounded" /><input id="wd-pin" type="password" maxlength="6" required placeholder="รหัสถอน 6 หลัก" class="w-full p-2 border rounded" /><button class="w-full py-2 bg-[#C59B27] font-bold rounded">ส่งคำขอถอนเงิน</button></form>`;
+        } else if (accountPanel === 'pin') {
+          body = ws.withdrawalPin ? `<p class="text-xs text-[#5C544B]">ตั้งค่าแล้ว หากต้องการเปลี่ยนกรุณาติดต่อฝ่ายบริการ</p>` : `<form onsubmit="submitPin(event)" class="space-y-2"><input id="new-pin" maxlength="6" required placeholder="ตั้งรหัสถอน 6 หลัก" class="w-full p-2 border rounded" /><button class="w-full py-2 bg-[#C59B27] font-bold rounded">บันทึกรหัสถอน</button></form>`;
+        } else if (accountPanel === 'bank') {
+          body = ws.bankAccount ? `<p class="text-xs">${ws.bankAccount.bankName} · ${ws.bankAccount.accountHolder} · ${maskBank(ws.bankAccount.accountNumber)}</p>` : `<form onsubmit="submitBank(event)" class="space-y-2"><select id="bk-name" class="w-full p-2 border rounded">${BANK_LIST.map((b) => `<option>${b}</option>`).join('')}</select><input id="bk-holder" required placeholder="ชื่อบัญชี" class="w-full p-2 border rounded" /><input id="bk-num" required minlength="10" maxlength="12" placeholder="เลขบัญชี 10-12 หลัก" class="w-full p-2 border rounded" /><button class="w-full py-2 bg-[#C59B27] font-bold rounded">ผูกบัญชีธนาคาร</button></form>`;
+        } else if (accountPanel === 'history') {
+          body = ws.txHistory.length === 0 ? '<p class="text-xs text-[#5C544B]">ยังไม่มีรายการธุรกรรม</p>' : ws.txHistory.slice(0, 15).map((t) => `<div class="flex justify-between py-1.5 border-b text-xs"><span>${t.title} (${t.status})</span><b>${fmt(t.amountBaht)} ฿</b></div>`).join('');
+        }
+        return `<section class="bg-white border border-[#C59B27] rounded-xl p-4 space-y-2 text-xs"><div class="flex justify-between font-bold"><span>จัดการบัญชี</span><button onclick="setAccPanel('none')">ปิด</button></div>${body}</section>`;
+      }
+
+      window.selectArt = (id) => { selectedArt = ARTWORKS.find((a) => a.id === id) || ARTWORKS[0]; render(); };
+      window.setOriginFilter = (f) => { filterOrigin = f; render(); };
+      window.togglePause = (p) => { sliderPaused = p; render(); };
+      window.openLvlModal = (lv) => { openLevel = lv; slideIdx = 0; render(); };
+      window.closeLvlModal = () => { openLevel = null; render(); };
+      window.stepSlide = (d) => { slideIdx = Math.max(0, Math.min(2, slideIdx + d)); render(); };
+      window.setAccPanel = (p) => { accountPanel = p; sessionStorage.setItem(KEYS.TAB_PANEL, p); render(); };
+      window.openAuth = (m) => { authMode = m; setView('auth'); };
+      window.logout = () => { currentUser = null; localStorage.removeItem(KEYS.SESSION); setView('home'); setToast('ออกจากระบบเรียบร้อย'); };
+      window.handleCenterTap = () => {
+        const now = Date.now();
+        if (now - lastTap > 2500) tapCount = 0;
+        lastTap = now;
+        if (++tapCount >= 5) { tapCount = 0; setView('admin'); }
+      };
+
+      window.submitAuth = (e) => {
+        e.preventDefault();
+        const phone = document.getElementById('auth-phone').value.replace(/\D/g, '');
+        const pass = document.getElementById('auth-pass').value;
+        if (authMode === 'register') {
+          const conf = document.getElementById('auth-confirm').value;
+          if (pass !== conf) return setToast('ยืนยันรหัสผ่านไม่ตรงกัน');
+          if (users.some((u) => u.phone === phone)) return setToast('เบอร์นี้สมัครสมาชิกไว้แล้ว');
+          const u = { phone, password: pass, createdAt: new Date().toISOString() };
+          users.push(u);
+          workspaces[phone] = newWorkspace(phone);
+          alerts.unshift({ id: 'al-' + Date.now(), phone, memberId: deriveId(phone), readByAdmin: false });
+          writeLS(KEYS.USERS, users);
+          writeLS(KEYS.WORKSPACES, workspaces);
+          writeLS(KEYS.ALERTS, alerts);
+          currentUser = u;
+          writeLS(KEYS.SESSION, u);
+          setView('home');
+          setToast('สมัครสมาชิกสำเร็จ (ยอดเริ่มต้น 0 บาท)');
+        } else {
+          const u = users.find((x) => x.phone === phone && x.password === pass);
+          if (!u) return setToast('เบอร์โทรหรือรหัสผ่านไม่ถูกต้อง');
+          if (!workspaces[phone]) workspaces[phone] = newWorkspace(phone);
+          currentUser = u;
+          writeLS(KEYS.SESSION, u);
+          writeLS(KEYS.WORKSPACES, workspaces);
+          setView('home');
+          setToast('เข้าสู่ระบบสำเร็จ');
+        }
+      };
+
+      window.placeBid = (id) => {
+        if (!currentUser) return setToast('กรุณาเข้าสู่ระบบก่อนกดประมูล');
+        const ws = workspaces[currentUser.phone];
+        const item = auctions.find((i) => i.id === id);
+        if (!item || ws.totalBalanceBaht < item.priceBaht) return setToast('ยอดเงินทั้งหมดไม่เพียงพอ');
+        const now = Date.now();
+        ws.totalBalanceBaht -= item.priceBaht;
+        ws.transactionBalanceBaht += item.priceBaht;
+        ws.vipLevel = Math.max(ws.vipLevel, item.level);
+        ws.activeBid = { item, startedAt: now, endsAt: now + item.durationMinutes * 60000 };
+        ws.txHistory.unshift({ id: 'tx-' + now, title: 'ประมูล: ' + item.titleTh, amountBaht: -item.priceBaht, status: 'ย้ายเข้าธุรกรรม' });
+        writeLS(KEYS.WORKSPACES, workspaces);
+        openLevel = null;
+        setView('timer');
+      };
+
+      window.submitTopup = (e) => {
+        e.preventDefault();
+        if (!currentUser) return setToast('กรุณาเข้าสู่ระบบก่อน');
+        const amt = Number(document.getElementById('dep-amt').value);
+        workspaces[currentUser.phone].txHistory.unshift({ id: 'tx-' + Date.now(), title: 'คำขอเติมเงิน', amountBaht: amt, status: 'รออนุมัติ' });
+        writeLS(KEYS.WORKSPACES, workspaces);
+        setAccPanel('none');
+        setToast('ส่งคำขอเติมเงินเรียบร้อย');
+      };
+
+      window.submitWithdraw = (e) => {
+        e.preventDefault();
+        if (!currentUser) return setToast('กรุณาเข้าสู่ระบบก่อน');
+        const ws = workspaces[currentUser.phone];
+        const amt = Number(document.getElementById('wd-amt').value);
+        const pin = document.getElementById('wd-pin').value;
+        if (!ws.bankAccount || !ws.withdrawalPin) return setToast('กรุณาผูกบัญชีและตั้งรหัสถอนก่อน');
+        if (pin !== ws.withdrawalPin) return setToast('รหัสถอนไม่ถูกต้อง');
+        if (amt > ws.totalBalanceBaht) return setToast('ยอดเงินไม่เพียงพอ');
+        ws.totalBalanceBaht -= amt;
+        ws.txHistory.unshift({ id: 'tx-' + Date.now(), title: 'คำขอถอนเงิน', amountBaht: -amt, status: 'รออนุมัติ' });
+        writeLS(KEYS.WORKSPACES, workspaces);
+        setAccPanel('none');
+        setToast('ส่งคำขอถอนเงินเรียบร้อย');
+      };
+
+      window.submitPin = (e) => {
+        e.preventDefault();
+        if (!currentUser) return setToast('กรุณาเข้าสู่ระบบก่อน');
+        workspaces[currentUser.phone].withdrawalPin = document.getElementById('new-pin').value;
+        writeLS(KEYS.WORKSPACES, workspaces);
+        setAccPanel('none');
+        setToast('บันทึกรหัสถอน 6 หลักเรียบร้อย');
+      };
+
+      window.submitBank = (e) => {
+        e.preventDefault();
+        if (!currentUser) return setToast('กรุณาเข้าสู่ระบบก่อน');
+        workspaces[currentUser.phone].bankAccount = {
+          bankName: document.getElementById('bk-name').value,
+          accountHolder: document.getElementById('bk-holder').value,
+          accountNumber: document.getElementById('bk-num').value,
+        };
+        writeLS(KEYS.WORKSPACES, workspaces);
+        setAccPanel('none');
+        setToast('ผูกบัญชีธนาคารเรียบร้อย');
+      };
+
+      window.unlockAdmin = (e) => {
+        e.preventDefault();
+        if (document.getElementById('admin-pin').value !== ADMIN_PASSCODE) return setToast('รหัสผ่านไม่ถูกต้อง');
+        adminUnlocked = true;
+        sessionStorage.setItem(KEYS.TAB_ADMIN, '1');
+        render();
+      };
+      window.lockAdmin = () => {
+        adminUnlocked = false;
+        sessionStorage.removeItem(KEYS.TAB_ADMIN);
+        setView('home');
+      };
+      window.selectAdminMember = (p) => { adminSelectedPhone = p; render(); };
+      window.markAlertsRead = () => { alerts = alerts.map((a) => ({ ...a, readByAdmin: true })); writeLS(KEYS.ALERTS, alerts); render(); };
+      window.adminAdjust = (dir) => {
+        const amt = Math.abs(Number(document.getElementById('adj-amt').value || 0)) * dir;
+        const ws = workspaces[adminSelectedPhone];
+        if (!ws || ws.totalBalanceBaht + amt < 0) return setToast('ไม่สามารถหักเกินยอดคงเหลือได้');
+        ws.totalBalanceBaht += amt;
+        ws.txHistory.unshift({ id: 'tx-' + Date.now(), title: dir > 0 ? 'แอดมินเพิ่มยอดเงิน' : 'แอดมินหักยอดเงิน', amountBaht: amt, status: 'อนุมัติแล้ว' });
+        writeLS(KEYS.WORKSPACES, workspaces);
+        render();
+        setToast('ปรับยอดเงินและซิงก์เข้าบัญชีสมาชิกเรียบร้อย');
+      };
+      window.toggleLvlLock = (p, lv) => {
+        const ws = workspaces[p];
+        ws.lockedLevels = ws.lockedLevels.includes(lv) ? ws.lockedLevels.filter((x) => x !== lv) : [...ws.lockedLevels, lv];
+        writeLS(KEYS.WORKSPACES, workspaces);
+        render();
+      };
+
+      render();
+    </script>
+  </body>
+</html>
