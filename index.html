@@ -10,8 +10,8 @@
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Noto+Sans+Thai:wght@400;500;600;700&family=Noto+Serif+Thai:wght@600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
-    <script defer src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Noto+Sans+Thai:wght@400;500;600;700&family=Noto+Serif+Thai:wght@600;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
       body {
@@ -34,6 +34,28 @@
       .marquee-track.paused {
         animation-play-state: paused;
       }
+      /* Fallback CSS กรณีเปิดผ่าน In-App Browser แล้ว Tailwind โหลดช้า */
+      .bg-white { background-color: #ffffff; }
+      .bg-\[\#FAF8F5\] { background-color: #faf8f5; }
+      .bg-\[\#C59B27\] { background-color: #c59b27; color: #1e1b18; }
+      .text-\[\#8C6A10\] { color: #8c6a10; }
+      .text-\[\#5C544B\] { color: #5c544b; }
+      .border, .border-2 { border: 1px solid rgba(197, 155, 39, 0.55); }
+      .rounded-xl, .rounded-2xl { border-radius: 14px; }
+      .rounded-lg, .rounded { border-radius: 8px; }
+      .p-4, .p-6 { padding: 16px; }
+      .p-2\.5, .p-3, .p-3\.5 { padding: 12px; }
+      .px-3, .px-4, .px-6 { padding-left: 14px; padding-right: 14px; }
+      .py-2, .py-2\.5 { padding-top: 10px; padding-bottom: 10px; }
+      .space-y-2 > * + * { margin-top: 8px; }
+      .space-y-3 > * + * { margin-top: 12px; }
+      .space-y-4 > * + * { margin-top: 16px; }
+      .grid { display: grid; gap: 12px; }
+      .grid-cols-2, .grid-cols-3, .grid-cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .flex { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+      .justify-between { justify-content: space-between; }
+      img { max-width: 100%; height: auto; display: block; }
+      button { cursor: pointer; }
     </style>
   </head>
   <body class="min-h-screen flex flex-col bg-[#FAF8F5] text-[#1E1B18] pb-16">
@@ -230,8 +252,6 @@
       let adminSelectedPhone = currentUser?.phone || Object.keys(workspaces)[0];
       let toast = null;
       let sliderPaused = false;
-      let tapCount = 0;
-      let lastTap = 0;
 
       const setToast = (msg) => {
         toast = msg;
@@ -270,9 +290,7 @@
       });
 
       document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) {
-          loadCloudState();
-        }
+        if (!document.hidden) loadCloudState();
       });
 
       window.addEventListener('focus', () => {
@@ -578,7 +596,7 @@
           <header class="sticky top-0 z-40 bg-[#FAF8F5]/95 border-b border-[#C59B27]/35">
             <div class="max-w-7xl mx-auto px-3 sm:px-6 h-12 grid grid-cols-3 items-center">
               <button onclick="setView('home')" class="text-left font-editorial text-sm sm:text-base font-bold truncate">หอศิลป์สุวรรณวิจิตร</button>
-              <button onclick="handleCenterTap()" class="font-editorial text-base font-bold text-center select-none">${titleMap[activeView] || 'หน้าแรก'}</button>
+              <span class="font-editorial text-base font-bold text-center select-none">${titleMap[activeView] || 'หน้าแรก'}</span>
               <div class="text-right">
                 ${currentUser
                   ? `<button onclick="logout()" class="px-2.5 py-1 text-xs font-semibold bg-white border border-[#C59B27] rounded">ออกระบบ</button>`
@@ -628,12 +646,6 @@
       };
       window.openAuth = (m) => { authMode = m; setView('auth'); };
       window.logout = () => { currentUser = null; localStorage.removeItem(KEYS.SESSION); setView('home'); setToast('ออกจากระบบเรียบร้อย'); };
-      window.handleCenterTap = () => {
-        const now = Date.now();
-        if (now - lastTap > 2500) tapCount = 0;
-        lastTap = now;
-        if (++tapCount >= 5) { tapCount = 0; setView('admin'); }
-      };
 
       window.submitAuth = async (e) => {
         e.preventDefault();
