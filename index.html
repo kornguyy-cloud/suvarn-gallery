@@ -34,28 +34,6 @@
       .marquee-track.paused {
         animation-play-state: paused;
       }
-      /* Fallback CSS กรณีเปิดผ่าน In-App Browser แล้ว Tailwind โหลดช้า */
-      .bg-white { background-color: #ffffff; }
-      .bg-\[\#FAF8F5\] { background-color: #faf8f5; }
-      .bg-\[\#C59B27\] { background-color: #c59b27; color: #1e1b18; }
-      .text-\[\#8C6A10\] { color: #8c6a10; }
-      .text-\[\#5C544B\] { color: #5c544b; }
-      .border, .border-2 { border: 1px solid rgba(197, 155, 39, 0.55); }
-      .rounded-xl, .rounded-2xl { border-radius: 14px; }
-      .rounded-lg, .rounded { border-radius: 8px; }
-      .p-4, .p-6 { padding: 16px; }
-      .p-2\.5, .p-3, .p-3\.5 { padding: 12px; }
-      .px-3, .px-4, .px-6 { padding-left: 14px; padding-right: 14px; }
-      .py-2, .py-2\.5 { padding-top: 10px; padding-bottom: 10px; }
-      .space-y-2 > * + * { margin-top: 8px; }
-      .space-y-3 > * + * { margin-top: 12px; }
-      .space-y-4 > * + * { margin-top: 16px; }
-      .grid { display: grid; gap: 12px; }
-      .grid-cols-2, .grid-cols-3, .grid-cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .flex { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-      .justify-between { justify-content: space-between; }
-      img { max-width: 100%; height: auto; display: block; }
-      button { cursor: pointer; }
     </style>
   </head>
   <body class="min-h-screen flex flex-col bg-[#FAF8F5] text-[#1E1B18] pb-16">
@@ -340,7 +318,7 @@
         if (activeView === 'home') {
           const filtered = filterOrigin === 'all' ? ARTWORKS : ARTWORKS.filter((a) => a.origin === filterOrigin);
           const sliderCards = [...ARTWORKS, ...ARTWORKS].map((a) => `
-            <div onclick="selectArt('${a.id}')" class="w-56 shrink-0 bg-white border ${selectedArt.id === a.id ? 'border-[#C59B27] ring-1 ring-[#C59B27]' : 'border-[#C59B27]/40'} rounded-xl overflow-hidden shadow-sm cursor-pointer">
+            <div onclick="selectArt('${a.id}')" class="w-44 sm:w-52 shrink-0 bg-white border ${selectedArt.id === a.id ? 'border-[#C59B27] ring-1 ring-[#C59B27]' : 'border-[#C59B27]/40'} rounded-xl overflow-hidden shadow-sm cursor-pointer">
               <div class="aspect-[4/3] bg-[#FAF8F5] overflow-hidden">
                 <img src="${a.imageUrl}" alt="${a.titleTh}" class="w-full h-full object-cover" />
               </div>
@@ -353,7 +331,7 @@
           `).join('');
 
           mainHtml = `
-            <main class="flex-1 max-w-7xl mx-auto w-full px-3 sm:px-6 py-4 space-y-4">
+            <main class="flex-1 max-w-6xl mx-auto w-full px-3 sm:px-6 py-4 space-y-4">
               <section class="bg-white border border-[#C59B27]/60 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
                 <div>
                   <p class="text-[11px] uppercase text-[#8C6A10] font-semibold">นิทรรศการภาพวาดไทยและต่างประเทศ</p>
@@ -380,7 +358,7 @@
                   </div>
                 </div>
                 <div class="grid md:grid-cols-2 gap-4 bg-[#FAF8F5] p-3.5 rounded-xl border border-[#C59B27]/35">
-                  <img src="${selectedArt.imageUrl}" alt="${selectedArt.titleTh}" class="w-full aspect-[4/3] object-cover rounded-lg border border-[#C59B27]/40" />
+                  <img src="${selectedArt.imageUrl}" alt="${selectedArt.titleTh}" class="w-full max-h-72 object-cover rounded-lg border border-[#C59B27]/40" />
                   <div class="space-y-2 text-xs">
                     <div class="text-[#8C6A10] font-bold">${selectedArt.accessionNo} · ${selectedArt.originLabel}</div>
                     <h3 class="font-editorial text-xl font-bold">${selectedArt.titleTh}</h3>
@@ -396,7 +374,7 @@
                 <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2.5">
                   ${filtered.map((a) => `
                     <button onclick="selectArt('${a.id}')" class="text-left p-2 rounded-lg border ${selectedArt.id === a.id ? 'border-[#C59B27] bg-[#FAF8F5]' : 'border-[#C59B27]/30 bg-white'}">
-                      <img src="${a.imageUrl}" alt="${a.titleTh}" class="w-full aspect-[4/3] object-cover rounded mb-1.5" />
+                      <img src="${a.imageUrl}" alt="${a.titleTh}" class="w-full h-24 object-cover rounded mb-1.5" />
                       <div class="text-xs font-bold truncate">${a.titleTh}</div>
                       <div class="text-[11px] text-[#8C6A10]">คอมฯ ${fmt(a.commissionBaht)} ฿</div>
                     </button>
@@ -434,7 +412,7 @@
                     <button onclick="stepSlide(-1)" ${slideIdx === 0 ? 'disabled' : ''} class="px-3 py-1 bg-[#FAF8F5] border rounded disabled:opacity-40">ก่อนหน้า</button>
                     <button onclick="stepSlide(1)" ${slideIdx === items.length - 1 ? 'disabled' : ''} class="px-3 py-1 bg-[#FAF8F5] border rounded disabled:opacity-40">ถัดไป</button>
                   </div>
-                  <img src="${cur.imageUrl}" class="w-full aspect-[16/10] object-cover rounded-lg border border-[#C59B27]/40" />
+                  <img src="${cur.imageUrl}" class="w-full h-48 object-cover rounded-lg border border-[#C59B27]/40" />
                   <div>
                     <div class="font-editorial text-lg font-bold">${cur.titleTh}</div>
                     <div class="text-xs text-[#5C544B]">ศิลปิน: ${cur.artistTh} · เวลา ${cur.durationMinutes} นาที</div>
@@ -453,7 +431,7 @@
           }
 
           mainHtml = `
-            <main class="flex-1 max-w-7xl mx-auto w-full px-3 sm:px-6 py-4 space-y-4">
+            <main class="flex-1 max-w-6xl mx-auto w-full px-3 sm:px-6 py-4 space-y-4">
               <section class="bg-white border border-[#C59B27] rounded-xl p-4 flex flex-wrap justify-between items-center gap-3">
                 <h1 class="font-editorial text-xl font-bold">ห้องประมูลภาพวาดศิลปะ 5 เลเวล</h1>
                 <div class="flex gap-3 text-xs">
@@ -470,7 +448,7 @@
               <div class="bg-white border-2 border-[#C59B27] rounded-2xl p-6 text-center space-y-4 shadow-sm">
                 <h1 class="font-editorial text-xl font-bold">เวลานับถอยหลังการประมูล</h1>
                 ${hasBid ? `
-                  <img src="${ws.activeBid.item.imageUrl}" class="w-full max-h-56 object-cover rounded-xl border border-[#C59B27]/40" />
+                  <img src="${ws.activeBid.item.imageUrl}" class="w-full h-56 object-cover rounded-xl border border-[#C59B27]/40" />
                   <div class="font-editorial text-lg font-bold">${ws.activeBid.item.titleTh}</div>
                   <div class="text-4xl font-bold text-[#8C6A10] tabular-nums">${mm}:${ss}</div>
                   <div class="text-xs text-[#5C544B]">ทุน ${fmt(ws.activeBid.item.priceBaht)} ฿ + ค่าคอมฯ ${fmt(ws.activeBid.item.commissionBaht)} ฿ จะคืนเข้าเงินทั้งหมดเมื่อครบเวลา</div>
@@ -542,11 +520,11 @@
           if (!adminUnlocked) {
             mainHtml = `
               <main class="flex-1 flex items-center justify-center p-4">
-                <form onsubmit="unlockAdmin(event)" class="w-full max-w-sm bg-white border-2 border-[#C59B27] rounded-2xl p-6 space-y-4 text-center">
+                <div class="w-full max-w-sm bg-white border-2 border-[#C59B27] rounded-2xl p-6 space-y-4 text-center">
                   <h1 class="font-editorial text-xl font-bold">เข้าสู่ระบบหลังบ้าน</h1>
-                  <input id="admin-pin" type="password" maxlength="6" placeholder="••••••" class="w-full p-2.5 text-center font-bold tracking-widest bg-[#FAF8F5] border border-[#C59B27] rounded-lg" />
-                  <button type="submit" class="w-full py-2.5 bg-[#C59B27] font-bold text-sm rounded-lg">ยืนยันรหัสผ่านหลังบ้าน</button>
-                </form>
+                  <input id="admin-pin" type="password" maxlength="6" onkeydown="if(event.key==='Enter'){event.preventDefault();unlockAdmin(event);}" placeholder="••••••" class="w-full p-2.5 text-center font-bold tracking-widest bg-[#FAF8F5] border border-[#C59B27] rounded-lg" />
+                  <button type="button" onclick="unlockAdmin(event)" class="w-full py-2.5 bg-[#C59B27] font-bold text-sm rounded-lg">ยืนยันรหัสผ่านหลังบ้าน</button>
+                </div>
               </main>`;
           } else {
             const sel = workspaces[adminSelectedPhone] || Object.values(workspaces)[0];
@@ -594,7 +572,7 @@
 
         document.getElementById('app').innerHTML = `
           <header class="sticky top-0 z-40 bg-[#FAF8F5]/95 border-b border-[#C59B27]/35">
-            <div class="max-w-7xl mx-auto px-3 sm:px-6 h-12 grid grid-cols-3 items-center">
+            <div class="max-w-6xl mx-auto px-3 sm:px-6 h-12 grid grid-cols-3 items-center">
               <button onclick="setView('home')" class="text-left font-editorial text-sm sm:text-base font-bold truncate">หอศิลป์สุวรรณวิจิตร</button>
               <span class="font-editorial text-base font-bold text-center select-none">${titleMap[activeView] || 'หน้าแรก'}</span>
               <div class="text-right">
@@ -742,8 +720,10 @@
       };
 
       window.unlockAdmin = (e) => {
-        e.preventDefault();
-        if (document.getElementById('admin-pin').value !== ADMIN_PASSCODE) return setToast('รหัสผ่านไม่ถูกต้อง');
+        if (e) e.preventDefault();
+        const inputEl = document.getElementById('admin-pin');
+        const val = String(inputEl ? inputEl.value : '').replace(/\D/g, '').trim();
+        if (val !== ADMIN_PASSCODE) return setToast('รหัสผ่านไม่ถูกต้อง (ใส่ 195466)');
         adminUnlocked = true;
         sessionStorage.setItem(KEYS.TAB_ADMIN, '1');
         render();
