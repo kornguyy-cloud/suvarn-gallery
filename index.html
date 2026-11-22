@@ -12,7 +12,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Noto+Sans+Thai:wght@400;500;600;700&family=Noto+Serif+Thai:wght@600;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <style>
       body {
         font-family: 'Noto Sans Thai', sans-serif;
@@ -44,9 +45,25 @@
       const LINE_URL = 'https://lin.ee/n2l2Qqx';
       const ADMIN_PASSCODE = '195466';
 
-      const SUPABASE_URL = 'https://zkyxegrycgvdssixztcu.supabase.co';
-      const SUPABASE_KEY = 'sb_publishable_NYbm6Oz-6EBaofEUO5oz8A_B_RKIKvJ';
-      const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+      const firebaseConfig = {
+        apiKey: "AIzaSyDpj61jqYSncoxDhXZUa7asWcnVlcGB_3k",
+        authDomain: "suvarn-gallery.firebaseapp.com",
+        projectId: "suvarn-gallery",
+        storageBucket: "suvarn-gallery.firebasestorage.app",
+        messagingSenderId: "995042891614",
+        appId: "1:995042891614:web:8ba68d344b1c13d8f8a1cf",
+        measurementId: "G-G85BF7MGVP"
+      };
+
+      let db = null;
+      try {
+        if (window.firebase) {
+          const app = firebase.apps.length ? firebase.app() : firebase.initializeApp(firebaseConfig);
+          db = firebase.firestore(app);
+        }
+      } catch (err) {
+        console.error('Firebase init error:', err);
+      }
 
       const KEYS = {
         USERS: 'sv_standalone_users_v1',
@@ -146,72 +163,96 @@
       });
 
       let users = readLS(KEYS.USERS, null);
-      if (!users) {
+      if (!users || !Array.isArray(users)) {
         users = [{ phone: '0812345678', password: '123456', createdAt: new Date().toISOString() }];
         writeLS(KEYS.USERS, users);
       }
       let workspaces = readLS(KEYS.WORKSPACES, null);
-      if (!workspaces) {
+      if (!workspaces || typeof workspaces !== 'object') {
         workspaces = { '0812345678': newWorkspace('0812345678') };
         writeLS(KEYS.WORKSPACES, workspaces);
       }
       let auctions = readLS(KEYS.AUCTIONS, DEFAULT_AUCTIONS);
       let alerts = readLS(KEYS.ALERTS, []);
       let currentUser = readLS(KEYS.SESSION, null);
+      let isSavingCloud = false;
+
+      const firestoreDocRef = db ? db.collection('suvarn_state').doc('main') : null;
+
+      function applyCloudPayload(cloudData) {
+        if (!cloudData || typeof cloudData !== 'object') return;
+        if (Array.isArray(cloudData.users)) users = cloudData.users;
+        if (cloudData.workspaces && typeof cloudData.workspaces === 'object') workspaces = cloudData.workspaces;
+        if (Array.isArray(cloudData.auctions) && cloudData.auctions.length > 0) auctions = cloudData.auctions;
+        if (Array.isArray(cloudData.alerts)) alerts = cloudData.alerts;
+
+        writeLS(KEYS.USERS, users);
+        writeLS(KEYS.WORKSPACES, workspaces);
+        writeLS(KEYS.AUCTIONS, auctions);
+        writeLS(KEYS.ALERTS, alerts);
+
+        if (currentUser) {
+          const matched = users.find((u) => u.phone === currentUser.phone);
+          if (matched) {
+            currentUser = matched;
+            writeLS(KEYS.SESSION, matched);
+          }
+          if (!workspaces[currentUser.phone]) {
+            workspaces[currentUser.phone] = newWorkspace(currentUser.phone);
+          }
+        }
+        if (!workspaces[adminSelectedPhone]) {
+          adminSelectedPhone = currentUser?.phone || Object.keys(workspaces)[0];
+        }
+      }
 
       async function saveCloudState() {
         writeLS(KEYS.USERS, users);
         writeLS(KEYS.WORKSPACES, workspaces);
         writeLS(KEYS.AUCTIONS, auctions);
         writeLS(KEYS.ALERTS, alerts);
-        if (!sb) return;
+        if (!firestoreDocRef) return;
         try {
-          const payloadObj = { users, workspaces, auctions, alerts };
-          await sb.from('app_state').upsert({
-            id: 'main',
-            data: payloadObj,
-            payload: payloadObj,
-            updated_at: new Date().toISOString()
+          isSavingCloud = true;
+          await firestoreDocRef.set({
+            users,
+            workspaces,
+            auctions,
+            alerts,
+            updatedAt: new Date().toISOString(),
           });
         } catch (err) {
-          console.error('Supabase save error:', err);
+          console.error('Firestore save error:', err);
+        } finally {
+          setTimeout(() => { isSavingCloud = false; }, 300);
         }
       }
 
       async function loadCloudState() {
-        if (!sb) return;
+        if (!firestoreDocRef) return;
         try {
-          const { data, error } = await sb.from('app_state').select('data, payload').eq('id', 'main').single();
-          const cloudData = data?.data || data?.payload || null;
-          if (cloudData) {
-            if (Array.isArray(cloudData.users)) users = cloudData.users;
-            if (cloudData.workspaces && typeof cloudData.workspaces === 'object') workspaces = cloudData.workspaces;
-            if (Array.isArray(cloudData.auctions)) auctions = cloudData.auctions;
-            if (Array.isArray(cloudData.alerts)) alerts = cloudData.alerts;
-            writeLS(KEYS.USERS, users);
-            writeLS(KEYS.WORKSPACES, workspaces);
-            writeLS(KEYS.AUCTIONS, auctions);
-            writeLS(KEYS.ALERTS, alerts);
-            if (currentUser) {
-              const matched = users.find((u) => u.phone === currentUser.phone);
-              if (matched) {
-                currentUser = matched;
-                writeLS(KEYS.SESSION, matched);
-              }
-              if (!workspaces[currentUser.phone]) {
-                workspaces[currentUser.phone] = newWorkspace(currentUser.phone);
-              }
-            }
-            if (!workspaces[adminSelectedPhone]) {
-              adminSelectedPhone = currentUser?.phone || Object.keys(workspaces)[0];
-            }
+          const snap = await firestoreDocRef.get();
+          if (snap.exists) {
+            applyCloudPayload(snap.data());
             render();
-          } else if (error && error.code === 'PGRST116') {
+          } else {
             await saveCloudState();
           }
         } catch (err) {
-          console.error('Supabase load error:', err);
+          console.error('Firestore load error:', err);
         }
+      }
+
+      if (firestoreDocRef) {
+        firestoreDocRef.onSnapshot((snap) => {
+          if (isSavingCloud) return;
+          if (snap.exists) {
+            applyCloudPayload(snap.data());
+            render();
+          }
+        }, (err) => {
+          console.error('Firestore snapshot error:', err);
+        });
       }
 
       const VALID_VIEWS = ['home', 'auction', 'timer', 'account', 'auth', 'admin'];
@@ -627,23 +668,24 @@
 
       window.submitAuth = async (e) => {
         e.preventDefault();
-        await loadCloudState();
-        const phone = document.getElementById('auth-phone').value.replace(/\D/g, '');
-        const pass = document.getElementById('auth-pass').value;
+        const phone = String(document.getElementById('auth-phone').value || '').replace(/\D/g, '').trim();
+        const pass = String(document.getElementById('auth-pass').value || '').trim();
+        if (phone.length < 9) return setToast('กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง');
         if (authMode === 'register') {
-          const conf = document.getElementById('auth-confirm').value;
+          const conf = String(document.getElementById('auth-confirm').value || '').trim();
           if (pass !== conf) return setToast('ยืนยันรหัสผ่านไม่ตรงกัน');
           if (users.some((u) => u.phone === phone)) return setToast('เบอร์นี้สมัครสมาชิกไว้แล้ว');
           const u = { phone, password: pass, createdAt: new Date().toISOString() };
           users.push(u);
           workspaces[phone] = newWorkspace(phone);
           alerts.unshift({ id: 'al-' + Date.now(), phone, memberId: deriveId(phone), readByAdmin: false });
-          await saveCloudState();
           currentUser = u;
           writeLS(KEYS.SESSION, u);
+          await saveCloudState();
           setView('home');
           setToast('สมัครสมาชิกสำเร็จ (ยอดเริ่มต้น 0 บาท)');
         } else {
+          await loadCloudState();
           const u = users.find((x) => x.phone === phone && x.password === pass);
           if (!u) return setToast('เบอร์โทรหรือรหัสผ่านไม่ถูกต้อง');
           if (!workspaces[phone]) workspaces[phone] = newWorkspace(phone);
