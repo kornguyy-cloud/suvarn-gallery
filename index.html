@@ -12,6 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Noto+Sans+Thai:wght@400;500;600;700&family=Noto+Serif+Thai:wght@600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
     <script defer src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
       body {
         font-family: 'Noto Sans Thai', sans-serif;
@@ -39,10 +40,13 @@
     <div id="app"></div>
 
     <script>
-      const IMG_BASE =
-        './';
+      const IMG_BASE = './';
       const LINE_URL = 'https://lin.ee/n2l2Qqx';
       const ADMIN_PASSCODE = '195466';
+
+      const SUPABASE_URL = 'https://zkyxegrycgvdssixztcu.supabase.co';
+      const SUPABASE_KEY = 'sb_publishable_NYbm6Oz-6EBaofEUO5oz8A_B_RKIKvJ';
+      const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
       const KEYS = {
         USERS: 'sv_standalone_users_v1',
@@ -156,6 +160,48 @@
       let alerts = readLS(KEYS.ALERTS, []);
       let currentUser = readLS(KEYS.SESSION, null);
 
+      async function saveCloudState() {
+        writeLS(KEYS.USERS, users);
+        writeLS(KEYS.WORKSPACES, workspaces);
+        writeLS(KEYS.AUCTIONS, auctions);
+        writeLS(KEYS.ALERTS, alerts);
+        if (!sb) return;
+        try {
+          await sb.from('app_state').upsert({
+            id: 'main',
+            data: { users, workspaces, auctions, alerts },
+            updated_at: new Date().toISOString()
+          });
+        } catch (err) {
+          console.error('Supabase save error:', err);
+        }
+      }
+
+      async function loadCloudState() {
+        if (!sb) return;
+        try {
+          const { data, error } = await sb.from('app_state').select('data').eq('id', 'main').single();
+          if (data && data.data) {
+            if (Array.isArray(data.data.users)) users = data.data.users;
+            if (data.data.workspaces && typeof data.data.workspaces === 'object') workspaces = data.data.workspaces;
+            if (Array.isArray(data.data.auctions)) auctions = data.data.auctions;
+            if (Array.isArray(data.data.alerts)) alerts = data.data.alerts;
+            writeLS(KEYS.USERS, users);
+            writeLS(KEYS.WORKSPACES, workspaces);
+            writeLS(KEYS.AUCTIONS, auctions);
+            writeLS(KEYS.ALERTS, alerts);
+            if (currentUser && !workspaces[currentUser.phone]) {
+              workspaces[currentUser.phone] = newWorkspace(currentUser.phone);
+            }
+            render();
+          } else if (error && error.code === 'PGRST116') {
+            await saveCloudState();
+          }
+        } catch (err) {
+          console.error('Supabase load error:', err);
+        }
+      }
+
       let activeView = new URLSearchParams(location.search).get('admin') === '1'
         ? 'admin'
         : sessionStorage.getItem(KEYS.TAB_VIEW) || 'home';
@@ -227,7 +273,7 @@
             }
           }
         });
-        if (changed) writeLS(KEYS.WORKSPACES, workspaces);
+        if (changed) saveCloudState();
         if (activeView === 'timer' || activeView === 'auction') render();
       }, 1000);
 
@@ -322,8 +368,7 @@
                 <div class="text-[11px] text-[#8C6A10] font-semibold">คอมฯ: ${l.commRange}</div>
               </button>`;
           }).join('');
-
-          let modalHtml = '';
+                    let modalHtml = '';
           if (openLevel) {
             const items = auctions.filter((i) => i.level === openLevel);
             const cur = items[slideIdx] || items[0];
@@ -553,7 +598,7 @@
         if (++tapCount >= 5) { tapCount = 0; setView('admin'); }
       };
 
-      window.submitAuth = (e) => {
+      window.submitAuth = async (e) => {
         e.preventDefault();
         const phone = document.getElementById('auth-phone').value.replace(/\D/g, '');
         const pass = document.getElementById('auth-pass').value;
@@ -565,9 +610,7 @@
           users.push(u);
           workspaces[phone] = newWorkspace(phone);
           alerts.unshift({ id: 'al-' + Date.now(), phone, memberId: deriveId(phone), readByAdmin: false });
-          writeLS(KEYS.USERS, users);
-          writeLS(KEYS.WORKSPACES, workspaces);
-          writeLS(KEYS.ALERTS, alerts);
+          await saveCloudState();
           currentUser = u;
           writeLS(KEYS.SESSION, u);
           setView('home');
@@ -578,13 +621,13 @@
           if (!workspaces[phone]) workspaces[phone] = newWorkspace(phone);
           currentUser = u;
           writeLS(KEYS.SESSION, u);
-          writeLS(KEYS.WORKSPACES, workspaces);
+          await saveCloudState();
           setView('home');
           setToast('เข้าสู่ระบบสำเร็จ');
         }
       };
 
-      window.placeBid = (id) => {
+      window.placeBid = async (id) => {
         if (!currentUser) return setToast('กรุณาเข้าสู่ระบบก่อนกดประมูล');
         const ws = workspaces[currentUser.phone];
         const item = auctions.find((i) => i.id === id);
@@ -595,22 +638,22 @@
         ws.vipLevel = Math.max(ws.vipLevel, item.level);
         ws.activeBid = { item, startedAt: now, endsAt: now + item.durationMinutes * 60000 };
         ws.txHistory.unshift({ id: 'tx-' + now, title: 'ประมูล: ' + item.titleTh, amountBaht: -item.priceBaht, status: 'ย้ายเข้าธุรกรรม' });
-        writeLS(KEYS.WORKSPACES, workspaces);
+        await saveCloudState();
         openLevel = null;
         setView('timer');
       };
 
-      window.submitTopup = (e) => {
+      window.submitTopup = async (e) => {
         e.preventDefault();
         if (!currentUser) return setToast('กรุณาเข้าสู่ระบบก่อน');
         const amt = Number(document.getElementById('dep-amt').value);
         workspaces[currentUser.phone].txHistory.unshift({ id: 'tx-' + Date.now(), title: 'คำขอเติมเงิน', amountBaht: amt, status: 'รออนุมัติ' });
-        writeLS(KEYS.WORKSPACES, workspaces);
+        await saveCloudState();
         setAccPanel('none');
         setToast('ส่งคำขอเติมเงินเรียบร้อย');
       };
 
-      window.submitWithdraw = (e) => {
+      window.submitWithdraw = async (e) => {
         e.preventDefault();
         if (!currentUser) return setToast('กรุณาเข้าสู่ระบบก่อน');
         const ws = workspaces[currentUser.phone];
@@ -621,21 +664,21 @@
         if (amt > ws.totalBalanceBaht) return setToast('ยอดเงินไม่เพียงพอ');
         ws.totalBalanceBaht -= amt;
         ws.txHistory.unshift({ id: 'tx-' + Date.now(), title: 'คำขอถอนเงิน', amountBaht: -amt, status: 'รออนุมัติ' });
-        writeLS(KEYS.WORKSPACES, workspaces);
+        await saveCloudState();
         setAccPanel('none');
         setToast('ส่งคำขอถอนเงินเรียบร้อย');
       };
 
-      window.submitPin = (e) => {
+      window.submitPin = async (e) => {
         e.preventDefault();
         if (!currentUser) return setToast('กรุณาเข้าสู่ระบบก่อน');
         workspaces[currentUser.phone].withdrawalPin = document.getElementById('new-pin').value;
-        writeLS(KEYS.WORKSPACES, workspaces);
+        await saveCloudState();
         setAccPanel('none');
         setToast('บันทึกรหัสถอน 6 หลักเรียบร้อย');
       };
 
-      window.submitBank = (e) => {
+      window.submitBank = async (e) => {
         e.preventDefault();
         if (!currentUser) return setToast('กรุณาเข้าสู่ระบบก่อน');
         workspaces[currentUser.phone].bankAccount = {
@@ -643,7 +686,7 @@
           accountHolder: document.getElementById('bk-holder').value,
           accountNumber: document.getElementById('bk-num').value,
         };
-        writeLS(KEYS.WORKSPACES, workspaces);
+        await saveCloudState();
         setAccPanel('none');
         setToast('ผูกบัญชีธนาคารเรียบร้อย');
       };
@@ -661,25 +704,30 @@
         setView('home');
       };
       window.selectAdminMember = (p) => { adminSelectedPhone = p; render(); };
-      window.markAlertsRead = () => { alerts = alerts.map((a) => ({ ...a, readByAdmin: true })); writeLS(KEYS.ALERTS, alerts); render(); };
-      window.adminAdjust = (dir) => {
+      window.markAlertsRead = async () => {
+        alerts = alerts.map((a) => ({ ...a, readByAdmin: true }));
+        await saveCloudState();
+        render();
+      };
+      window.adminAdjust = async (dir) => {
         const amt = Math.abs(Number(document.getElementById('adj-amt').value || 0)) * dir;
         const ws = workspaces[adminSelectedPhone];
         if (!ws || ws.totalBalanceBaht + amt < 0) return setToast('ไม่สามารถหักเกินยอดคงเหลือได้');
         ws.totalBalanceBaht += amt;
         ws.txHistory.unshift({ id: 'tx-' + Date.now(), title: dir > 0 ? 'แอดมินเพิ่มยอดเงิน' : 'แอดมินหักยอดเงิน', amountBaht: amt, status: 'อนุมัติแล้ว' });
-        writeLS(KEYS.WORKSPACES, workspaces);
+        await saveCloudState();
         render();
         setToast('ปรับยอดเงินและซิงก์เข้าบัญชีสมาชิกเรียบร้อย');
       };
-      window.toggleLvlLock = (p, lv) => {
+      window.toggleLvlLock = async (p, lv) => {
         const ws = workspaces[p];
         ws.lockedLevels = ws.lockedLevels.includes(lv) ? ws.lockedLevels.filter((x) => x !== lv) : [...ws.lockedLevels, lv];
-        writeLS(KEYS.WORKSPACES, workspaces);
+        await saveCloudState();
         render();
       };
 
       render();
+      loadCloudState();
     </script>
   </body>
 </html>
