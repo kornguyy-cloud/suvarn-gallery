@@ -550,20 +550,17 @@
           let modalHtml = '';
           if (openLevel) {
             const items = auctions.filter((i) => i.level === openLevel);
-            const cur = items[slideIdx] || items[0];
-            const isLocked = isAuctionItemLocked(ws, cur);
-            const scrollItemCards = items.map((it, idx) => {
+            const verticalCards = items.map((it, idx) => {
               const itemLk = isAuctionItemLocked(ws, it);
-              const isSelected = idx === slideIdx;
               return `
-                <div onclick="selectAuctionSlot(${idx})" class="snap-center shrink-0 w-72 sm:w-80 bg-[#FAF8F5] border-2 ${isSelected ? 'border-[#C59B27] ring-2 ring-[#C59B27]/40' : 'border-[#C59B27]/40'} rounded-xl p-3 space-y-2.5 cursor-pointer">
-                  <div class="flex justify-between items-center text-[11px]">
-                    <span class="font-bold text-[#8C6A10]">รายการที่ ${idx + 1}/${items.length}</span>
+                <div class="bg-[#FAF8F5] border border-[#C59B27]/50 rounded-xl p-3 space-y-2.5">
+                  <div class="flex justify-between items-center text-xs">
+                    <span class="font-bold text-[#8C6A10]">ภาพที่ ${idx + 1}/${items.length}</span>
                     <span class="font-bold text-[#1E1B18]">ราคา ${fmt(it.priceBaht)} บาท</span>
                   </div>
                   <img src="${it.imageUrl}" class="w-full h-44 object-cover rounded-lg border border-[#C59B27]/40" />
                   <div>
-                    <div class="font-editorial text-base font-bold truncate">${it.titleTh}</div>
+                    <div class="font-editorial text-base font-bold">${it.titleTh}</div>
                     <div class="text-xs text-[#5C544B]">ศิลปิน: ${it.artistTh} · เวลา ${it.durationMinutes} นาที</div>
                   </div>
                   <div class="grid grid-cols-2 gap-2 bg-white p-2.5 rounded-lg border border-[#C59B27]/30 text-xs">
@@ -572,7 +569,7 @@
                     <div><span class="text-[#5C544B] block">ผู้เข้าร่วม</span><b>${fmt(it.participants)} คน</b></div>
                     <div><span class="text-[#5C544B] block">ถูกใจ</span><b>${fmt(it.likes)}</b></div>
                   </div>
-                  <button type="button" onclick="event.stopPropagation(); placeBid('${it.id}')" ${itemLk || hasBid ? 'disabled' : ''} class="w-full py-2 bg-[#C59B27] disabled:bg-[#EBE6DF] font-bold text-xs rounded-lg text-[#1E1B18]">
+                  <button type="button" onclick="placeBid('${it.id}')" ${itemLk || hasBid ? 'disabled' : ''} class="w-full py-2.5 bg-[#C59B27] disabled:bg-[#EBE6DF] font-bold text-sm rounded-lg text-[#1E1B18]">
                     ${itemLk ? 'รายการนี้ถูกล็อกโดยหลังบ้าน' : hasBid ? 'มีรายการกำลังนับถอยหลังอยู่' : `ประมูล (${fmt(it.priceBaht)} บาท)`}
                   </button>
                 </div>`;
@@ -580,36 +577,16 @@
 
             modalHtml = `
               <div onclick="closeLvlModal()" class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-3">
-                <div onclick="event.stopPropagation()" class="w-full max-w-md max-h-[88vh] overflow-y-auto bg-white border-2 border-[#C59B27] rounded-2xl p-4 space-y-3">
+                <div onclick="event.stopPropagation()" class="w-full max-w-md max-h-[85vh] overflow-y-auto bg-white border-2 border-[#C59B27] rounded-2xl p-4 space-y-3">
                   <div class="flex justify-between items-center sticky top-0 bg-white z-10 pb-2 border-b border-[#C59B27]/25">
                     <div>
-                      <h3 class="font-editorial font-bold text-lg">เลเวล ${openLevel} · ภาพ ${slideIdx + 1}/${items.length}</h3>
-                      <p class="text-[11px] text-[#5C544B]">เลื่อนซ้าย-ขวา หรือเลื่อนขึ้น-ลงเพื่อดูทุกราคาในเลเวลนี้</p>
+                      <h3 class="font-editorial font-bold text-lg">เลเวล ${openLevel}</h3>
+                      <p class="text-[11px] text-[#5C544B]">เลื่อนขึ้น-ลงเพื่อเลือกรูปภาพและราคา</p>
                     </div>
                     <button onclick="closeLvlModal()" class="px-2.5 py-1 text-xs font-semibold border border-[#C59B27]/60 rounded-lg bg-[#FAF8F5]">ปิด</button>
                   </div>
-
-                  <div class="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2">
-                    ${scrollItemCards}
-                  </div>
-
-                  <div class="space-y-2.5 pt-2 border-t border-[#C59B27]/25">
-                    <div class="text-xs font-bold text-[#8C6A10]">เลื่อนดูรายการอื่นในเลเวล ${openLevel} ด้านล่าง:</div>
-                    ${items.map((it, idx) => {
-                      const itemLk = isAuctionItemLocked(ws, it);
-                      return `
-                        <div onclick="selectAuctionSlot(${idx})" class="p-2.5 rounded-xl border ${idx === slideIdx ? 'border-[#C59B27] bg-amber-50/40' : 'border-[#C59B27]/35 bg-[#FAF8F5]'} flex items-center gap-3 cursor-pointer">
-                          <img src="${it.imageUrl}" class="w-16 h-16 object-cover rounded-lg border border-[#C59B27]/40 shrink-0" />
-                          <div class="flex-1 min-w-0 text-xs">
-                            <div class="font-bold text-[#1E1B18] truncate">${it.titleTh}</div>
-                            <div class="text-[#5C544B]">ราคา <b class="text-[#1E1B18]">${fmt(it.priceBaht)} ฿</b> · คอมฯ <b class="text-[#8C6A10]">+${fmt(it.commissionBaht)} ฿</b></div>
-                            <div class="text-[11px] text-[#5C544B]">เวลา ${it.durationMinutes} นาที · ผู้เข้าร่วม ${fmt(it.participants)} คน</div>
-                          </div>
-                          <button type="button" onclick="event.stopPropagation(); placeBid('${it.id}')" ${itemLk || hasBid ? 'disabled' : ''} class="px-3 py-2 bg-[#C59B27] disabled:bg-[#EBE6DF] font-bold text-xs rounded-lg text-[#1E1B18] shrink-0">
-                            ${itemLk ? 'ล็อกอยู่' : hasBid ? 'กำลังนับ' : 'ประมูล'}
-                          </button>
-                        </div>`;
-                    }).join('')}
+                  <div class="space-y-3">
+                    ${verticalCards}
                   </div>
                 </div>
               </div>`;
