@@ -2,7 +2,7 @@
 <html lang="th">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>หอศิลป์สุวรรณวิจิตร | Suvarn Fine Art Gallery</title>
     <meta
       name="description"
@@ -15,10 +15,16 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <style>
-      body {
+      html, body {
         font-family: 'Noto Sans Thai', sans-serif;
         background: #faf8f5;
         color: #1e1b18;
+        touch-action: manipulation;
+        -webkit-text-size-adjust: 100%;
+        overflow-x: hidden;
+      }
+      input, select, textarea {
+        font-size: 16px !important;
       }
       .font-editorial {
         font-family: 'Noto Serif Thai', 'Cormorant Garamond', serif;
@@ -83,6 +89,10 @@
         navAuction: `<svg class="w-4 h-4 mb-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 12.5-8 8a2.119 2.119 0 1 1-3-3l8-8"/><path d="m16 16 6-6"/><path d="m8 8 6-6"/><path d="m9 7 8 8"/><path d="m21 11-8-8"/></svg>`,
         navTimer: `<svg class="w-4 h-4 mb-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3 2 6"/><path d="m22 6-3-3"/><path d="M10 2h4"/></svg>`,
         navAccount: `<svg class="w-4 h-4 mb-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+        eyeOpen: `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`,
+        eyeClosed: `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/></svg>`,
+        search: `<svg class="w-4 h-4 shrink-0 text-[#8C6A10]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>`,
+        alertCircle: `<svg class="w-4 h-4 shrink-0 text-red-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
       };
 
       const KEYS = {
@@ -153,6 +163,16 @@
         'ธนาคารกรุงไทย (KTB)',
         'ธนาคารกรุงศรีอยุธยา (BAY)',
         'ธนาคารทหารไทยธนชาต (TTB)',
+        'ธนาคารออมสิน (GSB)',
+        'ธนาคารเพื่อการเกษตรและสหกรณ์การเกษตร (BAAC)',
+        'ธนาคารอาคารสงเคราะห์ (GHB)',
+        'ธนาคารซีไอเอ็มบี ไทย (CIMB)',
+        'ธนาคารยูโอบี (UOB)',
+        'ธนาคารแลนด์ แอนด์ เฮ้าส์ (LH Bank)',
+        'ธนาคารทิสโก้ (TISCO)',
+        'ธนาคารเกียรตินาคินภัทร (KKP)',
+        'ธนาคารอิสลามแห่งประเทศไทย (IBANK)',
+        'ธนาคารไอซีบีซี ไทย (ICBC)',
       ];
 
       const readLS = (k, fallback) => {
@@ -167,6 +187,12 @@
         const d = String(num || '').replace(/\D/g, '');
         return d.length >= 4 ? '•••• ••' + d.slice(-4, -1) + '*' : '•••• ••••';
       };
+      const escHtml = (s) => String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+
       const newWorkspace = (phone) => ({
         phone,
         memberId: deriveId(phone),
@@ -196,6 +222,13 @@
         merged.lockedItemIds = Array.isArray(merged.lockedItemIds) ? merged.lockedItemIds : [];
         merged.txHistory = Array.isArray(merged.txHistory) ? merged.txHistory : [];
         return merged;
+      }
+
+      function resetViewportScale() {
+        const vp = document.querySelector('meta[name="viewport"]');
+        if (vp) {
+          vp.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+        }
       }
 
       let users = readLS(KEYS.USERS, null);
@@ -307,14 +340,24 @@
       let activeView = hasAdminParam
         ? 'admin'
         : (VALID_VIEWS.includes(savedView) && savedView !== 'admin' ? savedView : 'home');
-      let adminUnlocked = sessionStorage.getItem(KEYS.TAB_ADMIN) === '1';
-      let accountPanel = localStorage.getItem(KEYS.TAB_PANEL) || sessionStorage.getItem(KEYS.TAB_PANEL) || 'none';
+      let adminUnlocked = localStorage.getItem(KEYS.TAB_ADMIN) === '1' || sessionStorage.getItem(KEYS.TAB_ADMIN) === '1';
+      if (adminUnlocked) {
+        localStorage.setItem(KEYS.TAB_ADMIN, '1');
+      }
+      let accountPanel = 'none';
       let selectedArt = ARTWORKS[0];
       let filterOrigin = 'all';
       let authMode = 'login';
+      let authPhoneVal = '';
+      let authPassVal = '';
+      let authConfirmVal = '';
+      let authErrorMsg = '';
+      let showAuthPass = false;
+      let showAuthConfirm = false;
       let openLevel = null;
       let slideIdx = 0;
       let adminSelectedPhone = currentUser?.phone || Object.keys(workspaces)[0] || '';
+      let adminSearchQuery = '';
       let adminPriceLevelTab = 3;
       let toast = null;
       let sliderPaused = false;
@@ -332,6 +375,10 @@
           localStorage.setItem(KEYS.TAB_VIEW, nextView);
           sessionStorage.setItem(KEYS.TAB_VIEW, nextView);
         }
+        if (document.activeElement && typeof document.activeElement.blur === 'function') {
+          document.activeElement.blur();
+        }
+        resetViewportScale();
         window.scrollTo({ top: 0, behavior: 'smooth' });
         render();
       };
@@ -362,6 +409,7 @@
         workspaces = readLS(KEYS.WORKSPACES, workspaces);
         alerts = readLS(KEYS.ALERTS, alerts);
         currentUser = readLS(KEYS.SESSION, currentUser);
+        adminUnlocked = localStorage.getItem(KEYS.TAB_ADMIN) === '1';
         const syncedView = localStorage.getItem(KEYS.TAB_VIEW);
         if (syncedView && VALID_VIEWS.includes(syncedView) && syncedView !== 'admin' && activeView !== 'admin') {
           activeView = syncedView;
@@ -673,21 +721,89 @@
                 </button>
               </section>
 
-              ${renderAccountSubPanel(ws)}
+              ${renderAccountModal(ws)}
             </main>`;
         } else if (activeView === 'auth') {
+          const errBorder = authErrorMsg ? 'border-red-500 ring-1 ring-red-500 bg-red-50/40' : 'border-[#C59B27]/60 bg-[#FAF8F5]';
           mainHtml = `
             <main class="flex-1 max-w-md mx-auto w-full px-4 py-8">
               <div class="bg-white border-2 border-[#C59B27] rounded-2xl p-6 space-y-4 shadow-sm">
                 <div class="flex gap-2">
-                  <button onclick="openAuth('login')" class="flex-1 py-2 rounded-lg text-xs font-bold ${authMode === 'login' ? 'bg-[#C59B27]' : 'bg-[#FAF8F5] border'}">เข้าสู่ระบบ</button>
-                  <button onclick="openAuth('register')" class="flex-1 py-2 rounded-lg text-xs font-bold ${authMode === 'register' ? 'bg-[#C59B27]' : 'bg-[#FAF8F5] border'}">สมัครสมาชิก</button>
+                  <button type="button" onclick="openAuth('login')" class="flex-1 py-2.5 rounded-lg text-sm font-bold ${authMode === 'login' ? 'bg-[#C59B27] text-[#1E1B18]' : 'bg-[#FAF8F5] border border-[#C59B27]/40 text-[#5C544B]'}">เข้าสู่ระบบ</button>
+                  <button type="button" onclick="openAuth('register')" class="flex-1 py-2.5 rounded-lg text-sm font-bold ${authMode === 'register' ? 'bg-[#C59B27] text-[#1E1B18]' : 'bg-[#FAF8F5] border border-[#C59B27]/40 text-[#5C544B]'}">สมัครสมาชิก</button>
                 </div>
-                <form onsubmit="submitAuth(event)" class="space-y-3 text-xs">
-                  <div><label class="block font-semibold mb-1">เบอร์โทรศัพท์</label><input id="auth-phone" required placeholder="08XXXXXXXX" class="w-full p-2.5 bg-[#FAF8F5] border border-[#C59B27]/60 rounded-lg" /></div>
-                  <div><label class="block font-semibold mb-1">รหัสผ่าน (ตัวเลข 6-8 หลัก)</label><input id="auth-pass" type="password" required minlength="6" maxlength="8" class="w-full p-2.5 bg-[#FAF8F5] border border-[#C59B27]/60 rounded-lg" /></div>
-                  ${authMode === 'register' ? `<div><label class="block font-semibold mb-1">ยืนยันรหัสผ่าน</label><input id="auth-confirm" type="password" required minlength="6" maxlength="8" class="w-full p-2.5 bg-[#FAF8F5] border border-[#C59B27]/60 rounded-lg" /></div>` : ''}
-                  <button type="submit" class="w-full py-2.5 bg-[#C59B27] font-bold text-sm rounded-lg">${authMode === 'register' ? 'ยืนยันสมัครสมาชิก (เริ่มต้น 0 บาท)' : 'เข้าสู่ระบบ'}</button>
+
+                ${authErrorMsg ? `
+                  <div class="p-3 rounded-xl bg-red-50 border-2 border-red-500 text-red-700 text-xs font-bold flex items-center gap-2">
+                    ${ICONS.alertCircle}
+                    <span>${escHtml(authErrorMsg)}</span>
+                  </div>
+                ` : ''}
+
+                <form onsubmit="submitAuth(event)" novalidate class="space-y-3.5 text-xs">
+                  <div>
+                    <label class="block font-semibold mb-1 text-sm">เบอร์โทรศัพท์</label>
+                    <input
+                      id="auth-phone"
+                      type="tel"
+                      inputmode="numeric"
+                      value="${escHtml(authPhoneVal)}"
+                      oninput="onAuthInput('phone', this.value)"
+                      placeholder="08XXXXXXXX"
+                      class="w-full p-2.5 border ${errBorder} rounded-lg outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label class="block font-semibold mb-1 text-sm">รหัสผ่าน (ตัวเลข 6-8 หลัก)</label>
+                    <div class="relative">
+                      <input
+                        id="auth-pass"
+                        type="${showAuthPass ? 'text' : 'password'}"
+                        inputmode="numeric"
+                        maxlength="8"
+                        value="${escHtml(authPassVal)}"
+                        oninput="onAuthInput('pass', this.value)"
+                        placeholder="กรอกรหัสผ่าน 6-8 หลัก"
+                        class="w-full p-2.5 pr-11 border ${errBorder} rounded-lg outline-none"
+                      />
+                      <button
+                        type="button"
+                        onclick="toggleAuthEye('pass')"
+                        aria-label="แสดงหรือซ่อนรหัสผ่าน"
+                        class="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-[#8C6A10] hover:text-[#1E1B18]"
+                      >
+                        ${showAuthPass ? ICONS.eyeOpen : ICONS.eyeClosed}
+                      </button>
+                    </div>
+                  </div>
+                  ${authMode === 'register' ? `
+                    <div>
+                      <label class="block font-semibold mb-1 text-sm">ยืนยันรหัสผ่าน</label>
+                      <div class="relative">
+                        <input
+                          id="auth-confirm"
+                          type="${showAuthConfirm ? 'text' : 'password'}"
+                          inputmode="numeric"
+                          maxlength="8"
+                          value="${escHtml(authConfirmVal)}"
+                          oninput="onAuthInput('confirm', this.value)"
+                          placeholder="กรอกรหัสผ่านอีกครั้ง"
+                          class="w-full p-2.5 pr-11 border ${errBorder} rounded-lg outline-none"
+                        />
+                        <button
+                          type="button"
+                          onclick="toggleAuthEye('confirm')"
+                          aria-label="แสดงหรือซ่อนยืนยันรหัสผ่าน"
+                          class="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-[#8C6A10] hover:text-[#1E1B18]"
+                        >
+                          ${showAuthConfirm ? ICONS.eyeOpen : ICONS.eyeClosed}
+                        </button>
+                      </div>
+                    </div>
+                  ` : ''}
+                  <button type="submit" class="w-full py-3 bg-[#C59B27] font-bold text-sm rounded-lg text-[#1E1B18] shadow-xs">
+                    ${authMode === 'register' ? 'ยืนยันสมัครสมาชิก (เริ่มต้น 0 บาท)' : 'เข้าสู่ระบบ'}
+                  </button>
                 </form>
               </div>
             </main>`;
@@ -697,13 +813,20 @@
               <main class="flex-1 flex items-center justify-center p-4">
                 <div class="w-full max-w-sm bg-white border-2 border-[#C59B27] rounded-2xl p-6 space-y-4 text-center">
                   <h1 class="font-editorial text-xl font-bold">เข้าสู่ระบบหลังบ้าน</h1>
-                  <input id="admin-pin" type="password" maxlength="6" onkeydown="if(event.key==='Enter'){event.preventDefault();unlockAdmin(event);}" placeholder="••••••" class="w-full p-2.5 text-center font-bold tracking-widest bg-[#FAF8F5] border border-[#C59B27] rounded-lg" />
+                  <input id="admin-pin" type="password" inputmode="numeric" maxlength="6" onkeydown="if(event.key==='Enter'){event.preventDefault();unlockAdmin(event);}" placeholder="••••••" class="w-full p-2.5 text-center font-bold tracking-widest bg-[#FAF8F5] border border-[#C59B27] rounded-lg" />
                   <button type="button" onclick="unlockAdmin(event)" class="w-full py-2.5 bg-[#C59B27] font-bold text-sm rounded-lg">ยืนยันรหัสผ่านหลังบ้าน</button>
                 </div>
               </main>`;
           } else {
             const memberList = Object.values(workspaces);
-            const selRaw = workspaces[adminSelectedPhone] || memberList[0];
+            const q = String(adminSearchQuery || '').trim().toLowerCase();
+            const filteredMembers = q
+              ? memberList.filter((m) =>
+                  String(m.phone || '').toLowerCase().includes(q) ||
+                  String(m.memberId || '').toLowerCase().includes(q)
+                )
+              : memberList;
+            const selRaw = workspaces[adminSelectedPhone] || filteredMembers[0] || memberList[0];
             const sel = selRaw ? normalizeWorkspace(selRaw.phone, selRaw) : null;
             const unread = alerts.filter((a) => !a.readByAdmin).length;
 
@@ -732,12 +855,32 @@
                 </div>
 
                 <div class="bg-white border border-[#C59B27] rounded-xl p-4 space-y-4">
-                  <div class="flex flex-wrap gap-2">
-                    ${memberList.map((m) => `
-                      <button onclick="selectAdminMember('${m.phone}')" class="px-2.5 py-1 rounded border ${sel && sel.phone === m.phone ? 'bg-[#C59B27] font-bold' : 'bg-[#FAF8F5] border-[#C59B27]/40'}">
-                        ${m.memberId} (${m.phone}) · ${fmt(m.totalBalanceBaht)} ฿ ${m.suspended ? '· [ระงับ]' : ''}
-                      </button>
-                    `).join('')}
+                  <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                      <span class="font-bold text-sm">ค้นหาและเลือกสมาชิก (${filteredMembers.length}/${memberList.length} คน)</span>
+                      ${q ? `<button onclick="clearAdminSearch()" class="text-[#8C6A10] underline">ล้างการค้นหา</button>` : ''}
+                    </div>
+                    <div class="relative">
+                      <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">${ICONS.search}</span>
+                      <input
+                        id="admin-member-search"
+                        type="text"
+                        value="${escHtml(adminSearchQuery)}"
+                        oninput="onAdminSearch(this.value)"
+                        placeholder="พิมพ์เบอร์โทรศัพท์ หรือรหัสสมาชิก SV-... เพื่อค้นหาทันที"
+                        class="w-full pl-9 pr-3 py-2.5 bg-[#FAF8F5] border border-[#C59B27]/60 rounded-lg outline-none focus:border-[#C59B27]"
+                      />
+                    </div>
+                  </div>
+
+                  <div id="admin-member-pills" class="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
+                    ${filteredMembers.length === 0
+                      ? `<p class="text-[#5C544B] py-1">ไม่พบสมาชิกที่ตรงกับ "${escHtml(adminSearchQuery)}"</p>`
+                      : filteredMembers.map((m) => `
+                        <button onclick="selectAdminMember('${m.phone}')" class="px-2.5 py-1.5 rounded border ${sel && sel.phone === m.phone ? 'bg-[#C59B27] font-bold' : 'bg-[#FAF8F5] border-[#C59B27]/40'}">
+                          ${m.memberId} (${m.phone}) · ${fmt(m.totalBalanceBaht)} ฿ ${m.suspended ? '· [ระงับ]' : ''}
+                        </button>
+                      `).join('')}
                   </div>
 
                   ${sel ? `
@@ -887,65 +1030,208 @@
           </nav>`;
       }
 
-      function renderAccountSubPanel(ws) {
+      function renderAccountModal(ws) {
         if (accountPanel === 'none') return '';
+        const panelTitles = {
+          topup: 'เติมเงินเข้าบัญชี',
+          withdraw: 'แจ้งถอนเงิน',
+          pin: 'ตั้งค่ารหัสถอน (6 ตัวเลข)',
+          bank: 'บัญชีธนาคารรับเงิน',
+          history: 'ประวัติธุรกรรมทั้งหมด',
+        };
         let body = '';
         if (accountPanel === 'topup') {
-          body = `<form onsubmit="submitTopup(event)" class="space-y-2"><input id="dep-amt" type="number" min="100" required placeholder="จำนวนเงินเติม (บาท)" class="w-full p-2 border rounded" /><button class="w-full py-2 bg-[#C59B27] font-bold rounded">ส่งคำขอเติมเงิน</button></form>`;
+          body = `
+            <form onsubmit="submitTopup(event)" class="space-y-3">
+              <div>
+                <label class="block text-xs font-semibold text-[#5C544B] mb-1">จำนวนเงินที่ต้องการเติม (ขั้นต่ำ 100 บาท)</label>
+                <input id="dep-amt" type="number" inputmode="numeric" min="100" required placeholder="ระบุจำนวนเงิน (บาท)" class="w-full p-2.5 bg-[#FAF8F5] border border-[#C59B27]/60 rounded-xl outline-none focus:border-[#C59B27]" />
+              </div>
+              <button class="w-full py-2.5 bg-[#C59B27] font-bold text-sm rounded-xl text-[#1E1B18]">ส่งคำขอเติมเงิน</button>
+            </form>`;
         } else if (accountPanel === 'withdraw') {
-          body = `<form onsubmit="submitWithdraw(event)" class="space-y-2"><input id="wd-amt" type="number" min="100" required placeholder="จำนวนเงินถอน" class="w-full p-2 border rounded" /><input id="wd-pin" type="password" maxlength="6" required placeholder="รหัสถอน 6 หลัก" class="w-full p-2 border rounded" /><button class="w-full py-2 bg-[#C59B27] font-bold rounded">ส่งคำขอถอนเงิน</button></form>`;
+          body = `
+            <form onsubmit="submitWithdraw(event)" class="space-y-3">
+              <div class="p-2.5 rounded-xl bg-[#FAF8F5] border border-[#C59B27]/35 text-xs flex justify-between">
+                <span class="text-[#5C544B]">ยอดเงินที่ถอนได้:</span>
+                <b class="text-[#8C6A10]">${fmt(ws.totalBalanceBaht)} บาท</b>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-[#5C544B] mb-1">จำนวนเงินถอน</label>
+                <input id="wd-amt" type="number" inputmode="numeric" min="100" required placeholder="ระบุจำนวนเงินถอน (บาท)" class="w-full p-2.5 bg-[#FAF8F5] border border-[#C59B27]/60 rounded-xl outline-none focus:border-[#C59B27]" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-[#5C544B] mb-1">รหัสถอน 6 หลัก</label>
+                <input id="wd-pin" type="password" inputmode="numeric" maxlength="6" required placeholder="กรอกรหัสถอน 6 หลัก" class="w-full p-2.5 bg-[#FAF8F5] border border-[#C59B27]/60 rounded-xl outline-none focus:border-[#C59B27]" />
+              </div>
+              <button class="w-full py-2.5 bg-[#C59B27] font-bold text-sm rounded-xl text-[#1E1B18]">ส่งคำขอถอนเงิน</button>
+            </form>`;
         } else if (accountPanel === 'pin') {
-          body = ws.withdrawalPin ? `<p class="text-xs text-[#5C544B]">ตั้งค่าแล้ว หากต้องการเปลี่ยนกรุณาติดต่อฝ่ายบริการ</p>` : `<form onsubmit="submitPin(event)" class="space-y-2"><input id="new-pin" maxlength="6" required placeholder="ตั้งรหัสถอน 6 หลัก" class="w-full p-2 border rounded" /><button class="w-full py-2 bg-[#C59B27] font-bold rounded">บันทึกรหัสถอน</button></form>`;
+          body = ws.withdrawalPin
+            ? `<div class="p-3 bg-[#FAF8F5] border border-[#C59B27]/40 rounded-xl text-xs text-[#5C544B] space-y-2">
+                <p class="font-semibold text-[#1E1B18]">คุณได้ตั้งค่ารหัสถอน 6 หลักเรียบร้อยแล้ว</p>
+                <p>เพื่อความปลอดภัยสูงสุด สมาชิกไม่สามารถเปลี่ยนรหัสถอนด้วยตนเองได้ หากต้องการแก้ไขกรุณาติดต่อฝ่ายบริการ</p>
+              </div>`
+            : `<form onsubmit="submitPin(event)" class="space-y-3">
+                <div>
+                  <label class="block text-xs font-semibold text-[#5C544B] mb-1">กำหนดรหัสถอน (ตัวเลข 6 หลัก)</label>
+                  <input id="new-pin" type="tel" inputmode="numeric" maxlength="6" required placeholder="ตั้งรหัสถอน 6 หลัก" class="w-full p-2.5 bg-[#FAF8F5] border border-[#C59B27]/60 rounded-xl outline-none focus:border-[#C59B27]" />
+                </div>
+                <button class="w-full py-2.5 bg-[#C59B27] font-bold text-sm rounded-xl text-[#1E1B18]">บันทึกรหัสถอน</button>
+              </form>`;
         } else if (accountPanel === 'bank') {
-          body = ws.bankAccount ? `<p class="text-xs">${ws.bankAccount.bankName} · ${ws.bankAccount.accountHolder} · ${maskBank(ws.bankAccount.accountNumber)}</p>` : `<form onsubmit="submitBank(event)" class="space-y-2"><select id="bk-name" class="w-full p-2 border rounded">${BANK_LIST.map((b) => `<option>${b}</option>`).join('')}</select><input id="bk-holder" required placeholder="ชื่อบัญชี" class="w-full p-2 border rounded" /><input id="bk-num" required minlength="10" maxlength="12" placeholder="เลขบัญชี 10-12 หลัก" class="w-full p-2 border rounded" /><button class="w-full py-2 bg-[#C59B27] font-bold rounded">ผูกบัญชีธนาคาร</button></form>`;
+          body = ws.bankAccount
+            ? `<div class="p-3.5 bg-[#FAF8F5] border border-[#C59B27]/40 rounded-xl text-xs space-y-1.5">
+                <div class="text-[#8C6A10] font-bold">บัญชีธนาคารที่ผูกไว้แล้ว</div>
+                <div class="font-bold text-sm text-[#1E1B18]">${ws.bankAccount.bankName}</div>
+                <div class="text-[#5C544B]">ชื่อบัญชี: <b class="text-[#1E1B18]">${ws.bankAccount.accountHolder}</b></div>
+                <div class="text-[#5C544B]">เลขบัญชี: <b class="text-[#1E1B18]">${maskBank(ws.bankAccount.accountNumber)}</b></div>
+              </div>`
+            : `<form onsubmit="submitBank(event)" class="space-y-3">
+                <div>
+                  <label class="block text-xs font-semibold text-[#5C544B] mb-1">เลือกธนาคาร</label>
+                  <select id="bk-name" class="w-full p-2.5 bg-[#FAF8F5] border border-[#C59B27]/60 rounded-xl outline-none focus:border-[#C59B27]">
+                    ${BANK_LIST.map((b) => `<option>${b}</option>`).join('')}
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-[#5C544B] mb-1">ชื่อบัญชี (ตรงกับบัตรประชาชน)</label>
+                  <input id="bk-holder" required placeholder="ระบุชื่อ-นามสกุลบัญชี" class="w-full p-2.5 bg-[#FAF8F5] border border-[#C59B27]/60 rounded-xl outline-none focus:border-[#C59B27]" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-[#5C544B] mb-1">เลขที่บัญชีธนาคาร</label>
+                  <input id="bk-num" type="tel" inputmode="numeric" required minlength="10" maxlength="12" placeholder="เลขบัญชี 10-12 หลัก" class="w-full p-2.5 bg-[#FAF8F5] border border-[#C59B27]/60 rounded-xl outline-none focus:border-[#C59B27]" />
+                </div>
+                <button class="w-full py-2.5 bg-[#C59B27] font-bold text-sm rounded-xl text-[#1E1B18]">ผูกบัญชีธนาคาร</button>
+              </form>`;
         } else if (accountPanel === 'history') {
-          body = ws.txHistory.length === 0 ? '<p class="text-xs text-[#5C544B]">ยังไม่มีรายการธุรกรรม</p>' : ws.txHistory.slice(0, 15).map((t) => `<div class="flex justify-between py-1.5 border-b text-xs"><span>${t.title} (${t.status})</span><b>${fmt(t.amountBaht)} ฿</b></div>`).join('');
+          body = ws.txHistory.length === 0
+            ? '<p class="text-xs text-[#5C544B] text-center py-4">ยังไม่มีรายการธุรกรรม</p>'
+            : `<div class="max-h-72 overflow-y-auto divide-y divide-[#C59B27]/20">
+                ${ws.txHistory.slice(0, 20).map((t) => `
+                  <div class="flex justify-between items-center py-2.5 text-xs gap-2">
+                    <div>
+                      <div class="font-semibold text-[#1E1B18]">${t.title}</div>
+                      <div class="text-[11px] text-[#5C544B]">สถานะ: ${t.status}</div>
+                    </div>
+                    <b class="shrink-0 ${Number(t.amountBaht) < 0 ? 'text-red-700' : 'text-[#8C6A10]'}">${fmt(t.amountBaht)} ฿</b>
+                  </div>
+                `).join('')}
+              </div>`;
         }
-        return `<section class="bg-white border border-[#C59B27] rounded-xl p-4 space-y-2 text-xs"><div class="flex justify-between font-bold"><span>จัดการบัญชี</span><button onclick="setAccPanel('none')">ปิด</button></div>${body}</section>`;
+
+        return `
+          <div onclick="setAccPanel('none')" class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-3.5">
+            <div onclick="event.stopPropagation()" class="w-full max-w-md bg-white border-2 border-[#C59B27] rounded-2xl p-4 sm:p-5 space-y-3.5 shadow-xl">
+              <div class="flex justify-between items-center border-b border-[#C59B27]/25 pb-2.5">
+                <h3 class="font-editorial font-bold text-base sm:text-lg text-[#1E1B18]">${panelTitles[accountPanel] || 'จัดการบัญชี'}</h3>
+                <button type="button" onclick="setAccPanel('none')" class="px-3 py-1 text-xs font-semibold bg-[#FAF8F5] border border-[#C59B27]/60 rounded-lg">ปิด</button>
+              </div>
+              ${body}
+            </div>
+          </div>`;
       }
 
       window.selectArt = (id) => { selectedArt = ARTWORKS.find((a) => a.id === id) || ARTWORKS[0]; render(); };
       window.setOriginFilter = (f) => { filterOrigin = f; render(); };
       window.togglePause = (p) => { sliderPaused = p; render(); };
       window.openLvlModal = (lv) => { openLevel = lv; slideIdx = 0; render(); };
-      window.closeLvlModal = () => { openLevel = null; render(); };
+      window.closeLvlModal = () => { openLevel = null; resetViewportScale(); render(); };
       window.stepSlide = (d) => { slideIdx = Math.max(0, Math.min(2, slideIdx + d)); render(); };
       window.setAccPanel = (p) => {
         accountPanel = p;
-        localStorage.setItem(KEYS.TAB_PANEL, p);
-        sessionStorage.setItem(KEYS.TAB_PANEL, p);
+        if (p === 'none') {
+          if (document.activeElement && typeof document.activeElement.blur === 'function') {
+            document.activeElement.blur();
+          }
+          resetViewportScale();
+        }
         render();
       };
-      window.openAuth = (m) => { authMode = m; setView('auth'); };
+      window.openAuth = (m) => {
+        authMode = m;
+        authErrorMsg = '';
+        setView('auth');
+      };
+      window.onAuthInput = (field, val) => {
+        if (field === 'phone') authPhoneVal = val;
+        if (field === 'pass') authPassVal = val;
+        if (field === 'confirm') authConfirmVal = val;
+        if (authErrorMsg) {
+          authErrorMsg = '';
+        }
+      };
+      window.toggleAuthEye = (field) => {
+        if (field === 'pass') showAuthPass = !showAuthPass;
+        if (field === 'confirm') showAuthConfirm = !showAuthConfirm;
+        render();
+      };
       window.logout = () => { currentUser = null; localStorage.removeItem(KEYS.SESSION); setView('home'); setToast('ออกจากระบบเรียบร้อย'); };
 
       window.submitAuth = async (e) => {
         e.preventDefault();
-        const phone = String(document.getElementById('auth-phone').value || '').replace(/\D/g, '').trim();
-        const pass = String(document.getElementById('auth-pass').value || '').trim();
-        if (phone.length < 9) return setToast('กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง');
+        const rawPhone = document.getElementById('auth-phone')?.value ?? authPhoneVal;
+        const rawPass = document.getElementById('auth-pass')?.value ?? authPassVal;
+        const rawConf = document.getElementById('auth-confirm')?.value ?? authConfirmVal;
+
+        authPhoneVal = String(rawPhone);
+        authPassVal = String(rawPass);
+        authConfirmVal = String(rawConf);
+
+        const phone = authPhoneVal.replace(/\D/g, '').trim();
+        const pass = authPassVal.trim();
+
+        if (phone.length < 9) {
+          authErrorMsg = 'กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง (อย่างน้อย 9 หลัก)';
+          return render();
+        }
+        if (pass.length < 6 || pass.length > 8) {
+          authErrorMsg = 'รหัสผ่านไม่ถูกต้อง (ต้องเป็นตัวเลข 6-8 หลัก)';
+          return render();
+        }
+
         if (authMode === 'register') {
-          const conf = String(document.getElementById('auth-confirm').value || '').trim();
-          if (pass !== conf) return setToast('ยืนยันรหัสผ่านไม่ตรงกัน');
-          if (users.some((u) => u.phone === phone)) return setToast('เบอร์นี้สมัครสมาชิกไว้แล้ว');
+          const conf = authConfirmVal.trim();
+          if (pass !== conf) {
+            authErrorMsg = 'รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน';
+            return render();
+          }
+          if (users.some((u) => u.phone === phone)) {
+            authErrorMsg = 'เบอร์โทรศัพท์นี้สมัครสมาชิกไว้แล้ว';
+            return render();
+          }
+          authErrorMsg = '';
           const u = { phone, password: pass, createdAt: new Date().toISOString() };
           users.push(u);
           workspaces[phone] = newWorkspace(phone);
           alerts.unshift({ id: 'al-' + Date.now(), phone, memberId: deriveId(phone), readByAdmin: false });
           currentUser = u;
           writeLS(KEYS.SESSION, u);
+          authPhoneVal = '';
+          authPassVal = '';
+          authConfirmVal = '';
           await saveCloudState();
           setView('home');
           setToast('สมัครสมาชิกสำเร็จ (ยอดเริ่มต้น 0 บาท)');
         } else {
           await loadCloudState();
           const u = users.find((x) => x.phone === phone && x.password === pass);
-          if (!u) return setToast('เบอร์โทรหรือรหัสผ่านไม่ถูกต้อง');
+          if (!u) {
+            authErrorMsg = 'เบอร์โทรศัพท์หรือรหัสผ่านไม่ถูกต้อง';
+            return render();
+          }
           const wsCheck = normalizeWorkspace(phone, workspaces[phone]);
-          if (wsCheck.suspended) return setToast('บัญชีนี้ถูกระงับการใช้งานชั่วคราว กรุณาติดต่อฝ่ายบริการ');
+          if (wsCheck.suspended) {
+            authErrorMsg = 'บัญชีนี้ถูกระงับการใช้งานชั่วคราว กรุณาติดต่อฝ่ายบริการ';
+            return render();
+          }
+          authErrorMsg = '';
           if (!workspaces[phone]) workspaces[phone] = wsCheck;
           currentUser = u;
           writeLS(KEYS.SESSION, u);
+          authPhoneVal = '';
+          authPassVal = '';
+          authConfirmVal = '';
           await saveCloudState();
           setView('home');
           setToast('เข้าสู่ระบบสำเร็จ');
@@ -1035,13 +1321,41 @@
         const val = String(inputEl ? inputEl.value : '').replace(/\D/g, '').trim();
         if (val !== ADMIN_PASSCODE) return setToast('รหัสผ่านไม่ถูกต้อง (ใส่ 195466)');
         adminUnlocked = true;
+        localStorage.setItem(KEYS.TAB_ADMIN, '1');
         sessionStorage.setItem(KEYS.TAB_ADMIN, '1');
+        resetViewportScale();
         render();
       };
       window.lockAdmin = () => {
         adminUnlocked = false;
+        localStorage.removeItem(KEYS.TAB_ADMIN);
         sessionStorage.removeItem(KEYS.TAB_ADMIN);
         setView('home');
+      };
+      window.onAdminSearch = (val) => {
+        adminSearchQuery = val;
+        const q = String(val || '').trim().toLowerCase();
+        const list = Object.values(workspaces);
+        const matches = q
+          ? list.filter((m) =>
+              String(m.phone || '').toLowerCase().includes(q) ||
+              String(m.memberId || '').toLowerCase().includes(q)
+            )
+          : list;
+        if (matches.length > 0 && !matches.some((m) => m.phone === adminSelectedPhone)) {
+          adminSelectedPhone = matches[0].phone;
+        }
+        render();
+        const inp = document.getElementById('admin-member-search');
+        if (inp) {
+          inp.focus();
+          const len = inp.value.length;
+          inp.setSelectionRange(len, len);
+        }
+      };
+      window.clearAdminSearch = () => {
+        adminSearchQuery = '';
+        render();
       };
       window.selectAdminMember = (p) => { adminSelectedPhone = p; render(); };
       window.setAdminPriceLevelTab = (lv) => { adminPriceLevelTab = lv; render(); };
