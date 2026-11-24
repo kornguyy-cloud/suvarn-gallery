@@ -93,6 +93,7 @@
         eyeClosed: `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/></svg>`,
         search: `<svg class="w-4 h-4 shrink-0 text-[#8C6A10]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>`,
         alertCircle: `<svg class="w-4 h-4 shrink-0 text-red-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
+        logout: `<svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>`,
       };
 
       const KEYS = {
@@ -551,31 +552,65 @@
             const items = auctions.filter((i) => i.level === openLevel);
             const cur = items[slideIdx] || items[0];
             const isLocked = isAuctionItemLocked(ws, cur);
+            const scrollItemCards = items.map((it, idx) => {
+              const itemLk = isAuctionItemLocked(ws, it);
+              const isSelected = idx === slideIdx;
+              return `
+                <div onclick="selectAuctionSlot(${idx})" class="snap-center shrink-0 w-72 sm:w-80 bg-[#FAF8F5] border-2 ${isSelected ? 'border-[#C59B27] ring-2 ring-[#C59B27]/40' : 'border-[#C59B27]/40'} rounded-xl p-3 space-y-2.5 cursor-pointer">
+                  <div class="flex justify-between items-center text-[11px]">
+                    <span class="font-bold text-[#8C6A10]">รายการที่ ${idx + 1}/${items.length}</span>
+                    <span class="font-bold text-[#1E1B18]">ราคา ${fmt(it.priceBaht)} บาท</span>
+                  </div>
+                  <img src="${it.imageUrl}" class="w-full h-44 object-cover rounded-lg border border-[#C59B27]/40" />
+                  <div>
+                    <div class="font-editorial text-base font-bold truncate">${it.titleTh}</div>
+                    <div class="text-xs text-[#5C544B]">ศิลปิน: ${it.artistTh} · เวลา ${it.durationMinutes} นาที</div>
+                  </div>
+                  <div class="grid grid-cols-2 gap-2 bg-white p-2.5 rounded-lg border border-[#C59B27]/30 text-xs">
+                    <div><span class="text-[#5C544B] block">ราคา</span><b>${fmt(it.priceBaht)} บาท</b></div>
+                    <div><span class="text-[#5C544B] block">ค่าคอมมิชชั่น</span><b class="text-[#8C6A10]">+${fmt(it.commissionBaht)} บาท</b></div>
+                    <div><span class="text-[#5C544B] block">ผู้เข้าร่วม</span><b>${fmt(it.participants)} คน</b></div>
+                    <div><span class="text-[#5C544B] block">ถูกใจ</span><b>${fmt(it.likes)}</b></div>
+                  </div>
+                  <button type="button" onclick="event.stopPropagation(); placeBid('${it.id}')" ${itemLk || hasBid ? 'disabled' : ''} class="w-full py-2 bg-[#C59B27] disabled:bg-[#EBE6DF] font-bold text-xs rounded-lg text-[#1E1B18]">
+                    ${itemLk ? 'รายการนี้ถูกล็อกโดยหลังบ้าน' : hasBid ? 'มีรายการกำลังนับถอยหลังอยู่' : `ประมูล (${fmt(it.priceBaht)} บาท)`}
+                  </button>
+                </div>`;
+            }).join('');
+
             modalHtml = `
               <div onclick="closeLvlModal()" class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-3">
-                <div onclick="event.stopPropagation()" class="w-full max-w-md bg-white border-2 border-[#C59B27] rounded-2xl p-4 space-y-3">
-                  <div class="flex justify-between items-center">
-                    <h3 class="font-editorial font-bold text-lg">เลเวล ${openLevel} · ภาพ ${slideIdx + 1}/${items.length}</h3>
-                    <button onclick="closeLvlModal()" class="px-2 py-1 text-xs border border-[#C59B27]/60 rounded">ปิด</button>
+                <div onclick="event.stopPropagation()" class="w-full max-w-md max-h-[88vh] overflow-y-auto bg-white border-2 border-[#C59B27] rounded-2xl p-4 space-y-3">
+                  <div class="flex justify-between items-center sticky top-0 bg-white z-10 pb-2 border-b border-[#C59B27]/25">
+                    <div>
+                      <h3 class="font-editorial font-bold text-lg">เลเวล ${openLevel} · ภาพ ${slideIdx + 1}/${items.length}</h3>
+                      <p class="text-[11px] text-[#5C544B]">เลื่อนซ้าย-ขวา หรือเลื่อนขึ้น-ลงเพื่อดูทุกราคาในเลเวลนี้</p>
+                    </div>
+                    <button onclick="closeLvlModal()" class="px-2.5 py-1 text-xs font-semibold border border-[#C59B27]/60 rounded-lg bg-[#FAF8F5]">ปิด</button>
                   </div>
-                  <div class="flex justify-between gap-2 text-xs">
-                    <button onclick="stepSlide(-1)" ${slideIdx === 0 ? 'disabled' : ''} class="px-3 py-1 bg-[#FAF8F5] border rounded disabled:opacity-40">ก่อนหน้า</button>
-                    <button onclick="stepSlide(1)" ${slideIdx === items.length - 1 ? 'disabled' : ''} class="px-3 py-1 bg-[#FAF8F5] border rounded disabled:opacity-40">ถัดไป</button>
+
+                  <div class="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2">
+                    ${scrollItemCards}
                   </div>
-                  <img src="${cur.imageUrl}" class="w-full h-48 object-cover rounded-lg border border-[#C59B27]/40" />
-                  <div>
-                    <div class="font-editorial text-lg font-bold">${cur.titleTh}</div>
-                    <div class="text-xs text-[#5C544B]">ศิลปิน: ${cur.artistTh} · เวลา ${cur.durationMinutes} นาที</div>
+
+                  <div class="space-y-2.5 pt-2 border-t border-[#C59B27]/25">
+                    <div class="text-xs font-bold text-[#8C6A10]">เลื่อนดูรายการอื่นในเลเวล ${openLevel} ด้านล่าง:</div>
+                    ${items.map((it, idx) => {
+                      const itemLk = isAuctionItemLocked(ws, it);
+                      return `
+                        <div onclick="selectAuctionSlot(${idx})" class="p-2.5 rounded-xl border ${idx === slideIdx ? 'border-[#C59B27] bg-amber-50/40' : 'border-[#C59B27]/35 bg-[#FAF8F5]'} flex items-center gap-3 cursor-pointer">
+                          <img src="${it.imageUrl}" class="w-16 h-16 object-cover rounded-lg border border-[#C59B27]/40 shrink-0" />
+                          <div class="flex-1 min-w-0 text-xs">
+                            <div class="font-bold text-[#1E1B18] truncate">${it.titleTh}</div>
+                            <div class="text-[#5C544B]">ราคา <b class="text-[#1E1B18]">${fmt(it.priceBaht)} ฿</b> · คอมฯ <b class="text-[#8C6A10]">+${fmt(it.commissionBaht)} ฿</b></div>
+                            <div class="text-[11px] text-[#5C544B]">เวลา ${it.durationMinutes} นาที · ผู้เข้าร่วม ${fmt(it.participants)} คน</div>
+                          </div>
+                          <button type="button" onclick="event.stopPropagation(); placeBid('${it.id}')" ${itemLk || hasBid ? 'disabled' : ''} class="px-3 py-2 bg-[#C59B27] disabled:bg-[#EBE6DF] font-bold text-xs rounded-lg text-[#1E1B18] shrink-0">
+                            ${itemLk ? 'ล็อกอยู่' : hasBid ? 'กำลังนับ' : 'ประมูล'}
+                          </button>
+                        </div>`;
+                    }).join('')}
                   </div>
-                  <div class="grid grid-cols-2 gap-2 bg-[#FAF8F5] p-3 rounded-lg border border-[#C59B27]/35 text-xs">
-                    <div><span class="text-[#5C544B] block">ราคา</span><b class="text-sm">${fmt(cur.priceBaht)} บาท</b></div>
-                    <div><span class="text-[#5C544B] block">ค่าคอมมิชชั่น</span><b class="text-sm text-[#8C6A10]">+${fmt(cur.commissionBaht)} บาท</b></div>
-                    <div><span class="text-[#5C544B] block">ผู้เข้าร่วม</span><b>${fmt(cur.participants)} คน</b></div>
-                    <div><span class="text-[#5C544B] block">ถูกใจ</span><b>${fmt(cur.likes)}</b></div>
-                  </div>
-                  <button onclick="placeBid('${cur.id}')" ${isLocked || hasBid ? 'disabled' : ''} class="w-full py-2.5 bg-[#C59B27] disabled:bg-[#EBE6DF] font-bold text-sm rounded-lg">
-                    ${isLocked ? 'รายการนี้ถูกล็อกโดยหลังบ้าน' : hasBid ? 'มีรายการกำลังนับถอยหลังอยู่' : `ประมูล (${fmt(cur.priceBaht)} บาท)`}
-                  </button>
                 </div>
               </div>`;
           }
@@ -721,6 +756,15 @@
                 </button>
               </section>
 
+              ${currentUser ? `
+                <div class="pt-1 flex justify-center">
+                  <button type="button" onclick="logout()" class="w-full max-w-xs py-3 px-5 bg-gradient-to-r from-[#C59B27] to-[#D8B03C] hover:from-[#b58c1f] hover:to-[#c59b27] text-[#1E1B18] font-bold text-sm rounded-xl border-2 border-[#8C6A10] shadow-md inline-flex items-center justify-center gap-2">
+                    ${ICONS.logout}
+                    <span>ออกจากระบบ</span>
+                  </button>
+                </div>
+              ` : ''}
+
               ${renderAccountModal(ws)}
             </main>`;
         } else if (activeView === 'auth') {
@@ -802,7 +846,7 @@
                     </div>
                   ` : ''}
                   <button type="submit" class="w-full py-3 bg-[#C59B27] font-bold text-sm rounded-lg text-[#1E1B18] shadow-xs">
-                    ${authMode === 'register' ? 'ยืนยันสมัครสมาชิก (เริ่มต้น 0 บาท)' : 'เข้าสู่ระบบ'}
+                    ${authMode === 'register' ? 'ยืนยันสมัครสมาชิก' : 'เข้าสู่ระบบ'}
                   </button>
                 </form>
               </div>
@@ -1068,443 +1112,4 @@
             </form>`;
         } else if (accountPanel === 'pin') {
           body = ws.withdrawalPin
-            ? `<div class="p-3 bg-[#FAF8F5] border border-[#C59B27]/40 rounded-xl text-xs text-[#5C544B] space-y-2">
-                <p class="font-semibold text-[#1E1B18]">คุณได้ตั้งค่ารหัสถอน 6 หลักเรียบร้อยแล้ว</p>
-                <p>เพื่อความปลอดภัยสูงสุด สมาชิกไม่สามารถเปลี่ยนรหัสถอนด้วยตนเองได้ หากต้องการแก้ไขกรุณาติดต่อฝ่ายบริการ</p>
-              </div>`
-            : `<form onsubmit="submitPin(event)" class="space-y-3">
-                <div>
-                  <label class="block text-xs font-semibold text-[#5C544B] mb-1">กำหนดรหัสถอน (ตัวเลข 6 หลัก)</label>
-                  <input id="new-pin" type="tel" inputmode="numeric" maxlength="6" required placeholder="ตั้งรหัสถอน 6 หลัก" class="w-full p-2.5 bg-[#FAF8F5] border border-[#C59B27]/60 rounded-xl outline-none focus:border-[#C59B27]" />
-                </div>
-                <button class="w-full py-2.5 bg-[#C59B27] font-bold text-sm rounded-xl text-[#1E1B18]">บันทึกรหัสถอน</button>
-              </form>`;
-        } else if (accountPanel === 'bank') {
-          body = ws.bankAccount
-            ? `<div class="p-3.5 bg-[#FAF8F5] border border-[#C59B27]/40 rounded-xl text-xs space-y-1.5">
-                <div class="text-[#8C6A10] font-bold">บัญชีธนาคารที่ผูกไว้แล้ว</div>
-                <div class="font-bold text-sm text-[#1E1B18]">${ws.bankAccount.bankName}</div>
-                <div class="text-[#5C544B]">ชื่อบัญชี: <b class="text-[#1E1B18]">${ws.bankAccount.accountHolder}</b></div>
-                <div class="text-[#5C544B]">เลขบัญชี: <b class="text-[#1E1B18]">${maskBank(ws.bankAccount.accountNumber)}</b></div>
-              </div>`
-            : `<form onsubmit="submitBank(event)" class="space-y-3">
-                <div>
-                  <label class="block text-xs font-semibold text-[#5C544B] mb-1">เลือกธนาคาร</label>
-                  <select id="bk-name" class="w-full p-2.5 bg-[#FAF8F5] border border-[#C59B27]/60 rounded-xl outline-none focus:border-[#C59B27]">
-                    ${BANK_LIST.map((b) => `<option>${b}</option>`).join('')}
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-[#5C544B] mb-1">ชื่อบัญชี (ตรงกับบัตรประชาชน)</label>
-                  <input id="bk-holder" required placeholder="ระบุชื่อ-นามสกุลบัญชี" class="w-full p-2.5 bg-[#FAF8F5] border border-[#C59B27]/60 rounded-xl outline-none focus:border-[#C59B27]" />
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-[#5C544B] mb-1">เลขที่บัญชีธนาคาร</label>
-                  <input id="bk-num" type="tel" inputmode="numeric" required minlength="10" maxlength="12" placeholder="เลขบัญชี 10-12 หลัก" class="w-full p-2.5 bg-[#FAF8F5] border border-[#C59B27]/60 rounded-xl outline-none focus:border-[#C59B27]" />
-                </div>
-                <button class="w-full py-2.5 bg-[#C59B27] font-bold text-sm rounded-xl text-[#1E1B18]">ผูกบัญชีธนาคาร</button>
-              </form>`;
-        } else if (accountPanel === 'history') {
-          body = ws.txHistory.length === 0
-            ? '<p class="text-xs text-[#5C544B] text-center py-4">ยังไม่มีรายการธุรกรรม</p>'
-            : `<div class="max-h-72 overflow-y-auto divide-y divide-[#C59B27]/20">
-                ${ws.txHistory.slice(0, 20).map((t) => `
-                  <div class="flex justify-between items-center py-2.5 text-xs gap-2">
-                    <div>
-                      <div class="font-semibold text-[#1E1B18]">${t.title}</div>
-                      <div class="text-[11px] text-[#5C544B]">สถานะ: ${t.status}</div>
-                    </div>
-                    <b class="shrink-0 ${Number(t.amountBaht) < 0 ? 'text-red-700' : 'text-[#8C6A10]'}">${fmt(t.amountBaht)} ฿</b>
-                  </div>
-                `).join('')}
-              </div>`;
-        }
-
-        return `
-          <div onclick="setAccPanel('none')" class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-3.5">
-            <div onclick="event.stopPropagation()" class="w-full max-w-md bg-white border-2 border-[#C59B27] rounded-2xl p-4 sm:p-5 space-y-3.5 shadow-xl">
-              <div class="flex justify-between items-center border-b border-[#C59B27]/25 pb-2.5">
-                <h3 class="font-editorial font-bold text-base sm:text-lg text-[#1E1B18]">${panelTitles[accountPanel] || 'จัดการบัญชี'}</h3>
-                <button type="button" onclick="setAccPanel('none')" class="px-3 py-1 text-xs font-semibold bg-[#FAF8F5] border border-[#C59B27]/60 rounded-lg">ปิด</button>
-              </div>
-              ${body}
-            </div>
-          </div>`;
-      }
-
-      window.selectArt = (id) => { selectedArt = ARTWORKS.find((a) => a.id === id) || ARTWORKS[0]; render(); };
-      window.setOriginFilter = (f) => { filterOrigin = f; render(); };
-      window.togglePause = (p) => { sliderPaused = p; render(); };
-      window.openLvlModal = (lv) => { openLevel = lv; slideIdx = 0; render(); };
-      window.closeLvlModal = () => { openLevel = null; resetViewportScale(); render(); };
-      window.stepSlide = (d) => { slideIdx = Math.max(0, Math.min(2, slideIdx + d)); render(); };
-      window.setAccPanel = (p) => {
-        accountPanel = p;
-        if (p === 'none') {
-          if (document.activeElement && typeof document.activeElement.blur === 'function') {
-            document.activeElement.blur();
-          }
-          resetViewportScale();
-        }
-        render();
-      };
-      window.openAuth = (m) => {
-        authMode = m;
-        authErrorMsg = '';
-        setView('auth');
-      };
-      window.onAuthInput = (field, val) => {
-        if (field === 'phone') authPhoneVal = val;
-        if (field === 'pass') authPassVal = val;
-        if (field === 'confirm') authConfirmVal = val;
-        if (authErrorMsg) {
-          authErrorMsg = '';
-        }
-      };
-      window.toggleAuthEye = (field) => {
-        if (field === 'pass') showAuthPass = !showAuthPass;
-        if (field === 'confirm') showAuthConfirm = !showAuthConfirm;
-        render();
-      };
-      window.logout = () => { currentUser = null; localStorage.removeItem(KEYS.SESSION); setView('home'); setToast('ออกจากระบบเรียบร้อย'); };
-
-      window.submitAuth = async (e) => {
-        e.preventDefault();
-        const rawPhone = document.getElementById('auth-phone')?.value ?? authPhoneVal;
-        const rawPass = document.getElementById('auth-pass')?.value ?? authPassVal;
-        const rawConf = document.getElementById('auth-confirm')?.value ?? authConfirmVal;
-
-        authPhoneVal = String(rawPhone);
-        authPassVal = String(rawPass);
-        authConfirmVal = String(rawConf);
-
-        const phone = authPhoneVal.replace(/\D/g, '').trim();
-        const pass = authPassVal.trim();
-
-        if (phone.length < 9) {
-          authErrorMsg = 'กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง (อย่างน้อย 9 หลัก)';
-          return render();
-        }
-        if (pass.length < 6 || pass.length > 8) {
-          authErrorMsg = 'รหัสผ่านไม่ถูกต้อง (ต้องเป็นตัวเลข 6-8 หลัก)';
-          return render();
-        }
-
-        if (authMode === 'register') {
-          const conf = authConfirmVal.trim();
-          if (pass !== conf) {
-            authErrorMsg = 'รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน';
-            return render();
-          }
-          if (users.some((u) => u.phone === phone)) {
-            authErrorMsg = 'เบอร์โทรศัพท์นี้สมัครสมาชิกไว้แล้ว';
-            return render();
-          }
-          authErrorMsg = '';
-          const u = { phone, password: pass, createdAt: new Date().toISOString() };
-          users.push(u);
-          workspaces[phone] = newWorkspace(phone);
-          alerts.unshift({ id: 'al-' + Date.now(), phone, memberId: deriveId(phone), readByAdmin: false });
-          currentUser = u;
-          writeLS(KEYS.SESSION, u);
-          authPhoneVal = '';
-          authPassVal = '';
-          authConfirmVal = '';
-          await saveCloudState();
-          setView('home');
-          setToast('สมัครสมาชิกสำเร็จ (ยอดเริ่มต้น 0 บาท)');
-        } else {
-          await loadCloudState();
-          const u = users.find((x) => x.phone === phone && x.password === pass);
-          if (!u) {
-            authErrorMsg = 'เบอร์โทรศัพท์หรือรหัสผ่านไม่ถูกต้อง';
-            return render();
-          }
-          const wsCheck = normalizeWorkspace(phone, workspaces[phone]);
-          if (wsCheck.suspended) {
-            authErrorMsg = 'บัญชีนี้ถูกระงับการใช้งานชั่วคราว กรุณาติดต่อฝ่ายบริการ';
-            return render();
-          }
-          authErrorMsg = '';
-          if (!workspaces[phone]) workspaces[phone] = wsCheck;
-          currentUser = u;
-          writeLS(KEYS.SESSION, u);
-          authPhoneVal = '';
-          authPassVal = '';
-          authConfirmVal = '';
-          await saveCloudState();
-          setView('home');
-          setToast('เข้าสู่ระบบสำเร็จ');
-        }
-      };
-
-      window.placeBid = async (id) => {
-        if (!currentUser) return setToast('กรุณาเข้าสู่ระบบก่อนกดประมูล');
-        const ws = normalizeWorkspace(currentUser.phone, workspaces[currentUser.phone]);
-        workspaces[currentUser.phone] = ws;
-        if (ws.suspended) return setToast('บัญชีของคุณถูกระงับการใช้งาน ไม่สามารถกดประมูลได้');
-        const item = auctions.find((i) => i.id === id);
-        if (!item) return;
-        if (isAuctionItemLocked(ws, item)) return setToast(`ราคานี้ (${fmt(item.priceBaht)} บาท) ถูกล็อกโดยระบบหลังบ้าน`);
-        if (ws.totalBalanceBaht < item.priceBaht) return setToast('ยอดเงินทั้งหมดไม่เพียงพอ');
-        const now = Date.now();
-        ws.totalBalanceBaht -= item.priceBaht;
-        ws.transactionBalanceBaht += item.priceBaht;
-        ws.vipLevel = Math.max(ws.vipLevel, item.level);
-        ws.activeBid = { item, startedAt: now, endsAt: now + item.durationMinutes * 60000 };
-        ws.txHistory.unshift({ id: 'tx-' + now, title: 'ประมูล: ' + item.titleTh, amountBaht: -item.priceBaht, status: 'ย้ายเข้าธุรกรรม' });
-        await saveCloudState();
-        openLevel = null;
-        setView('timer');
-      };
-
-      window.submitTopup = async (e) => {
-        e.preventDefault();
-        if (!currentUser) return setToast('กรุณาเข้าสู่ระบบก่อน');
-        const ws = normalizeWorkspace(currentUser.phone, workspaces[currentUser.phone]);
-        workspaces[currentUser.phone] = ws;
-        if (ws.suspended) return setToast('บัญชีของคุณถูกระงับการใช้งาน');
-        const amt = Number(document.getElementById('dep-amt').value);
-        ws.txHistory.unshift({ id: 'tx-' + Date.now(), type: 'topup', title: 'คำขอเติมเงิน', amountBaht: amt, status: 'รออนุมัติ' });
-        await saveCloudState();
-        setAccPanel('none');
-        setToast('ส่งคำขอเติมเงินเรียบร้อย');
-      };
-
-      window.submitWithdraw = async (e) => {
-        e.preventDefault();
-        if (!currentUser) return setToast('กรุณาเข้าสู่ระบบก่อน');
-        const ws = normalizeWorkspace(currentUser.phone, workspaces[currentUser.phone]);
-        workspaces[currentUser.phone] = ws;
-        if (ws.suspended) return setToast('บัญชีของคุณถูกระงับการใช้งาน');
-        const amt = Number(document.getElementById('wd-amt').value);
-        const pin = document.getElementById('wd-pin').value;
-        if (!ws.bankAccount || !ws.withdrawalPin) return setToast('กรุณาผูกบัญชีและตั้งรหัสถอนก่อน');
-        if (pin !== ws.withdrawalPin) return setToast('รหัสถอนไม่ถูกต้อง');
-        if (amt > ws.totalBalanceBaht) return setToast('ยอดเงินไม่เพียงพอ');
-        ws.totalBalanceBaht -= amt;
-        ws.txHistory.unshift({ id: 'tx-' + Date.now(), type: 'withdraw', title: 'คำขอถอนเงิน', amountBaht: -amt, status: 'รออนุมัติ' });
-        await saveCloudState();
-        setAccPanel('none');
-        setToast('ส่งคำขอถอนเงินเรียบร้อย');
-      };
-
-      window.submitPin = async (e) => {
-        e.preventDefault();
-        if (!currentUser) return setToast('กรุณาเข้าสู่ระบบก่อน');
-        const ws = normalizeWorkspace(currentUser.phone, workspaces[currentUser.phone]);
-        ws.withdrawalPin = document.getElementById('new-pin').value;
-        workspaces[currentUser.phone] = ws;
-        await saveCloudState();
-        setAccPanel('none');
-        setToast('บันทึกรหัสถอน 6 หลักเรียบร้อย');
-      };
-
-      window.submitBank = async (e) => {
-        e.preventDefault();
-        if (!currentUser) return setToast('กรุณาเข้าสู่ระบบก่อน');
-        const ws = normalizeWorkspace(currentUser.phone, workspaces[currentUser.phone]);
-        ws.bankAccount = {
-          bankName: document.getElementById('bk-name').value,
-          accountHolder: document.getElementById('bk-holder').value,
-          accountNumber: document.getElementById('bk-num').value,
-        };
-        workspaces[currentUser.phone] = ws;
-        await saveCloudState();
-        setAccPanel('none');
-        setToast('ผูกบัญชีธนาคารเรียบร้อย');
-      };
-
-      window.unlockAdmin = (e) => {
-        if (e) e.preventDefault();
-        const inputEl = document.getElementById('admin-pin');
-        const val = String(inputEl ? inputEl.value : '').replace(/\D/g, '').trim();
-        if (val !== ADMIN_PASSCODE) return setToast('รหัสผ่านไม่ถูกต้อง (ใส่ 195466)');
-        adminUnlocked = true;
-        localStorage.setItem(KEYS.TAB_ADMIN, '1');
-        sessionStorage.setItem(KEYS.TAB_ADMIN, '1');
-        resetViewportScale();
-        render();
-      };
-      window.lockAdmin = () => {
-        adminUnlocked = false;
-        localStorage.removeItem(KEYS.TAB_ADMIN);
-        sessionStorage.removeItem(KEYS.TAB_ADMIN);
-        setView('home');
-      };
-      window.onAdminSearch = (val) => {
-        adminSearchQuery = val;
-        const q = String(val || '').trim().toLowerCase();
-        const list = Object.values(workspaces);
-        const matches = q
-          ? list.filter((m) =>
-              String(m.phone || '').toLowerCase().includes(q) ||
-              String(m.memberId || '').toLowerCase().includes(q)
-            )
-          : list;
-        if (matches.length > 0 && !matches.some((m) => m.phone === adminSelectedPhone)) {
-          adminSelectedPhone = matches[0].phone;
-        }
-        render();
-        const inp = document.getElementById('admin-member-search');
-        if (inp) {
-          inp.focus();
-          const len = inp.value.length;
-          inp.setSelectionRange(len, len);
-        }
-      };
-      window.clearAdminSearch = () => {
-        adminSearchQuery = '';
-        render();
-      };
-      window.selectAdminMember = (p) => { adminSelectedPhone = p; render(); };
-      window.setAdminPriceLevelTab = (lv) => { adminPriceLevelTab = lv; render(); };
-      window.markAlertsRead = async () => {
-        alerts = alerts.map((a) => ({ ...a, readByAdmin: true }));
-        await saveCloudState();
-        render();
-      };
-      window.adminAdjust = async (dir) => {
-        const amt = Math.abs(Number(document.getElementById('adj-amt').value || 0)) * dir;
-        const ws = normalizeWorkspace(adminSelectedPhone, workspaces[adminSelectedPhone]);
-        if (!ws || ws.totalBalanceBaht + amt < 0) return setToast('ไม่สามารถหักเกินยอดคงเหลือได้');
-        ws.totalBalanceBaht += amt;
-        ws.txHistory.unshift({ id: 'tx-' + Date.now(), title: dir > 0 ? 'แอดมินเพิ่มยอดเงิน' : 'แอดมินหักยอดเงิน', amountBaht: amt, status: 'อนุมัติแล้ว' });
-        workspaces[adminSelectedPhone] = ws;
-        await saveCloudState();
-        render();
-        setToast('ปรับยอดเงินและซิงก์เข้าบัญชีสมาชิกเรียบร้อย');
-      };
-      window.reviewMemberTx = async (phone, txId, approved) => {
-        const ws = normalizeWorkspace(phone, workspaces[phone]);
-        const idx = ws.txHistory.findIndex((t) => t.id === txId);
-        if (idx === -1) return;
-        const tx = ws.txHistory[idx];
-        const absAmt = Math.abs(Number(tx.amountBaht) || 0);
-        const isWithdraw = tx.type === 'withdraw' || Number(tx.amountBaht) < 0 || String(tx.title || '').includes('ถอน');
-        if (approved) {
-          if (!isWithdraw) {
-            ws.totalBalanceBaht += absAmt;
-          }
-          tx.status = 'อนุมัติแล้ว';
-          setToast(`อนุมัติรายการ "${tx.title}" ${fmt(absAmt)} บาทเรียบร้อย`);
-        } else {
-          if (isWithdraw) {
-            ws.totalBalanceBaht += absAmt;
-          }
-          tx.status = 'ปฏิเสธ';
-          setToast(`ปฏิเสธรยการ "${tx.title}" แล้ว`);
-        }
-        ws.txHistory[idx] = tx;
-        workspaces[phone] = ws;
-        await saveCloudState();
-        render();
-      };
-      window.toggleSuspendMember = async (phone) => {
-        const ws = normalizeWorkspace(phone, workspaces[phone]);
-        ws.suspended = !ws.suspended;
-        workspaces[phone] = ws;
-        await saveCloudState();
-        render();
-        setToast(ws.suspended ? `ระงับสมาชิก ${phone} เรียบร้อย` : `ปลดระงับสมาชิก ${phone} เรียบร้อย`);
-      };
-      window.deleteMember = async (phone) => {
-        if (Object.keys(workspaces).length <= 1) return setToast('ต้องมีสมาชิกอย่างน้อย 1 รายในระบบ');
-        delete workspaces[phone];
-        users = users.filter((u) => u.phone !== phone);
-        alerts = alerts.filter((a) => a.phone !== phone);
-        if (currentUser?.phone === phone) {
-          currentUser = null;
-          localStorage.removeItem(KEYS.SESSION);
-        }
-        adminSelectedPhone = Object.keys(workspaces)[0] || '';
-        await saveCloudState();
-        render();
-        setToast(`ลบสมาชิก ${phone} เรียบร้อย`);
-      };
-      window.saveMemberCredentials = async (oldPhone) => {
-        const nextPhone = String(document.getElementById('adm-edit-phone').value || '').replace(/\D/g, '').trim();
-        const nextPass = String(document.getElementById('adm-edit-pass').value || '').trim();
-        if (nextPhone.length < 9) return setToast('กรุณากรอกเบอร์โทรศัพท์อย่างน้อย 9 หลัก');
-        if (nextPass.length < 6) return setToast('กรุณากรอกรหัสผ่านอย่างน้อย 6 ตัวอักษร');
-        if (nextPhone !== oldPhone && workspaces[nextPhone]) return setToast('เบอร์โทรศัพท์ใหม่ซ้ำกับสมาชิกอื่น');
-
-        const ws = normalizeWorkspace(nextPhone, workspaces[oldPhone]);
-        ws.phone = nextPhone;
-        ws.memberId = deriveId(nextPhone);
-        if (oldPhone !== nextPhone) {
-          delete workspaces[oldPhone];
-        }
-        workspaces[nextPhone] = ws;
-
-        const uIdx = users.findIndex((u) => u.phone === oldPhone);
-        if (uIdx !== -1) {
-          users[uIdx] = { ...users[uIdx], phone: nextPhone, password: nextPass };
-        } else {
-          users.push({ phone: nextPhone, password: nextPass, createdAt: new Date().toISOString() });
-        }
-
-        alerts = alerts.map((a) => (a.phone === oldPhone ? { ...a, phone: nextPhone, memberId: deriveId(nextPhone) } : a));
-        if (currentUser?.phone === oldPhone) {
-          currentUser = { ...currentUser, phone: nextPhone, password: nextPass };
-          writeLS(KEYS.SESSION, currentUser);
-        }
-        adminSelectedPhone = nextPhone;
-        await saveCloudState();
-        render();
-        setToast('บันทึกเบอร์โทรศัพท์และรหัสผ่านเรียบร้อย');
-      };
-      window.saveMemberBankAndPin = async (phone) => {
-        const ws = normalizeWorkspace(phone, workspaces[phone]);
-        const bankName = document.getElementById('adm-bk-name').value;
-        const accountHolder = String(document.getElementById('adm-bk-holder').value || '').trim();
-        const accountNumber = String(document.getElementById('adm-bk-num').value || '').trim();
-        const txPin = String(document.getElementById('adm-tx-pin').value || '').replace(/\D/g, '').trim();
-
-        if (accountHolder || accountNumber) {
-          ws.bankAccount = { bankName, accountHolder, accountNumber };
-        }
-        if (txPin) {
-          if (txPin.length !== 6) return setToast('รหัสธุรกรรม (รหัสถอน) ต้องเป็นตัวเลข 6 หลัก');
-          ws.withdrawalPin = txPin;
-        }
-        workspaces[phone] = ws;
-        await saveCloudState();
-        render();
-        setToast('บันทึกบัญชีธนาคารและรหัสธุรกรรมเรียบร้อย');
-      };
-      window.clearMemberPin = async (phone) => {
-        const ws = normalizeWorkspace(phone, workspaces[phone]);
-        ws.withdrawalPin = null;
-        workspaces[phone] = ws;
-        await saveCloudState();
-        render();
-        setToast('ล้างรหัสธุรกรรม (รหัสถอน) เรียบร้อย');
-      };
-      window.toggleLvlLock = async (p, lv) => {
-        const ws = normalizeWorkspace(p, workspaces[p]);
-        ws.lockedLevels = ws.lockedLevels.includes(lv) ? ws.lockedLevels.filter((x) => x !== lv) : [...ws.lockedLevels, lv];
-        workspaces[p] = ws;
-        await saveCloudState();
-        render();
-      };
-      window.toggleItemPriceLock = async (p, slotKey, itemId, priceBaht) => {
-        const ws = normalizeWorkspace(p, workspaces[p]);
-        const exists = ws.lockedItemIds.includes(slotKey) || ws.lockedItemIds.includes(itemId);
-        if (exists) {
-          ws.lockedItemIds = ws.lockedItemIds.filter((k) => k !== slotKey && k !== itemId);
-          setToast(`ยกเลิกล็อกราคา ${fmt(priceBaht)} บาทแล้ว สามารถกดประมูลได้ตามปกติ`);
-        } else {
-          ws.lockedItemIds = [...ws.lockedItemIds, slotKey];
-          setToast(`ล็อกราคา ${fmt(priceBaht)} บาทแล้ว สมาชิกจะไม่สามารถกดประมูลราคานี้ได้`);
-        }
-        workspaces[p] = ws;
-        await saveCloudState();
-        render();
-      };
-
-      render();
-      loadCloudState();
-    </script>
-  </body>
-</html>
+            ? `<div class="p-
