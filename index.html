@@ -314,7 +314,7 @@
           const snap = await firestoreDocRef.get();
           if (snap.exists) {
             applyCloudPayload(snap.data());
-            render();
+            if (openLevel === null && accountPanel === 'none') render();
           } else {
             await saveCloudState();
           }
@@ -328,7 +328,7 @@
           if (isSavingCloud) return;
           if (snap.exists) {
             applyCloudPayload(snap.data());
-            render();
+            if (openLevel === null && accountPanel === 'none') render();
           }
         }, (err) => {
           console.error('Firestore snapshot error:', err);
@@ -356,6 +356,7 @@
       let showAuthPass = false;
       let showAuthConfirm = false;
       let openLevel = null;
+      let levelModalScrollTop = 0;
       let slideIdx = 0;
       let adminSelectedPhone = currentUser?.phone || Object.keys(workspaces)[0] || '';
       let adminSearchQuery = '';
@@ -415,15 +416,15 @@
         if (syncedView && VALID_VIEWS.includes(syncedView) && syncedView !== 'admin' && activeView !== 'admin') {
           activeView = syncedView;
         }
-        render();
+        if (openLevel === null && accountPanel === 'none') render();
       });
 
       document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) loadCloudState();
+        if (!document.hidden && openLevel === null && accountPanel === 'none') loadCloudState();
       });
 
       window.addEventListener('focus', () => {
-        loadCloudState();
+        if (openLevel === null && accountPanel === 'none') loadCloudState();
       });
 
       setInterval(() => {
@@ -453,10 +454,15 @@
           }
         });
         if (changed) saveCloudState();
-        if (activeView === 'timer' || activeView === 'auction') render();
+        if (activeView === 'timer' || (activeView === 'auction' && openLevel === null)) render();
       }, 1000);
 
       function render() {
+        const prevModalScrollEl = document.getElementById('level-modal-scroll');
+        if (prevModalScrollEl && openLevel !== null) {
+          levelModalScrollTop = prevModalScrollEl.scrollTop;
+        }
+
         const ws = activeWs();
         const titleMap = { home: 'หน้าแรก', auction: 'ประมูล', timer: 'เวลา', account: 'บัญชี', admin: 'หลังบ้าน', auth: authMode === 'register' ? 'สมัครสมาชิก' : 'เข้าสู่ระบบ' };
         const hasBid = ws.activeBid && ws.activeBid.endsAt > Date.now();
@@ -577,7 +583,7 @@
 
             modalHtml = `
               <div onclick="closeLvlModal()" class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-3">
-                <div onclick="event.stopPropagation()" class="w-full max-w-md max-h-[85vh] overflow-y-auto bg-white border-2 border-[#C59B27] rounded-2xl p-4 space-y-3">
+                <div id="level-modal-scroll" onscroll="window.onLevelModalScroll(this.scrollTop)" onclick="event.stopPropagation()" class="w-full max-w-md max-h-[85vh] overflow-y-auto overscroll-contain bg-white border-2 border-[#C59B27] rounded-2xl p-4 space-y-3">
                   <div class="flex justify-between items-center sticky top-0 bg-white z-10 pb-2 border-b border-[#C59B27]/25">
                     <div>
                       <h3 class="font-editorial font-bold text-lg">เลเวล ${openLevel}</h3>
@@ -1049,6 +1055,11 @@
               `).join('')}
             </div>
           </nav>`;
+
+        const nextModalScrollEl = document.getElementById('level-modal-scroll');
+        if (nextModalScrollEl && openLevel !== null && levelModalScrollTop > 0) {
+          nextModalScrollEl.scrollTop = levelModalScrollTop;
+        }
       }
 
       function renderAccountModal(ws) {
@@ -1156,8 +1167,9 @@
       window.selectArt = (id) => { selectedArt = ARTWORKS.find((a) => a.id === id) || ARTWORKS[0]; render(); };
       window.setOriginFilter = (f) => { filterOrigin = f; render(); };
       window.togglePause = (p) => { sliderPaused = p; render(); };
-      window.openLvlModal = (lv) => { openLevel = lv; slideIdx = 0; render(); };
-      window.closeLvlModal = () => { openLevel = null; resetViewportScale(); render(); };
+      window.onLevelModalScroll = (st) => { levelModalScrollTop = Number(st) || 0; };
+      window.openLvlModal = (lv) => { openLevel = lv; levelModalScrollTop = 0; slideIdx = 0; render(); };
+      window.closeLvlModal = () => { openLevel = null; levelModalScrollTop = 0; resetViewportScale(); render(); };
       window.selectAuctionSlot = (idx) => {
         const items = auctions.filter((i) => i.level === openLevel);
         slideIdx = Math.max(0, Math.min(items.length - 1, idx));
@@ -1285,6 +1297,7 @@
         ws.txHistory.unshift({ id: 'tx-' + now, title: 'ประมูล: ' + item.titleTh, amountBaht: -item.priceBaht, status: 'ย้ายเข้าธุรกรรม' });
         await saveCloudState();
         openLevel = null;
+        levelModalScrollTop = 0;
         setView('timer');
       };
 
