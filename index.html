@@ -41,6 +41,25 @@
       .marquee-track.paused {
         animation-play-state: paused;
       }
+      .btn-gold-cta {
+        background: linear-gradient(135deg, #d7b244 0%, #c59b27 50%, #a87f14 100%);
+        color: #1e1b18;
+        border: 1.5px solid #8c6a10;
+        box-shadow: 0 6px 18px rgba(140, 106, 16, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+      }
+      .btn-gold-cta:hover {
+        filter: brightness(1.03);
+      }
+      .gallery-frame-ornament {
+        background-image:
+          linear-gradient(to right, #c59b27 14px, transparent 14px),
+          linear-gradient(to bottom, #c59b27 14px, transparent 14px),
+          linear-gradient(to left, #c59b27 14px, transparent 14px),
+          linear-gradient(to top, #c59b27 14px, transparent 14px);
+        background-position: top 8px left 8px, top 8px left 8px, top 8px right 8px, top 8px right 8px;
+        background-size: 14px 14px;
+        background-repeat: no-repeat;
+      }
     </style>
   </head>
   <body class="min-h-screen flex flex-col bg-[#FAF8F5] text-[#1E1B18] pb-16">
@@ -50,6 +69,16 @@
       const IMG_BASE = './';
       const LINE_URL = 'https://lin.ee/n2l2Qqx';
       const ADMIN_PASSCODE = '195466';
+      const MUSEUM_VALUE_IMG = IMG_BASE + 'watermarked_img_4025394870190870566.jpg';
+
+      const ART_VALUE_COPY = {
+        heading: 'คุณค่าแห่งงานศิลปะและสุนทรียะอันล้ำค่า',
+        paragraphs: [
+          'งานศิลปะคือมรดกทางปัญญาและจิตวิญญาณที่ส่งต่อผ่านกาลเวลา ในทุกฝีแปรงและแสงเงาคือเรื่องราว ประวัติศาสตร์ และวัฒนธรรมอันล้ำค่า ที่สะท้อนความวิจิตรและความคิดสร้างสรรค์ของมนุษยชาติ',
+          'ที่หอศิลป์สุวรรณวิจิตร เราได้คัดสรรผลงานศิลปะชั้นครู ทั้งศิลปะไทยดั้งเดิมและศิลปะสากลร่วมสมัย เพื่อให้ท่านได้สัมผัสกับความงามที่ไร้ขอบเขต ไม่ว่าจะเป็นภาพวาดไทยที่เปี่ยมด้วยเอกลักษณ์อันประณีต หรือผลงานต่างประเทศที่โดดเด่นด้วยเทคนิคและอารมณ์อันลึกซึ้ง',
+          'ทุกชิ้นงานคือประจักษ์พยานแห่งคุณค่าที่ควรค่าแก่การเชิดชูและอนุรักษ์ การได้อยู่ร่วมกับงานศิลปะชั้นเยี่ยมมิเพียงแต่ช่วยยกระดับสุนทรียะแห่งการมองเห็น แต่ยังเป็นการเติมเต็มจิตวิญญาณและสร้างแรงบันดาลใจใหม่ๆ ให้แก่ผู้ที่ได้ชื่นชมและครอบครองอย่างแท้จริง',
+        ],
+      };
 
       const firebaseConfig = {
         apiKey: "AIzaSyDpj61jqYSncoxDhXZUa7asWcnVlcGB_3k",
@@ -85,6 +114,9 @@
         bank: `<svg class="w-4 h-4 shrink-0 text-[#8C6A10]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 22 7 12 2"/><line x1="6" y1="11" x2="6" y2="17"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/><line x1="18" y1="11" x2="18" y2="17"/><line x1="3" y1="21" x2="21" y2="21"/></svg>`,
         receipt: `<svg class="w-4 h-4 shrink-0 text-[#8C6A10]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></svg>`,
         chevronRight: `<svg class="w-4 h-4 shrink-0 text-[#8C6A10]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`,
+        arrowLeft: `<svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>`,
+        heart: `<svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`,
+        heartFilled: `<svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`,
         navHome: `<svg class="w-4 h-4 mb-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
         navAuction: `<svg class="w-4 h-4 mb-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 12.5-8 8a2.119 2.119 0 1 1-3-3l8-8"/><path d="m16 16 6-6"/><path d="m8 8 6-6"/><path d="m9 7 8 8"/><path d="m21 11-8-8"/></svg>`,
         navTimer: `<svg class="w-4 h-4 mb-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3 2 6"/><path d="m22 6-3-3"/><path d="M10 2h4"/></svg>`,
@@ -108,27 +140,27 @@
       };
 
       const ARTWORKS = [
-        { id: 'art-th-01', accessionNo: 'SV-TH-2026-01', titleTh: 'วิหารทองอรุณและบัวบูชา', artistTh: 'อ.สุรศักดิ์ พงษ์ไพบูลย์', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'คุณพิพัฒน์ วงศ์สุวรรณ', commissionBaht: 48000, estimatedValueBaht: 480000, imageUrl: IMG_BASE + 'paint_thai_golden_pavilion_1795220691183.jpg', description: 'จิตรกรรมไทยร่วมสมัยผสานสถาปัตยกรรมอยุธยากับแสงอรุณรุ่งบนผืนน้ำ' },
-        { id: 'art-intl-01', accessionNo: 'SV-INT-2026-02', titleTh: 'แสงทองแห่งคลองแกรนด์คาแนล เวนิส', artistTh: 'มาร์โก เบลลินี', origin: 'international', originLabel: 'ศิลปะต่างประเทศ', owner: 'คอลเลกชัน เอเลนา รอสโตวา', commissionBaht: 85000, estimatedValueBaht: 850000, imageUrl: IMG_BASE + 'paint_intl_venice_canal_1795220754100.jpg', description: 'ทิวทัศน์เมืองเวนิสยามอาทิตย์อัสดงสะท้อนผิวน้ำด้วยฝีแปรงอิมเพรสชันนิสม์' },
-        { id: 'art-th-02', accessionNo: 'SV-TH-2026-03', titleTh: 'สายน้ำเจ้าพระยายามสนธยา', artistTh: 'รสลินทร์ จิตรกรชัย', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'คุณนลินี เตชะไพบูลย์', commissionBaht: 52500, estimatedValueBaht: 525000, imageUrl: IMG_BASE + 'paint_thai_chaophraya_twilight_1795220691075.jpg', description: 'วิถีชีวิตสายน้ำเจ้าพระยา เรือไม้สักแล่นผ่านเงาพระปรางค์วัดอรุณ' },
-        { id: 'art-intl-02', accessionNo: 'SV-INT-2026-04', titleTh: 'หุ่นนิ่งโบตั๋นขาวและเครื่องทองเหลืองโบราณ', artistTh: 'แคลร์ ดูบัวส์', origin: 'international', originLabel: 'ศิลปะต่างประเทศ', owner: 'Mr. Henrik Lindqvist', commissionBaht: 64000, estimatedValueBaht: 640000, imageUrl: IMG_BASE + 'paint_intl_peonies_brass_1795220710286.jpg', description: 'หุ่นนิ่งดอกโบตั๋นสีงาช้างในแจกันพอร์ซเลนคู่ผลมะเดื่อและเข็มทิศทองเหลือง' },
-        { id: 'art-th-03', accessionNo: 'SV-TH-2026-05', titleTh: 'ม่านหมอกล้านนาและนาขั้นบันไดสีทอง', artistTh: 'ธนากร ศรีล้านนา', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'มูลนิธิศิลปวัฒนธรรมเชียงใหม่', commissionBaht: 42000, estimatedValueBaht: 420000, imageUrl: IMG_BASE + 'paint_thai_lanna_terraces_1795220691245.jpg', description: 'ขุนเขาภาคเหนือยามเช้าที่ผืนหมอกโอบล้อมนาขั้นบันไดต้องแสงทอง' },
-        { id: 'art-intl-03', accessionNo: 'SV-INT-2026-06', titleTh: 'ศาลาฤดูใบไม้ร่วงแห่งเกียวโต', artistTh: 'เคนจิ ทาคาฮาชิ', origin: 'international', originLabel: 'ศิลปะต่างประเทศ', owner: 'Sato Heritage Gallery', commissionBaht: 72000, estimatedValueBaht: 720000, imageUrl: IMG_BASE + 'paint_intl_kyoto_pavilion_1795220754160.jpg', description: 'พู่กันหมึกญี่ปุ่นผสานเมฆทองคำเปลวและใบเมเปิลสีชาดแบบวาบิ-ซาบิ' },
-        { id: 'art-th-04', accessionNo: 'SV-TH-2026-07', titleTh: 'ธารน้ำตกมรกตและเอื้องผึ้งป่าหิมพานต์', artistTh: 'อรุณพงษ์ วนาศิลป์', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'คุณศิริพร รัตนมงคล', commissionBaht: 36000, estimatedValueBaht: 360000, imageUrl: IMG_BASE + 'paint_thai_emerald_waterfall_1795220691784.jpg', description: 'น้ำตกมรกตไหลผ่านโขดหินมอสและกล้วยไม้ป่าภายใต้ลำแสงทองยามเช้า' },
-        { id: 'art-intl-04', accessionNo: 'SV-INT-2026-08', titleTh: 'ชายฝั่งอามัลฟียามแสงแดดสีทอง', artistTh: 'อันโตนิโอ เฟร์รารา', origin: 'international', originLabel: 'ศิลปะต่างประเทศ', owner: 'Fondazione Arte Napoli', commissionBaht: 68000, estimatedValueBaht: 680000, imageUrl: IMG_BASE + 'paint_intl_amalfi_coast_1795220692030.jpg', description: 'หมู่บ้านริมหน้าผาอามัลฟีอาบแสงแดดเมดิเตอร์เรเนียนเหนือทะเลสีคราม' },
-        { id: 'art-th-05', accessionNo: 'SV-TH-2026-09', titleTh: 'โคมยี่เป็งและกระทงสายแห่งอโยธยา', artistTh: 'กิตติภพ สุวรรณธาดา', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'คุณธนัท ดำรงค์ศิลป์', commissionBaht: 92000, estimatedValueBaht: 920000, imageUrl: IMG_BASE + 'paint_thai_ayutthaya_lanterns_1795220690967.jpg', description: 'โคมไฟสีทองเหนือพระปรางค์วัดโบราณและเงากระทงดอกบัวบนผิวน้ำ' },
-        { id: 'art-intl-05', accessionNo: 'SV-INT-2026-10', titleTh: 'เรือนกระจกหลวงแห่งเวียนนา', artistTh: 'ฟรานซ์ ฟอน ไฮเดน', origin: 'international', originLabel: 'ศิลปะต่างประเทศ', owner: 'Belvedere Kunsthandel', commissionBaht: 110000, estimatedValueBaht: 1100000, imageUrl: IMG_BASE + 'paint_intl_vienna_conservatory_1795220691736.jpg', description: 'ซุ้มโค้งกระจกสูงตระหง่านและประติมากรรมหินอ่อนต้องแสงบ่ายสีทอง' },
-        { id: 'art-th-06', accessionNo: 'SV-TH-2026-11', titleTh: 'หงส์สุวรรณในสระบัวหิมพานต์', artistTh: 'ครูช่างปราณีต จิตรกรรมไทย', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'มูลนิธิอนุรักษ์ศิลป์ไทย', commissionBaht: 78000, estimatedValueBaht: 780000, imageUrl: IMG_BASE + 'paint_thai_himmapan_swan_1795220754660.jpg', description: 'หงส์ขาวทรงเครื่องกลางสระบัวทองคำท่ามกลางเมฆลายกนกเปลวโบราณ' },
-        { id: 'art-intl-06', accessionNo: 'SV-INT-2026-12', titleTh: 'ฟยอร์ดนอร์ดิกยามอาทิตย์อัสดงสีทอง', artistTh: 'เอริก โซลเบิร์ก', origin: 'international', originLabel: 'ศิลปะต่างประเทศ', owner: 'Oslo Fine Collectors Guild', commissionBaht: 76000, estimatedValueBaht: 760000, imageUrl: IMG_BASE + 'paint_intl_nordic_fjord_1795220755255.jpg', description: 'ยอดเขาหิมะสะท้อนแสงแชมเปญลงบนผืนน้ำฟยอร์ดที่นิ่งราวกระจกเงา' },
-        { id: 'art-th-07', accessionNo: 'SV-TH-2026-13', titleTh: 'เจดีย์สุโขทัยในสายหมอกอรุณ', artistTh: 'อ.กิตติศักดิ์ สุโขทัย', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'คุณปรเมศวร์ สุโขทัยกุล', commissionBaht: 58000, estimatedValueBaht: 580000, imageUrl: IMG_BASE + 'paint_thai_sukhothai_stupa_1795220691422.jpg', description: 'มหาเจดีย์ทรงพุ่มข้าวบิณฑ์แห่งสุโขทัยท่ามกลางสายหมอกบางยามเช้า' },
-        { id: 'art-intl-07', accessionNo: 'SV-INT-2026-14', titleTh: 'ถนนโอเปร่ากรุงปารีสหลังสายฝน', artistTh: 'ฌอง-ลุค มาร์แตง', origin: 'international', originLabel: 'ศิลปะต่างประเทศ', owner: 'Galerie Champs-Élysées', commissionBaht: 54000, estimatedValueBaht: 540000, imageUrl: IMG_BASE + 'paint_intl_paris_boulevard_1795220691248.jpg', description: 'ถนนหน้าโรงอุปรากรปารีสหลังฝนซาสะท้อนแสงโคมไฟสีทองอุ่น' },
-        { id: 'art-th-08', accessionNo: 'SV-TH-2026-15', titleTh: 'กระบวนพยุหยาตราทางชลมารคสุวรรณ', artistTh: 'ศ.ดร.วิจิตร บวรศิลป์', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'หอศิลป์สุวรรณวิจิตร', commissionBaht: 160000, estimatedValueBaht: 1600000, imageUrl: IMG_BASE + 'paint_thai_royal_barge_1795220691574.jpg', description: 'เรือพระที่นั่งสุพรรณหงส์เคลื่อนผ่านแสงอาทิตย์สีทองเหนือเจ้าพระยา' },
-        { id: 'art-intl-08', accessionNo: 'SV-INT-2026-16', titleTh: 'คฤหาสน์ทัสคานีท่ามกลางทิวสนทอง', artistTh: 'ลอเรนโซ คอนติ', origin: 'international', originLabel: 'ศิลปะต่างประเทศ', owner: 'Casa d’Arte Firenze', commissionBaht: 49000, estimatedValueBaht: 490000, imageUrl: IMG_BASE + 'paint_intl_tuscany_villa_1795220754179.jpg', description: 'แนวต้นสนไซเปรสสู่คฤหาสน์หินทัสคานีอาบแสงแห่งฤดูเก็บเกี่ยว' },
-        { id: 'art-th-09', accessionNo: 'SV-TH-2026-17', titleTh: 'ตลาดน้ำยามเช้าและดอกบัวสยาม', artistTh: 'อรุณวรรณ ศิลป์สยาม', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'คุณสุภาวดี เจริญวัฒนา', commissionBaht: 31000, estimatedValueBaht: 310000, imageUrl: IMG_BASE + 'paint_thai_floating_market_1795220691470.jpg', description: 'เรือพายบรรทุกดอกบัวชมพูและผลไม้ท่ามกลางหมอกเช้าเหนือผิวน้ำ' },
-        { id: 'art-intl-09', accessionNo: 'SV-INT-2026-18', titleTh: 'กองเรือสำเภายุคทองแห่งดัตช์', artistTh: 'เฮนดริก ฟาน เดอร์ เบิร์ก', origin: 'international', originLabel: 'ศิลปะต่างประเทศ', owner: 'Rijkscollectie Rotterdam', commissionBaht: 128000, estimatedValueBaht: 1280000, imageUrl: IMG_BASE + 'paint_intl_dutch_galleon_1795220691745.jpg', description: 'เรือใบสำเภาหลวงยุคทองฝ่าเกลียวคลื่นภายใต้แสงเงาแบบดัตช์มาสเตอร์' },
-        { id: 'art-th-10', accessionNo: 'SV-TH-2026-19', titleTh: 'ลายรดน้ำกินรีป่าหิมพานต์ทองคำ', artistTh: 'ครูช่างศิลป์รัตนโกสินทร์', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'คลังสมบัติหอศิลป์สุวรรณวิจิตร', commissionBaht: 96000, estimatedValueBaht: 960000, imageUrl: IMG_BASE + 'paint_thai_kinnaree_gold_1795220691843.jpg', description: 'ศิลปะลายรดน้ำปิดทองคำเปลวแท้บนพื้นรักดำถ่ายทอดกินรีป่าหิมพานต์' },
-        { id: 'art-intl-10', accessionNo: 'SV-INT-2026-20', titleTh: 'ทะเลสาบแอลป์ยามรุ่งอรุณสีทอง', artistTh: 'วิลเฮล์ม เวเบอร์', origin: 'international', originLabel: 'ศิลปะต่างประเทศ', owner: 'Zürich Kunststiftung', commissionBaht: 82000, estimatedValueBaht: 820000, imageUrl: IMG_BASE + 'paint_intl_swiss_alpine_1795220754005.jpg', description: 'ขุนเขาแอลป์สะท้อนเงาเหนือผืนน้ำสีครามใสในยามรุ่งอรุณ' },
-        { id: 'art-th-11', accessionNo: 'SV-TH-2026-21', titleTh: 'โพธิ์ทองแห่งความสงบนิรันดร์', artistTh: 'ปราโมทย์ วรรณศิลป์', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'คุณวรินทร กาญจนศิลป์', commissionBaht: 45000, estimatedValueBaht: 450000, imageUrl: IMG_BASE + 'paint_thai_golden_bodhi_1795220691214.jpg', description: 'ร่มเงาต้นพระศรีมหาโพธิ์ใบสีทองอร่ามแผ่กิ่งก้านปกคลุมลานธรรม' },
+        { id: 'art-th-01', accessionNo: 'SV-TH-2026-01', titleTh: 'วิหารทองอรุณและบัวบูชา', artistTh: 'อ.สุรศักดิ์ พงษ์ไพบูลย์', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'คุณพิพัฒน์ วงศ์สุวรรณ', commissionBaht: 48000, estimatedValueBaht: 480000, imageUrl: IMG_BASE + 'paint_thai_golden_pavilion_1795220691183.jpg', description: 'จิตรกรรมไทยร่วมสมัยผสานสถาปัตยกรรมอยุธยากับแสงอรุณรุ่งบนผืนน้ำ ถ่ายทอดความสงบงามและความศรัทธาที่ดำรงอยู่เหนือกาลเวลา' },
+        { id: 'art-intl-01', accessionNo: 'SV-INT-2026-02', titleTh: 'แสงทองแห่งคลองแกรนด์คาแนล เวนิส', artistTh: 'มาร์โก เบลลินี', origin: 'international', originLabel: 'ศิลปะต่างประเทศ', owner: 'คอลเลกชัน เอเลนา รอสโตวา', commissionBaht: 85000, estimatedValueBaht: 850000, imageUrl: IMG_BASE + 'paint_intl_venice_canal_1795220754100.jpg', description: 'ทิวทัศน์เมืองเวนิสยามอาทิตย์อัสดงสะท้อนผิวน้ำด้วยฝีแปรงอิมเพรสชันนิสม์อันละเมียดละไม เผยความโรแมนติกของแสงและเงา' },
+        { id: 'art-th-02', accessionNo: 'SV-TH-2026-03', titleTh: 'สายน้ำเจ้าพระยายามสนธยา', artistTh: 'รสลินทร์ จิตรกรชัย', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'คุณนลินี เตชะไพบูลย์', commissionBaht: 52500, estimatedValueBaht: 525000, imageUrl: IMG_BASE + 'paint_thai_chaophraya_twilight_1795220691075.jpg', description: 'วิถีชีวิตสายน้ำเจ้าพระยา เรือไม้สักแล่นผ่านเงาพระปรางค์วัดอรุณยามสนธยา สื่อถึงสายสัมพันธ์อันอบอุ่นระหว่างผู้คนกับแม่น้ำ' },
+        { id: 'art-intl-02', accessionNo: 'SV-INT-2026-04', titleTh: 'หุ่นนิ่งโบตั๋นขาวและเครื่องทองเหลืองโบราณ', artistTh: 'แคลร์ ดูบัวส์', origin: 'international', originLabel: 'ศิลปะต่างประเทศ', owner: 'Mr. Henrik Lindqvist', commissionBaht: 64000, estimatedValueBaht: 640000, imageUrl: IMG_BASE + 'paint_intl_peonies_brass_1795220710286.jpg', description: 'หุ่นนิ่งดอกโบตั๋นสีงาช้างในแจกันพอร์ซเลนคู่ผลมะเดื่อและเข็มทิศทองเหลือง สะท้อนความบริสุทธิ์และความงดงามที่นิ่งสงบ' },
+        { id: 'art-th-03', accessionNo: 'SV-TH-2026-05', titleTh: 'ม่านหมอกล้านนาและนาขั้นบันไดสีทอง', artistTh: 'ธนากร ศรีล้านนา', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'มูลนิธิศิลปวัฒนธรรมเชียงใหม่', commissionBaht: 42000, estimatedValueBaht: 420000, imageUrl: IMG_BASE + 'paint_thai_lanna_terraces_1795220691245.jpg', description: 'ขุนเขาภาคเหนือยามเช้าที่ผืนหมอกโอบล้อมนาขั้นบันไดต้องแสงทอง เปรียบเสมือนความอุดมสมบูรณ์และภูมิปัญญาชาวล้านนา' },
+        { id: 'art-intl-03', accessionNo: 'SV-INT-2026-06', titleTh: 'ศาลาฤดูใบไม้ร่วงแห่งเกียวโต', artistTh: 'เคนจิ ทาคาฮาชิ', origin: 'international', originLabel: 'ศิลปะต่างประเทศ', owner: 'Sato Heritage Gallery', commissionBaht: 72000, estimatedValueBaht: 720000, imageUrl: IMG_BASE + 'paint_intl_kyoto_pavilion_1795220754160.jpg', description: 'พู่กันหมึกญี่ปุ่นผสานเมฆทองคำเปลวและใบเมเปิลสีชาดแบบวาบิ-ซาบิ ถ่ายทอดความงามของฤดูกาลที่แปรเปลี่ยนอย่างละเมียดละไม' },
+        { id: 'art-th-04', accessionNo: 'SV-TH-2026-07', titleTh: 'ธารน้ำตกมรกตและเอื้องผึ้งป่าหิมพานต์', artistTh: 'อรุณพงษ์ วนาศิลป์', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'คุณศิริพร รัตนมงคล', commissionBaht: 36000, estimatedValueBaht: 360000, imageUrl: IMG_BASE + 'paint_thai_emerald_waterfall_1795220691784.jpg', description: 'น้ำตกมรกตไหลผ่านโขดหินมอสและกล้วยไม้ป่าภายใต้ลำแสงทองยามเช้า สะท้อนความบริสุทธิ์และความมีชีวิตชีวาแห่งผืนป่า' },
+        { id: 'art-intl-04', accessionNo: 'SV-INT-2026-08', titleTh: 'ชายฝั่งอามัลฟียามแสงแดดสีทอง', artistTh: 'อันโตนิโอ เฟร์รารา', origin: 'international', originLabel: 'ศิลปะต่างประเทศ', owner: 'Fondazione Arte Napoli', commissionBaht: 68000, estimatedValueBaht: 680000, imageUrl: IMG_BASE + 'paint_intl_amalfi_coast_1795220692030.jpg', description: 'หมู่บ้านริมหน้าผาอามัลฟีอาบแสงแดดเมดิเตอร์เรเนียนเหนือทะเลสีคราม เต็มไปด้วยพลังชีวิตและสีสันอันงดงาม' },
+        { id: 'art-th-05', accessionNo: 'SV-TH-2026-09', titleTh: 'โคมยี่เป็งและกระทงสายแห่งอโยธยา', artistTh: 'กิตติภพ สุวรรณธาดา', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'คุณธนัท ดำรงค์ศิลป์', commissionBaht: 92000, estimatedValueBaht: 920000, imageUrl: IMG_BASE + 'paint_thai_ayutthaya_lanterns_1795220690967.jpg', description: 'โคมไฟสีทองเหนือพระปรางค์วัดโบราณและเงากระทงดอกบัวบนผิวน้ำ สื่อถึงแสงสว่างแห่งปัญญาและความเจริญรุ่งเรือง' },
+        { id: 'art-intl-05', accessionNo: 'SV-INT-2026-10', titleTh: 'เรือนกระจกหลวงแห่งเวียนนา', artistTh: 'ฟรานซ์ ฟอน ไฮเดน', origin: 'international', originLabel: 'ศิลปะต่างประเทศ', owner: 'Belvedere Kunsthandel', commissionBaht: 110000, estimatedValueBaht: 1100000, imageUrl: IMG_BASE + 'paint_intl_vienna_conservatory_1795220691736.jpg', description: 'ซุ้มโค้งกระจกสูงตระหง่านและประติมากรรมหินอ่อนต้องแสงบ่ายสีทอง งดงามด้วยสัดส่วนสถาปัตยกรรมอันสง่างาม' },
+        { id: 'art-th-06', accessionNo: 'SV-TH-2026-11', titleTh: 'หงส์สุวรรณในสระบัวหิมพานต์', artistTh: 'ครูช่างปราณีต จิตรกรรมไทย', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'มูลนิธิอนุรักษ์ศิลป์ไทย', commissionBaht: 78000, estimatedValueBaht: 780000, imageUrl: IMG_BASE + 'paint_thai_himmapan_swan_1795220754660.jpg', description: 'หงส์ขาวทรงเครื่องกลางสระบัวทองคำท่ามกลางเมฆลายกนกเปลวโบราณ สัญลักษณ์แห่งความสง่างามและเกียรติยศอันวิจิตร' },
+        { id: 'art-intl-06', accessionNo: 'SV-INT-2026-12', titleTh: 'ฟยอร์ดนอร์ดิกยามอาทิตย์อัสดงสีทอง', artistTh: 'เอริก โซลเบิร์ก', origin: 'international', originLabel: 'ศิลปะต่างประเทศ', owner: 'Oslo Fine Collectors Guild', commissionBaht: 76000, estimatedValueBaht: 760000, imageUrl: IMG_BASE + 'paint_intl_nordic_fjord_1795220755255.jpg', description: 'ยอดเขาหิมะสะท้อนแสงแชมเปญลงบนผืนน้ำฟยอร์ดที่นิ่งราวกระจกเงา มอบความสงบเยือกเย็นและยิ่งใหญ่ในเวลาเดียวกัน' },
+        { id: 'art-th-07', accessionNo: 'SV-TH-2026-13', titleTh: 'เจดีย์สุโขทัยในสายหมอกอรุณ', artistTh: 'อ.กิตติศักดิ์ สุโขทัย', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'คุณปรเมศวร์ สุโขทัยกุล', commissionBaht: 58000, estimatedValueBaht: 580000, imageUrl: IMG_BASE + 'paint_thai_sukhothai_stupa_1795220691422.jpg', description: 'มหาเจดีย์ทรงพุ่มข้าวบิณฑ์แห่งสุโขทัยท่ามกลางสายหมอกบางยามเช้า สะท้อนรากเหง้าศิลปกรรมอันทรงคุณค่าของแผ่นดิน' },
+        { id: 'art-intl-07', accessionNo: 'SV-INT-2026-14', titleTh: 'ถนนโอเปร่ากรุงปารีสหลังสายฝน', artistTh: 'ฌอง-ลุค มาร์แตง', origin: 'international', originLabel: 'ศิลปะต่างประเทศ', owner: 'Galerie Champs-Élysées', commissionBaht: 54000, estimatedValueBaht: 540000, imageUrl: IMG_BASE + 'paint_intl_paris_boulevard_1795220691248.jpg', description: 'ถนนหน้าโรงอุปรากรปารีสหลังฝนซาสะท้อนแสงโคมไฟสีทองอุ่น ให้ความรู้สึกคลาสสิกและมีเสน่ห์เหนือกาลเวลา' },
+        { id: 'art-th-08', accessionNo: 'SV-TH-2026-15', titleTh: 'กระบวนพยุหยาตราทางชลมารคสุวรรณ', artistTh: 'ศ.ดร.วิจิตร บวรศิลป์', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'หอศิลป์สุวรรณวิจิตร', commissionBaht: 160000, estimatedValueBaht: 1600000, imageUrl: IMG_BASE + 'paint_thai_royal_barge_1795220691574.jpg', description: 'เรือพระที่นั่งสุพรรณหงส์เคลื่อนผ่านแสงอาทิตย์สีทองเหนือเจ้าพระยา ถ่ายทอดความวิจิตรตระการตาแห่งศิลปะชั้นสูงของไทย' },
+        { id: 'art-intl-08', accessionNo: 'SV-INT-2026-16', titleTh: 'คฤหาสน์ทัสคานีท่ามกลางทิวสนทอง', artistTh: 'ลอเรนโซ คอนติ', origin: 'international', originLabel: 'ศิลปะต่างประเทศ', owner: 'Casa d’Arte Firenze', commissionBaht: 49000, estimatedValueBaht: 490000, imageUrl: IMG_BASE + 'paint_intl_tuscany_villa_1795220754179.jpg', description: 'แนวต้นสนไซเปรสสู่คฤหาสน์หินทัสคานีอาบแสงแห่งฤดูเก็บเกี่ยว สื่อถึงความอบอุ่นและความสงบงามแห่งชนบทอิตาลี' },
+        { id: 'art-th-09', accessionNo: 'SV-TH-2026-17', titleTh: 'ตลาดน้ำยามเช้าและดอกบัวสยาม', artistTh: 'อรุณวรรณ ศิลป์สยาม', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'คุณสุภาวดี เจริญวัฒนา', commissionBaht: 31000, estimatedValueBaht: 310000, imageUrl: IMG_BASE + 'paint_thai_floating_market_1795220691470.jpg', description: 'เรือพายบรรทุกดอกบัวชมพูและผลไม้ท่ามกลางหมอกเช้าเหนือผิวน้ำ ถ่ายทอดความงดงามของวัฒนธรรมสายน้ำและความอุดมสมบูรณ์' },
+        { id: 'art-intl-09', accessionNo: 'SV-INT-2026-18', titleTh: 'กองเรือสำเภายุคทองแห่งดัตช์', artistTh: 'เฮนดริก ฟาน เดอร์ เบิร์ก', origin: 'international', originLabel: 'ศิลปะต่างประเทศ', owner: 'Rijkscollectie Rotterdam', commissionBaht: 128000, estimatedValueBaht: 1280000, imageUrl: IMG_BASE + 'paint_intl_dutch_galleon_1795220691745.jpg', description: 'เรือใบสำเภาหลวงยุคทองฝ่าเกลียวคลื่นภายใต้แสงเงาแบบดัตช์มาสเตอร์ สะท้อนจิตวิญญาณแห่งการเดินทางและเสรีภาพ' },
+        { id: 'art-th-10', accessionNo: 'SV-TH-2026-19', titleTh: 'ลายรดน้ำกินรีป่าหิมพานต์ทองคำ', artistTh: 'ครูช่างศิลป์รัตนโกสินทร์', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'คลังสมบัติหอศิลป์สุวรรณวิจิตร', commissionBaht: 96000, estimatedValueBaht: 960000, imageUrl: IMG_BASE + 'paint_thai_kinnaree_gold_1795220691843.jpg', description: 'ศิลปะลายรดน้ำปิดทองคำเปลวแท้บนพื้นรักดำถ่ายทอดกินรีป่าหิมพานต์ เผยความอ่อนช้อยและความประณีตขั้นสูงสุดของช่างศิลป์' },
+        { id: 'art-intl-10', accessionNo: 'SV-INT-2026-20', titleTh: 'ทะเลสาบแอลป์ยามรุ่งอรุณสีทอง', artistTh: 'วิลเฮล์ม เวเบอร์', origin: 'international', originLabel: 'ศิลปะต่างประเทศ', owner: 'Zürich Kunststiftung', commissionBaht: 82000, estimatedValueBaht: 820000, imageUrl: IMG_BASE + 'paint_intl_swiss_alpine_1795220754005.jpg', description: 'ขุนเขาแอลป์สะท้อนเงาเหนือผืนน้ำสีครามใสในยามรุ่งอรุณ สื่อถึงความบริสุทธิ์และความสงบนิ่งอันน่าประทับใจ' },
+        { id: 'art-th-11', accessionNo: 'SV-TH-2026-21', titleTh: 'โพธิ์ทองแห่งความสงบนิรันดร์', artistTh: 'ปราโมทย์ วรรณศิลป์', origin: 'thai', originLabel: 'ศิลปะไทย', owner: 'คุณวรินทร กาญจนศิลป์', commissionBaht: 45000, estimatedValueBaht: 450000, imageUrl: IMG_BASE + 'paint_thai_golden_bodhi_1795220691214.jpg', description: 'ร่มเงาต้นพระศรีมหาโพธิ์ใบสีทองอร่ามแผ่กิ่งก้านปกคลุมลานธรรม สื่อถึงความร่มเย็นและความสงบสุขภายในจิตใจ' },
       ];
 
       const LEVELS = [
@@ -193,6 +225,12 @@
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
+
+      function getArtworkMeaning(item) {
+        const found = ARTWORKS.find((a) => a.titleTh === item.titleTh || a.imageUrl === item.imageUrl);
+        if (found && found.description) return found.description;
+        return `ผลงานภาพวาด "${item.titleTh}" โดย ${item.artistTh} ที่คัดสรรมาจัดแสดงในหอศิลป์สุวรรณวิจิตร ถ่ายทอดความวิจิตรทางฝีแปรงและสุนทรียะแห่งศิลปะอย่างลึกซึ้ง`;
+      }
 
       const newWorkspace = (phone) => ({
         phone,
@@ -314,7 +352,7 @@
           const snap = await firestoreDocRef.get();
           if (snap.exists) {
             applyCloudPayload(snap.data());
-            if (openLevel === null && accountPanel === 'none') render();
+            if (auctionStep === 'levels' && accountPanel === 'none') render();
           } else {
             await saveCloudState();
           }
@@ -328,7 +366,7 @@
           if (isSavingCloud) return;
           if (snap.exists) {
             applyCloudPayload(snap.data());
-            if (openLevel === null && accountPanel === 'none') render();
+            if (auctionStep === 'levels' && accountPanel === 'none') render();
           }
         }, (err) => {
           console.error('Firestore snapshot error:', err);
@@ -355,8 +393,16 @@
       let authErrorMsg = '';
       let showAuthPass = false;
       let showAuthConfirm = false;
-      let openLevel = null;
-      let levelModalScrollTop = 0;
+
+      // สถานะหน้าจอคั่น / เลือกรูป / รายละเอียด / ยืนยันประมูล
+      let auctionStep = 'levels'; // 'levels' | 'art_value' | 'gallery' | 'detail'
+      let selectedLevelNum = null;
+      let selectedAuctionItemId = null;
+      let confirmBidItemId = null;
+      let galleryScrollY = 0;
+      let restoreGalleryScrollNext = false;
+      let likedIds = [];
+
       let slideIdx = 0;
       let adminSelectedPhone = currentUser?.phone || Object.keys(workspaces)[0] || '';
       let adminSearchQuery = '';
@@ -373,6 +419,12 @@
       const setView = (v) => {
         const nextView = VALID_VIEWS.includes(v) ? v : 'home';
         activeView = nextView;
+        if (nextView === 'auction') {
+          auctionStep = 'levels';
+          selectedLevelNum = null;
+          selectedAuctionItemId = null;
+          confirmBidItemId = null;
+        }
         if (nextView !== 'admin') {
           localStorage.setItem(KEYS.TAB_VIEW, nextView);
           sessionStorage.setItem(KEYS.TAB_VIEW, nextView);
@@ -416,15 +468,15 @@
         if (syncedView && VALID_VIEWS.includes(syncedView) && syncedView !== 'admin' && activeView !== 'admin') {
           activeView = syncedView;
         }
-        if (openLevel === null && accountPanel === 'none') render();
+        if (auctionStep === 'levels' && accountPanel === 'none') render();
       });
 
       document.addEventListener('visibilitychange', () => {
-        if (!document.hidden && openLevel === null && accountPanel === 'none') loadCloudState();
+        if (!document.hidden && auctionStep === 'levels' && accountPanel === 'none') loadCloudState();
       });
 
       window.addEventListener('focus', () => {
-        if (openLevel === null && accountPanel === 'none') loadCloudState();
+        if (auctionStep === 'levels' && accountPanel === 'none') loadCloudState();
       });
 
       setInterval(() => {
@@ -454,13 +506,12 @@
           }
         });
         if (changed) saveCloudState();
-        if (activeView === 'timer' || (activeView === 'auction' && openLevel === null)) render();
+        if (activeView === 'timer' || (activeView === 'auction' && auctionStep === 'levels')) render();
       }, 1000);
 
       function render() {
-        const prevModalScrollEl = document.getElementById('level-modal-scroll');
-        if (prevModalScrollEl && openLevel !== null) {
-          levelModalScrollTop = prevModalScrollEl.scrollTop;
+        if (activeView === 'auction' && auctionStep === 'gallery') {
+          galleryScrollY = window.scrollY || window.pageYOffset || 0;
         }
 
         const ws = activeWs();
@@ -540,91 +591,253 @@
               </section>
             </main>`;
         } else if (activeView === 'auction') {
-          const levelCards = LEVELS.map((l) => {
-            const locked = ws.lockedLevels.includes(l.level);
-            return `
-              <button onclick="openLvlModal(${l.level})" class="text-left p-3.5 rounded-xl border border-[#C59B27]/60 bg-white hover:border-[#C59B27] shadow-sm space-y-2">
-                <div class="flex justify-between items-center">
-                  <span class="text-xs font-bold px-2 py-0.5 rounded ${locked ? 'bg-[#EBE6DF]' : 'bg-[#C59B27]'}">เลเวล ${l.level}</span>
-                  <span class="text-[11px] text-[#8C6A10]">${l.motif}</span>
+          if (auctionStep === 'art_value' && selectedLevelNum !== null) {
+            const lvInfo = LEVELS.find((x) => x.level === selectedLevelNum) || LEVELS[0];
+            mainHtml = `
+              <main class="flex-1 w-full bg-[#FAF8F5] flex flex-col justify-between min-h-[calc(100vh-7.5rem)]">
+                <div class="max-w-3xl mx-auto w-full px-3 sm:px-6 pt-3 pb-6 space-y-4">
+                  <div class="flex items-center justify-between bg-white border border-[#C59B27]/50 rounded-xl px-3 py-2.5 shadow-2xs">
+                    <button type="button" onclick="backToLevels()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#FAF8F5] hover:bg-[#F4EEE1] border border-[#C59B27]/60 text-xs font-bold text-[#1E1B18]">
+                      ${ICONS.arrowLeft}
+                      <span>ย้อนกลับ</span>
+                    </button>
+                    <span class="font-editorial text-sm sm:text-base font-bold text-[#8C6A10]">${lvInfo.name}</span>
+                    <span class="w-16"></span>
+                  </div>
+
+                  <section class="bg-white border-2 border-[#C59B27]/75 rounded-2xl overflow-hidden shadow-sm">
+                    <div class="relative w-full bg-[#1E1B18]">
+                      <img
+                        src="${MUSEUM_VALUE_IMG}"
+                        onerror="this.onerror=null;this.src='${ARTWORKS[0].imageUrl}';"
+                        alt="หอพิพิธภัณฑ์และหอศิลป์สุวรรณวิจิตร"
+                        class="w-full h-56 sm:h-72 object-cover"
+                      />
+                      <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/35 to-transparent p-3.5 text-white">
+                        <div class="text-[11px] tracking-wider uppercase text-[#E8C55B] font-semibold">Suvarn Fine Art Gallery · Museum Collection</div>
+                        <div class="font-editorial text-base sm:text-lg font-bold">นิทรรศการหอพิพิธภัณฑ์และแกลเลอรีศิลปะชั้นสูง</div>
+                      </div>
+                    </div>
+
+                    <div class="p-4 sm:p-6 space-y-3.5 bg-gradient-to-b from-[#FFFDF9] to-[#FAF5E8]">
+                      <div class="text-center border-b border-[#C59B27]/30 pb-3">
+                        <span class="inline-block text-[11px] font-bold px-3 py-0.5 rounded-full bg-[#C59B27]/20 text-[#8C6A10] mb-1">สุนทรียะแห่งศิลปะ</span>
+                        <h1 class="font-editorial text-xl sm:text-2xl font-bold text-[#1E1B18]">${ART_VALUE_COPY.heading}</h1>
+                      </div>
+
+                      <div class="space-y-3 text-xs sm:text-sm leading-relaxed text-[#3B342C]">
+                        ${ART_VALUE_COPY.paragraphs.map((p) => `<p>${p}</p>`).join('')}
+                      </div>
+
+                      <div class="pt-4 flex justify-center">
+                        <button
+                          type="button"
+                          onclick="goToLevelGallery(${selectedLevelNum})"
+                          class="btn-gold-cta w-full max-w-xs py-3.5 px-8 rounded-xl font-bold text-base tracking-wide text-center cursor-pointer"
+                        >
+                          ถัดไป
+                        </button>
+                      </div>
+                    </div>
+                  </section>
                 </div>
-                <div class="font-editorial text-base font-bold">${l.name}</div>
-                <div class="text-[11px] text-[#5C544B]">ราคา: ${l.priceRange}</div>
-                <div class="text-[11px] text-[#8C6A10] font-semibold">คอมฯ: ${l.commRange}</div>
-              </button>`;
-          }).join('');
-          let modalHtml = '';
-          if (openLevel) {
-            const items = auctions.filter((i) => i.level === openLevel);
+              </main>`;
+          } else if (auctionStep === 'gallery' && selectedLevelNum !== null) {
+            const lvInfo = LEVELS.find((x) => x.level === selectedLevelNum) || LEVELS[0];
+            const items = auctions
+              .filter((i) => i.level === selectedLevelNum)
+              .sort((a, b) => (Number(a.slotIndex) || 0) - (Number(b.slotIndex) || 0) || (Number(a.priceBaht) || 0) - (Number(b.priceBaht) || 0));
+
             const verticalCards = items.map((it, idx) => {
               const itemLk = isAuctionItemLocked(ws, it);
               return `
-                <div class="bg-[#FAF8F5] border border-[#C59B27]/50 rounded-xl p-3 space-y-2.5">
+                <div
+                  onclick="openAuctionDetail('${it.id}')"
+                  class="bg-white border ${itemLk ? 'border-red-300/80 opacity-90' : 'border-[#C59B27]/60 hover:border-[#C59B27]'} rounded-2xl p-3.5 space-y-2.5 shadow-sm cursor-pointer transition"
+                >
                   <div class="flex justify-between items-center text-xs">
-                    <span class="font-bold text-[#8C6A10]">ภาพที่ ${idx + 1}/${items.length}</span>
-                    <span class="font-bold text-[#1E1B18]">ราคา ${fmt(it.priceBaht)} บาท</span>
+                    <span class="font-bold text-[#8C6A10]">ภาพที่ ${idx + 1}/${items.length} · ${lvInfo.motif}</span>
+                    <span class="px-2.5 py-0.5 rounded-full bg-[#FAF8F5] border border-[#C59B27]/50 font-bold text-[#1E1B18]">ราคา ${fmt(it.priceBaht)} บาท</span>
                   </div>
-                  <img src="${it.imageUrl}" class="w-full h-44 object-cover rounded-lg border border-[#C59B27]/40" />
-                  <div>
-                    <div class="font-editorial text-base font-bold">${it.titleTh}</div>
-                    <div class="text-xs text-[#5C544B]">ศิลปิน: ${it.artistTh} · เวลา ${it.durationMinutes} นาที</div>
+                  <div class="relative overflow-hidden rounded-xl border border-[#C59B27]/40 bg-[#FAF8F5]">
+                    <img src="${it.imageUrl}" alt="${it.titleTh}" class="w-full h-48 sm:h-56 object-cover" />
+                    ${itemLk ? `<span class="absolute top-2.5 right-2.5 px-2.5 py-1 rounded-lg bg-red-600/90 text-white text-[11px] font-bold">ถูกล็อกโดยหลังบ้าน</span>` : ''}
                   </div>
-                  <div class="grid grid-cols-2 gap-2 bg-white p-2.5 rounded-lg border border-[#C59B27]/30 text-xs">
-                    <div><span class="text-[#5C544B] block">ราคา</span><b>${fmt(it.priceBaht)} บาท</b></div>
-                    <div><span class="text-[#5C544B] block">ค่าคอมมิชชั่น</span><b class="text-[#8C6A10]">+${fmt(it.commissionBaht)} บาท</b></div>
-                    <div><span class="text-[#5C544B] block">ผู้เข้าร่วม</span><b>${fmt(it.participants)} คน</b></div>
-                    <div><span class="text-[#5C544B] block">ถูกใจ</span><b>${fmt(it.likes)}</b></div>
+                  <div class="flex items-end justify-between gap-2 pt-0.5">
+                    <div class="min-w-0">
+                      <div class="font-editorial text-base sm:text-lg font-bold text-[#1E1B18] truncate">${it.titleTh}</div>
+                      <div class="text-xs text-[#5C544B] truncate">ศิลปิน: ${it.artistTh} · ค่าคอมมิชชั่น +${fmt(it.commissionBaht)} บาท</div>
+                    </div>
+                    <span class="shrink-0 text-[11px] font-bold text-[#8C6A10] bg-[#FAF8F5] border border-[#C59B27]/40 px-2.5 py-1 rounded-lg">แตะเพื่อดูรายละเอียด</span>
                   </div>
-                  <button type="button" onclick="placeBid('${it.id}')" ${itemLk || hasBid ? 'disabled' : ''} class="w-full py-2.5 bg-[#C59B27] disabled:bg-[#EBE6DF] font-bold text-sm rounded-lg text-[#1E1B18]">
-                    ${itemLk ? 'รายการนี้ถูกล็อกโดยหลังบ้าน' : hasBid ? 'มีรายการกำลังนับถอยหลังอยู่' : `ประมูล (${fmt(it.priceBaht)} บาท)`}
-                  </button>
                 </div>`;
             }).join('');
 
-            modalHtml = `
-              <div onclick="closeLvlModal()" class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-3">
-                <div id="level-modal-scroll" onscroll="window.onLevelModalScroll(this.scrollTop)" onclick="event.stopPropagation()" class="w-full max-w-md max-h-[85vh] overflow-y-auto overscroll-contain bg-white border-2 border-[#C59B27] rounded-2xl p-4 space-y-3">
-                  <div class="flex justify-between items-center sticky top-0 bg-white z-10 pb-2 border-b border-[#C59B27]/25">
-                    <div>
-                      <h3 class="font-editorial font-bold text-lg">เลเวล ${openLevel}</h3>
-                      <p class="text-[11px] text-[#5C544B]">เลื่อนขึ้น-ลงเพื่อเลือกรูปภาพและราคา</p>
+            mainHtml = `
+              <main class="flex-1 w-full bg-[#FAF8F5] min-h-[calc(100vh-7.5rem)]">
+                <div class="max-w-3xl mx-auto w-full px-3 sm:px-6 pt-3 pb-6 space-y-3.5">
+                  <div class="flex items-center justify-between bg-white border border-[#C59B27]/60 rounded-xl px-3 py-2.5 shadow-2xs sticky top-12 z-20">
+                    <button type="button" onclick="backToArtValue()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#FAF8F5] hover:bg-[#F4EEE1] border border-[#C59B27]/60 text-xs font-bold text-[#1E1B18]">
+                      ${ICONS.arrowLeft}
+                      <span>ย้อนกลับ</span>
+                    </button>
+                    <div class="text-center">
+                      <div class="font-editorial text-sm sm:text-base font-bold text-[#1E1B18]">${lvInfo.name}</div>
+                      <div class="text-[10px] text-[#5C544B]">เลื่อนขึ้น-ลงเพื่อเลือกรูปภาพและราคา · กดที่รูปเพื่อเข้าสู่รายละเอียด</div>
                     </div>
-                    <button onclick="closeLvlModal()" class="px-2.5 py-1 text-xs font-semibold border border-[#C59B27]/60 rounded-lg bg-[#FAF8F5]">ปิด</button>
+                    <span class="text-xs font-bold text-[#8C6A10]">${items.length} ภาพ</span>
                   </div>
-                  <div class="space-y-3">
+
+                  <div class="space-y-3.5">
                     ${verticalCards}
                   </div>
                 </div>
-              </div>`;
-          }
+              </main>`;
+          } else if (auctionStep === 'detail' && selectedAuctionItemId) {
+            const item = auctions.find((i) => i.id === selectedAuctionItemId) || auctions[0];
+            const itemLk = isAuctionItemLocked(ws, item);
+            const isLiked = likedIds.includes(item.id);
+            const displayLikes = (Number(item.likes) || 0) + (isLiked ? 1 : 0);
+            const meaningText = getArtworkMeaning(item);
 
-          mainHtml = `
-            <main class="flex-1 max-w-6xl mx-auto w-full px-3 sm:px-6 py-4 space-y-4">
-              <section class="bg-white border border-[#C59B27] rounded-xl p-4 flex flex-wrap justify-between items-center gap-3">
-                <h1 class="font-editorial text-xl font-bold">ห้องประมูลภาพวาดศิลปะ 5 เลเวล</h1>
-                <div class="flex gap-3 text-xs">
-                  <div class="bg-[#FAF8F5] border border-[#C59B27]/40 px-3 py-2 rounded-lg"><span class="block text-[#5C544B]">เงินทั้งหมด</span><b class="text-base">${fmt(ws.totalBalanceBaht)} ฿</b></div>
-                  <div class="bg-[#FAF8F5] border border-[#C59B27]/40 px-3 py-2 rounded-lg"><span class="block text-[#5C544B]">ธุรกรรม</span><b class="text-base text-[#8C6A10]">${fmt(ws.transactionBalanceBaht)} ฿</b></div>
+            mainHtml = `
+              <main class="flex-1 w-full bg-[#FAF8F5] min-h-[calc(100vh-7.5rem)]">
+                <div class="max-w-2xl mx-auto w-full px-3 sm:px-6 pt-3 pb-8 space-y-4">
+                  <div class="flex items-center justify-between bg-white border border-[#C59B27]/60 rounded-xl px-3 py-2.5 shadow-2xs sticky top-12 z-20">
+                    <button type="button" onclick="backToGallery()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#FAF8F5] hover:bg-[#F4EEE1] border border-[#C59B27]/60 text-xs font-bold text-[#1E1B18]">
+                      ${ICONS.arrowLeft}
+                      <span>ย้อนกลับ</span>
+                    </button>
+                    <span class="font-editorial text-sm sm:text-base font-bold text-[#8C6A10]">รายละเอียดผลงานศิลปะ</span>
+                    <span class="text-[11px] font-semibold text-[#5C544B]">เลเวล ${item.level}</span>
+                  </div>
+
+                  <section class="bg-white border-2 border-[#C59B27]/75 rounded-2xl p-4 sm:p-5 space-y-4 shadow-sm">
+                    <div class="flex flex-wrap items-center justify-between gap-2 text-[11px]">
+                      <span class="px-2.5 py-1 rounded-full bg-[#FAF8F5] border border-[#C59B27]/50 font-bold text-[#8C6A10]">ผ่านการคัดสรรโดยหอศิลป์สุวรรณวิจิตร</span>
+                      <span class="text-[#5C544B] font-semibold">รหัสผลงาน #${escHtml(item.id.toUpperCase())}</span>
+                    </div>
+
+                    <div class="rounded-2xl overflow-hidden border-2 border-[#C59B27]/50 bg-[#FAF8F5]">
+                      <img src="${item.imageUrl}" alt="${item.titleTh}" class="w-full max-h-80 object-cover" />
+                    </div>
+
+                    <!-- รายละเอียดรูปภาพ: ชื่อรูปภาพ / ชื่อศิลปิน / ความหมายรูปภาพ -->
+                    <div class="bg-[#FAF8F5] border border-[#C59B27]/35 rounded-xl p-4 space-y-3">
+                      <div>
+                        <div class="text-[11px] font-semibold text-[#8C6A10]">ชื่อรูปภาพ</div>
+                        <h1 class="font-editorial text-xl sm:text-2xl font-bold text-[#1E1B18] mt-0.5">${item.titleTh}</h1>
+                      </div>
+
+                      <div class="border-t border-[#C59B27]/25 pt-2.5">
+                        <div class="text-[11px] font-semibold text-[#8C6A10]">ชื่อศิลปิน</div>
+                        <div class="text-sm font-bold text-[#1E1B18] mt-0.5">${item.artistTh}</div>
+                      </div>
+
+                      <div class="border-t border-[#C59B27]/25 pt-2.5">
+                        <div class="text-[11px] font-semibold text-[#8C6A10]">ความหมายของรูปภาพ</div>
+                        <p class="text-xs sm:text-sm leading-relaxed text-[#3B342C] mt-1">${meaningText}</p>
+                      </div>
+                    </div>
+
+                    <!-- ข้อมูลเรียงแบบ บนล่าง (ไม่แบ่งซ้ายขวา): ราคา / ค่าคอมมิชชั่น / คนเข้าร่วม / กดไลฟ์ใจ -->
+                    <div class="space-y-2.5">
+                      <div class="bg-white border border-[#C59B27]/45 rounded-xl p-3.5">
+                        <div class="text-xs text-[#5C544B]">ราคาเข้าร่วมประมูล</div>
+                        <div class="text-lg font-bold text-[#1E1B18] mt-0.5">${fmt(item.priceBaht)} บาท</div>
+                      </div>
+
+                      <div class="bg-white border border-[#C59B27]/45 rounded-xl p-3.5">
+                        <div class="text-xs text-[#5C544B]">ค่าคอมมิชชั่น</div>
+                        <div class="text-lg font-bold text-[#8C6A10] mt-0.5">+${fmt(item.commissionBaht)} บาท</div>
+                      </div>
+
+                      <div class="bg-white border border-[#C59B27]/45 rounded-xl p-3.5">
+                        <div class="text-xs text-[#5C544B]">คนเข้าร่วม</div>
+                        <div class="text-base font-bold text-[#1E1B18] mt-0.5">${fmt(item.participants)} ท่าน</div>
+                      </div>
+
+                      <div class="bg-[#FAF8F5] border border-[#C59B27]/50 rounded-xl p-3.5">
+                        <div class="text-xs text-[#5C544B] mb-1.5">กดไลฟ์ใจ</div>
+                        <button
+                          type="button"
+                          onclick="toggleDetailLike('${item.id}')"
+                          class="w-full py-2.5 px-4 rounded-xl border ${isLiked ? 'bg-rose-50 border-rose-400 text-rose-700' : 'bg-white border-[#C59B27]/60 text-[#1E1B18]'} font-bold text-sm inline-flex items-center justify-center gap-2 transition"
+                        >
+                          <span class="${isLiked ? 'text-rose-600' : 'text-[#8C6A10]'}">${isLiked ? ICONS.heartFilled : ICONS.heart}</span>
+                          <span>${isLiked ? 'ถูกใจผลงานแล้ว' : 'กดถูกใจผลงาน'} · ${fmt(displayLikes)}</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- ปุ่มเข้าร่วมประมูลทันที เด่นตรงกลางด้านล่างเหมือนปุ่มถัดไป -->
+                    <div class="pt-3 flex justify-center">
+                      <button
+                        type="button"
+                        onclick="askConfirmBid('${item.id}')"
+                        ${itemLk || hasBid ? 'disabled' : ''}
+                        class="btn-gold-cta disabled:bg-[#EBE6DF] disabled:border-[#D4CEC3] disabled:text-[#7A7267] disabled:shadow-none w-full max-w-xs py-3.5 px-6 rounded-xl font-bold text-base tracking-wide text-center cursor-pointer"
+                      >
+                        ${itemLk ? 'รายการนี้ถูกล็อกโดยหลังบ้าน' : hasBid ? 'มีรายการกำลังนับถอยหลังอยู่' : 'เข้าร่วมประมูลทันที'}
+                      </button>
+                    </div>
+                  </section>
                 </div>
-              </section>
-              <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">${levelCards}</section>
-              ${modalHtml}
-            </main>`;
+              </main>`;
+          } else {
+            const levelCards = LEVELS.map((l) => {
+              const locked = ws.lockedLevels.includes(l.level);
+              return `
+                <button onclick="openLvlModal(${l.level})" class="text-left p-3.5 rounded-xl border border-[#C59B27]/60 bg-white hover:border-[#C59B27] shadow-sm space-y-2">
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold px-2 py-0.5 rounded ${locked ? 'bg-[#EBE6DF]' : 'bg-[#C59B27]'}">เลเวล ${l.level}</span>
+                    <span class="text-[11px] text-[#8C6A10]">${l.motif}</span>
+                  </div>
+                  <div class="font-editorial text-base font-bold">${l.name}</div>
+                  <div class="text-[11px] text-[#5C544B]">ราคา: ${l.priceRange}</div>
+                  <div class="text-[11px] text-[#8C6A10] font-semibold">คอมฯ: ${l.commRange}</div>
+                </button>`;
+            }).join('');
+
+            mainHtml = `
+              <main class="flex-1 max-w-6xl mx-auto w-full px-3 sm:px-6 py-4 space-y-4">
+                <section class="bg-white border border-[#C59B27] rounded-xl p-4 flex flex-wrap justify-between items-center gap-3">
+                  <h1 class="font-editorial text-xl font-bold">ห้องประมูลภาพวาดศิลปะ 5 เลเวล</h1>
+                  <div class="flex gap-3 text-xs">
+                    <div class="bg-[#FAF8F5] border border-[#C59B27]/40 px-3 py-2 rounded-lg"><span class="block text-[#5C544B]">เงินทั้งหมด</span><b class="text-base">${fmt(ws.totalBalanceBaht)} ฿</b></div>
+                    <div class="bg-[#FAF8F5] border border-[#C59B27]/40 px-3 py-2 rounded-lg"><span class="block text-[#5C544B]">ธุรกรรม</span><b class="text-base text-[#8C6A10]">${fmt(ws.transactionBalanceBaht)} ฿</b></div>
+                  </div>
+                </section>
+                <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">${levelCards}</section>
+              </main>`;
+          }
         } else if (activeView === 'timer') {
           mainHtml = `
             <main class="flex-1 max-w-2xl mx-auto w-full px-4 py-6">
-              <div class="bg-white border-2 border-[#C59B27] rounded-2xl p-6 text-center space-y-4 shadow-sm">
-                <h1 class="font-editorial text-xl font-bold">เวลานับถอยหลังการประมูล</h1>
-                ${hasBid ? `
-                  <img src="${ws.activeBid.item.imageUrl}" class="w-full h-56 object-cover rounded-xl border border-[#C59B27]/40" />
-                  <div class="font-editorial text-lg font-bold">${ws.activeBid.item.titleTh}</div>
-                  <div class="text-4xl font-bold text-[#8C6A10] tabular-nums">${mm}:${ss}</div>
-                  <div class="text-xs text-[#5C544B]">ทุน ${fmt(ws.activeBid.item.priceBaht)} ฿ + ค่าคอมฯ ${fmt(ws.activeBid.item.commissionBaht)} ฿ จะคืนเข้าเงินทั้งหมดเมื่อครบเวลา</div>
-                ` : `
-                  <p class="text-sm text-[#5C544B]">ยังไม่มีรายการที่กำลังนับถอยหลัง</p>
-                  ${ws.lastSettledItem ? `<div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-900">รายการล่าสุดเสร็จสิ้นแล้ว: ${ws.lastSettledItem.titleTh}</div>` : ''}
-                  <button onclick="setView('auction')" class="px-5 py-2.5 bg-[#C59B27] font-bold text-sm rounded-lg">ไปหน้าประมูล</button>
-                `}
+              <div class="bg-white border-2 border-[#C59B27] rounded-2xl p-2 shadow-md">
+                <div class="gallery-frame-ornament border border-[#C59B27]/65 rounded-xl p-5 sm:p-6 text-center space-y-4 bg-gradient-to-b from-[#FFFDF9] to-[#FAF5E8]">
+                  <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#C59B27]/15 border border-[#C59B27]/50 text-[11px] font-bold text-[#8C6A10]">
+                    ${ICONS.shieldCheck}
+                    <span>หอศิลป์สุวรรณวิจิตร · บันทึกรอบประมูล</span>
+                  </div>
+                  <h1 class="font-editorial text-xl sm:text-2xl font-bold text-[#1E1B18]">เวลานับถอยหลังการประมูล</h1>
+                  ${hasBid ? `
+                    <div class="p-1.5 rounded-2xl border-2 border-[#C59B27]/60 bg-white shadow-xs">
+                      <img src="${ws.activeBid.item.imageUrl}" class="w-full h-56 object-cover rounded-xl" />
+                    </div>
+                    <div class="font-editorial text-lg sm:text-xl font-bold text-[#1E1B18]">${ws.activeBid.item.titleTh}</div>
+                    <div class="py-2 px-4 rounded-xl bg-white/90 border border-[#C59B27]/45 inline-block">
+                      <div class="text-4xl font-bold text-[#8C6A10] tabular-nums tracking-wider">${mm}:${ss}</div>
+                    </div>
+                    <div class="text-xs sm:text-sm text-[#5C544B] bg-white/80 border border-[#C59B27]/30 rounded-xl p-3">
+                      ทุน <b class="text-[#1E1B18]">${fmt(ws.activeBid.item.priceBaht)} ฿</b> + ค่าคอมฯ <b class="text-[#8C6A10]">${fmt(ws.activeBid.item.commissionBaht)} ฿</b> จะคืนเข้าเงินทั้งหมดเมื่อครบเวลา
+                    </div>
+                  ` : `
+                    <p class="text-sm text-[#5C544B]">ยังไม่มีรายการที่กำลังนับถอยหลัง</p>
+                    ${ws.lastSettledItem ? `<div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-900">รายการล่าสุดเสร็จสิ้นแล้ว: ${ws.lastSettledItem.titleTh}</div>` : ''}
+                    <button onclick="setView('auction')" class="btn-gold-cta px-6 py-2.5 font-bold text-sm rounded-xl">ไปหน้าประมูล</button>
+                  `}
+                </div>
               </div>
             </main>`;
         } else if (activeView === 'account') {
@@ -1026,6 +1239,8 @@
           }
         }
 
+        const confirmModalHtml = renderConfirmBidModal();
+
         document.getElementById('app').innerHTML = `
           <header class="sticky top-0 z-40 bg-[#FAF8F5]/95 border-b border-[#C59B27]/35">
             <div class="max-w-6xl mx-auto px-3 sm:px-6 h-12 grid grid-cols-3 items-center">
@@ -1038,8 +1253,9 @@
               </div>
             </div>
           </header>
-          ${toast ? `<div class="fixed top-14 left-1/2 -translate-x-1/2 z-50 bg-emerald-50 border-2 border-emerald-600 text-emerald-950 px-4 py-2 rounded-xl text-xs font-bold shadow">${toast}</div>` : ''}
+          ${toast ? `<div class="fixed top-14 left-1/2 -translate-x-1/2 z-50 bg-emerald-600 border-2 border-emerald-800 text-white px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold shadow-lg">${toast}</div>` : ''}
           ${mainHtml}
+          ${confirmModalHtml}
           <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 border-t border-[#C59B27]/45">
             <div class="max-w-3xl mx-auto grid grid-cols-4 h-14 text-[11px]">
               ${[
@@ -1056,10 +1272,47 @@
             </div>
           </nav>`;
 
-        const nextModalScrollEl = document.getElementById('level-modal-scroll');
-        if (nextModalScrollEl && openLevel !== null && levelModalScrollTop > 0) {
-          nextModalScrollEl.scrollTop = levelModalScrollTop;
+        if (restoreGalleryScrollNext && activeView === 'auction' && auctionStep === 'gallery') {
+          restoreGalleryScrollNext = false;
+          const targetY = galleryScrollY;
+          requestAnimationFrame(() => {
+            window.scrollTo({ top: targetY, behavior: 'auto' });
+          });
         }
+      }
+
+      function renderConfirmBidModal() {
+        if (!confirmBidItemId) return '';
+        const item = auctions.find((i) => i.id === confirmBidItemId);
+        if (!item) return '';
+        return `
+          <div onclick="cancelConfirmBid()" class="fixed inset-0 z-50 bg-black/55 flex items-center justify-center p-4">
+            <div onclick="event.stopPropagation()" class="w-full max-w-sm bg-white border-2 border-[#C59B27] rounded-2xl p-5 space-y-4 shadow-2xl text-center">
+              <div class="font-editorial text-lg font-bold text-[#1E1B18]">ยืนยันการเข้าร่วมประมูล</div>
+              <div class="bg-[#FAF8F5] border border-[#C59B27]/40 rounded-xl p-3 text-xs space-y-1 text-left">
+                <div class="font-bold text-sm text-[#1E1B18]">${item.titleTh}</div>
+                <div class="text-[#5C544B]">ศิลปิน: ${item.artistTh}</div>
+                <div class="pt-1 text-[#1E1B18]">ราคาเข้าร่วม: <b>${fmt(item.priceBaht)} บาท</b></div>
+                <div class="text-[#8C6A10]">ค่าคอมมิชชั่น: <b>+${fmt(item.commissionBaht)} บาท</b></div>
+              </div>
+              <div class="grid grid-cols-2 gap-2.5 pt-1">
+                <button
+                  type="button"
+                  onclick="cancelConfirmBid()"
+                  class="py-2.5 px-4 rounded-xl bg-[#FAF8F5] hover:bg-[#EFE9DD] border border-[#C59B27]/60 font-bold text-sm text-[#1E1B18]"
+                >
+                  ยกเลิก
+                </button>
+                <button
+                  type="button"
+                  onclick="executeConfirmedBid('${item.id}')"
+                  class="btn-gold-cta py-2.5 px-4 rounded-xl font-bold text-sm text-[#1E1B18]"
+                >
+                  ยืนยัน
+                </button>
+              </div>
+            </div>
+          </div>`;
       }
 
       function renderAccountModal(ws) {
@@ -1167,16 +1420,78 @@
       window.selectArt = (id) => { selectedArt = ARTWORKS.find((a) => a.id === id) || ARTWORKS[0]; render(); };
       window.setOriginFilter = (f) => { filterOrigin = f; render(); };
       window.togglePause = (p) => { sliderPaused = p; render(); };
-      window.onLevelModalScroll = (st) => { levelModalScrollTop = Number(st) || 0; };
-      window.openLvlModal = (lv) => { openLevel = lv; levelModalScrollTop = 0; slideIdx = 0; render(); };
-      window.closeLvlModal = () => { openLevel = null; levelModalScrollTop = 0; resetViewportScale(); render(); };
+
+      // ฟังก์ชันนำทางหน้าคั่นคุณค่างานศิลปะ -> หน้าเลือกรูป -> หน้ารายละเอียด -> ยืนยัน/ยกเลิก -> หน้าเวลา
+      window.openLvlModal = (lv) => {
+        selectedLevelNum = lv;
+        auctionStep = 'art_value';
+        selectedAuctionItemId = null;
+        confirmBidItemId = null;
+        galleryScrollY = 0;
+        slideIdx = 0;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        render();
+      };
+      window.backToLevels = () => {
+        auctionStep = 'levels';
+        selectedLevelNum = null;
+        selectedAuctionItemId = null;
+        confirmBidItemId = null;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        render();
+      };
+      window.goToLevelGallery = (lv) => {
+        selectedLevelNum = lv || selectedLevelNum;
+        auctionStep = 'gallery';
+        galleryScrollY = 0;
+        window.scrollTo({ top: 0, behavior: 'auto' });
+        render();
+      };
+      window.backToArtValue = () => {
+        auctionStep = 'art_value';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        render();
+      };
+      window.openAuctionDetail = (itemId) => {
+        galleryScrollY = window.scrollY || window.pageYOffset || 0;
+        selectedAuctionItemId = itemId;
+        auctionStep = 'detail';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        render();
+      };
+      window.backToGallery = () => {
+        auctionStep = 'gallery';
+        restoreGalleryScrollNext = true;
+        render();
+      };
+      window.toggleDetailLike = (itemId) => {
+        if (likedIds.includes(itemId)) {
+          likedIds = likedIds.filter((x) => x !== itemId);
+        } else {
+          likedIds = [...likedIds, itemId];
+        }
+        render();
+      };
+      window.askConfirmBid = (itemId) => {
+        confirmBidItemId = itemId;
+        render();
+      };
+      window.cancelConfirmBid = () => {
+        confirmBidItemId = null;
+        render();
+      };
+      window.executeConfirmedBid = async (itemId) => {
+        confirmBidItemId = null;
+        await window.placeBid(itemId);
+      };
+
       window.selectAuctionSlot = (idx) => {
-        const items = auctions.filter((i) => i.level === openLevel);
+        const items = auctions.filter((i) => i.level === selectedLevelNum);
         slideIdx = Math.max(0, Math.min(items.length - 1, idx));
         render();
       };
       window.stepSlide = (d) => {
-        const items = auctions.filter((i) => i.level === openLevel);
+        const items = auctions.filter((i) => i.level === selectedLevelNum);
         slideIdx = Math.max(0, Math.min(items.length - 1, slideIdx + d));
         render();
       };
@@ -1296,9 +1611,11 @@
         ws.activeBid = { item, startedAt: now, endsAt: now + item.durationMinutes * 60000 };
         ws.txHistory.unshift({ id: 'tx-' + now, title: 'ประมูล: ' + item.titleTh, amountBaht: -item.priceBaht, status: 'ย้ายเข้าธุรกรรม' });
         await saveCloudState();
-        openLevel = null;
-        levelModalScrollTop = 0;
+        auctionStep = 'levels';
+        selectedLevelNum = null;
+        selectedAuctionItemId = null;
         setView('timer');
+        setToast('เข้าร่วมประมูลสำเร็จ');
       };
 
       window.submitTopup = async (e) => {
